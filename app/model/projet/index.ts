@@ -10,8 +10,9 @@ export class US {
     datesEstimee: string;
     datesEffectives: string;
     children: Item[];
+    type: string;
 
-    constructor(nom: string, description: string, id: string, priorite: string, statut: string, technologies: string, complexite: string, estimation: string, datesEstimee: string, datesEffectives: string, children: Item[]){
+    constructor(nom: string, description: string, id: string, priorite: string, statut: string, technologies: string, complexite: string, estimation: string, datesEstimee: string, datesEffectives: string, children: Item[], type: string){
     this.nom = nom;
     this.description = description;
     this.id = id;
@@ -23,10 +24,11 @@ export class US {
     this.datesEstimee = datesEstimee;
     this.datesEffectives = datesEffectives;
     this.children = children;
+    this.type = type;
     }
 }
 
-export type Item =  US | EnsembleUS | Sprint;
+export type Item =  US | EnsembleUS | Sprint ;
 
 export type NestedItem = US | EnsembleUS;
 
@@ -34,10 +36,12 @@ export class EnsembleUS {
     nom: string;
     children: NestedItem[];
     id: string;
-    constructor(nom: string, children: NestedItem[], id: string){
+    type: string;
+    constructor(nom: string, children: NestedItem[], id: string, type: string){
         this.nom = nom;
         this.children = children;
         this.id = id;
+        this.type = type;
     }
 }
 
@@ -45,10 +49,12 @@ export class Sprint {
     nom: string;
     children: NestedItem[];
     id: string;
-    constructor(nom: string, children: NestedItem[], id:string){
+    type: string
+    constructor(nom: string, children: NestedItem[], id:string, type: string){
         this.nom = nom;
         this.children = children;
         this.id = id;
+        this.type = type;
     }
 }
 

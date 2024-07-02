@@ -33,8 +33,12 @@ import { nativeUserStoryStateEnum } from "@/schemas/forms/user-story"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { useSelectedItemStore } from "../store/selectedItem"
+import { US } from "@/app/model/projet"
 
 export const CreateUserStoryForm = () => {
+  const selectedItemState = useSelectedItemStore((state) => state);
+
   const form = useForm({
     resolver: zodResolver(createUserStoryFormSchema),
     defaultValues: {
@@ -59,7 +63,23 @@ export const CreateUserStoryForm = () => {
 
   //TODO: add types
   const onSubmit = (data: any) => {
-    console.log(`UserStory Form Submitted with data : ${data}`)
+    console.log(selectedItemState)
+    console.log(data)
+    let editedItem = {
+      nom: data.nom,
+      description: data.description,
+      id: "ID-US" ,
+      priorite: data.priorite,
+      statut: data.us_etat,
+      technologies: data.technologies,
+      complexite: data.complexite,
+      estimation: data.estimation_initiale,
+      datesEstimee: data.date_range_estim,
+      datesEffectives: data.date_range_effective,
+      children: [],
+      type: "US"
+    } as US
+    selectedItemState.selectedItem.nom = editedItem.nom;
   }
 
   

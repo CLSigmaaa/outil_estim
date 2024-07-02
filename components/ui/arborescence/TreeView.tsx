@@ -10,8 +10,20 @@ import Box from '@mui/material/Box';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddItemButton from './AddToItemButton';
 import AddToProjectButton from './AddToProjectButton';
+import { useSelectedItemStore } from '@/components/store/selectedItem';
+
 
 export default function TreeView({ selectedProject, setSelectedProject }: { selectedProject: Projet, setSelectedProject:React.Dispatch<React.SetStateAction<Projet>> }) {
+
+  const selectedItemState = useSelectedItemStore((state) => state);
+  
+  function setSelectedItem(itemId: string){
+    let newSelectedItem = findItemInProject(itemId);
+    if (newSelectedItem != undefined){
+      selectedItemState.selectedItem = newSelectedItem;
+      newSelectedItem = selectedItemState.selectedItem;
+    }
+  }
 
   const [anchorBotPos, setAnchorBotPos] = React.useState({ left: 0, top: 0 })
 
@@ -27,13 +39,15 @@ export default function TreeView({ selectedProject, setSelectedProject }: { sele
     extends Omit<UseTreeItem2Parameters, 'rootRef'>,
     Omit<React.HTMLAttributes<HTMLLIElement>, 'onFocus'> { }
 
-
   function findItemInProject(itemId: string): Item | undefined {
     return findItemAux(selectedProject.children, itemId);
   }
 
   function findItemAux(children: Item[], itemId: string): Item | undefined {
     for (const item of children) {
+      if (item == undefined){
+        return
+      }
       if (item.id == itemId) {
         return item;
       }
@@ -125,7 +139,8 @@ export default function TreeView({ selectedProject, setSelectedProject }: { sele
       estimation: "",
       datesEstimee: "",
       datesEffectives: "",
-      children: []
+      children: [],
+      type: "US"
     }
   }
 
@@ -144,13 +159,13 @@ export default function TreeView({ selectedProject, setSelectedProject }: { sele
   }
 
   function addEnsembleToItem(itemId: string) {
-    var selectedItemB = findItemInProject(itemId);
-    var nextUSNb = selectedProject.childNb + 1;
-    var newEnsembleUS: EnsembleUS = {
+    let selectedItemB = findItemInProject(itemId);
+    let nextUSNb = selectedProject.childNb + 1;
+    let newEnsembleUS: EnsembleUS = {
       nom: "Ensemble" + nextUSNb,
       children: [],
       id: "ID-Ensemble" + nextUSNb,
-
+      type: "Ensemble"
     }
     if (selectedItemB == undefined) {
       selectedProject.children = [...selectedProject.children, newEnsembleUS];
@@ -177,7 +192,7 @@ export default function TreeView({ selectedProject, setSelectedProject }: { sele
       nom: "Ensemble" + nextUSNb,
       children: [],
       id: "ID-Ensemble" + nextUSNb,
-
+      type: "Ensemble"
     }
     selectedProject.children = [...selectedProject.children, newEnsembleUS];
     selectedProject.childNb++
@@ -191,15 +206,15 @@ export default function TreeView({ selectedProject, setSelectedProject }: { sele
       nom: "Sprint" + nextUSNb,
       children: [],
       id: "ID-Sprint" + nextUSNb,
-
+      type: "Sprint"
     }
     selectedProject.children = [...selectedProject.children, newSprint];
     selectedProject.childNb++
     handleClose()
   }
 
-  function getProjectItemLabel(item: US | EnsembleUS | Sprint) {
-    return item.nom;
+  function getProjectItemLabel(item: US | EnsembleUS | Sprint ) {
+    return item ? item.nom : "";
   }
 
 
@@ -207,6 +222,7 @@ export default function TreeView({ selectedProject, setSelectedProject }: { sele
     <Box>
       <RichTreeView
         items={selectedProject.children}
+        onItemFocus={(event, itemId) => setSelectedItem(itemId)}
         getItemLabel={getProjectItemLabel}
         slots={{
           item: CustomTreeItem
@@ -214,6 +230,10 @@ export default function TreeView({ selectedProject, setSelectedProject }: { sele
       >
       </RichTreeView>
       <AddToProjectButton addUS={addUS} addEnsemble={addEnsemble} addSprint={addSprint}/>
+      <button onClick={() => {
+        handleClose()
+        console.log(selectedProject)
+        }}> ff</button>
     </Box>
   );
 }
