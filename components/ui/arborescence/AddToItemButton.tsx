@@ -45,8 +45,8 @@ export default function AddToItemButton(
                     'aria-labelledby': 'add-element-button',
                 }}
             >
-                <MenuItem onClick={() => addUSToItem(itemId)}>User Story</MenuItem>
-                <MenuItem onClick={() => addEnsembleToItem(itemId)}>Ensemble</MenuItem>
+                <MenuItem onClick={() => {addUSToItem(itemId); handleClose();}}>User Story</MenuItem>
+                <MenuItem onClick={() => {addEnsembleToItem(itemId); handleClose();}}>Ensemble</MenuItem>
 
             </Menu>
         </div>

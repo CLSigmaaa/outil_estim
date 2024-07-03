@@ -24,7 +24,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   ref: React.Ref<HTMLLIElement>,
 ) {
   const { id, itemId, label, disabled, children, ...other } = props;
-  const { addItem, deleteItem, setSelectedItem, selectedItem, project } = useTreeStore();
+  const { addItem, deleteItem, setSelectedItem, selectedItem, project, getNewUS: getNewUS, getNewEnsemble } = useTreeStore();
   //const isSelected = selectedItemId == selectedItem;
 
   const handleDeleteItem = (itemId: any) => {
@@ -46,33 +46,8 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
     padding: theme.spacing(0.2, 0.5),
   }));
 
-  function getNewEnsemble() {
-    var nextUSNb = project.childNb + 1;
-    return {
-      nom: "Ensemble" + nextUSNb,
-      children: [],
-      id: "ID-Ensemble" + nextUSNb,
-      type: "Ensemble"
-    }
-  }
 
-  function getNewUS() {
-    let nextUSNb = project.childNb + 1;
-    return {
-      nom: "US" + nextUSNb,
-      description: "description de l'US" + nextUSNb,
-      id: "ID-US" + nextUSNb,
-      priorite: "Mineur",
-      statut: "Non commencé",
-      technologies: "",
-      complexite: "",
-      estimation: "",
-      datesEstimee: "",
-      datesEffectives: "",
-      children: [],
-      type: "US"
-    }
-  }
+
   return (
     <TreeItem2Provider itemId={itemId}>
       <TreeItem2Root {...getRootProps(other)}>
@@ -99,48 +74,8 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
 
 
 export default function TreeView() {
-  const { project, addItem, selectedItem, setSelectedItem } = useTreeStore();
+  const { project, addItem, selectedItem, setSelectedItem, getNewUS: getNewUS, getNewEnsemble, getNewSprint } = useTreeStore();
   const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
-
-
-
-  function getNewUS() {
-    let nextUSNb = project.childNb + 1;
-    return {
-      nom: "US" + nextUSNb,
-      description: "description de l'US" + nextUSNb,
-      id: "ID-US" + nextUSNb,
-      priorite: "Mineur",
-      statut: "Non commencé",
-      technologies: "",
-      complexite: "",
-      estimation: "",
-      datesEstimee: "",
-      datesEffectives: "",
-      children: [],
-      type: "US"
-    }
-  }
-
-  function getNewEnsemble() {
-    var nextUSNb = project.childNb + 1;
-    return {
-      nom: "Ensemble" + nextUSNb,
-      children: [],
-      id: "ID-Ensemble" + nextUSNb,
-      type: "Ensemble"
-    }
-  }
-
-  function getNewSprint() {
-    var nextUSNb = project.childNb + 1;
-    return {
-      nom: "Sprint" + nextUSNb,
-      children: [],
-      id: "ID-Sprint" + nextUSNb,
-      type: "Sprint"
-    }
-  }
 
   function getProjectItemLabel(item: any) {
     return item ? item.nom : "";

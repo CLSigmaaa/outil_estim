@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { Item, Projet } from "@/app/model/projet/index";
+import { EnsembleUS, Item, Projet, Sprint, US } from "@/app/model/projet/index";
 
 interface TreeState {
   project: Projet;
@@ -9,10 +9,13 @@ interface TreeState {
   setProject: (newProject: Projet) => void;
   addItem: (parentId: string, newItem: Item) => void;
   deleteItem: (itemId: string) => void;
-  editItem: (itemId, updatedProperties) => void;
+  editItem: (itemId:string, updatedProperties:Item) => void;
+  getNewUS: () => US;
+  getNewEnsemble: () => EnsembleUS;
+  getNewSprint: () => Sprint;
 }
 
-export const useTreeStore = create<TreeState>((set) => ({
+export const useTreeStore = create<TreeState>((set, get) => ({
   project: {
     // Initialisez avec un projet par défaut ou un objet vide
     children: [],
@@ -74,4 +77,40 @@ export const useTreeStore = create<TreeState>((set) => ({
       }
     };
   }),
+  getNewUS: () => {
+      let nextUSNb = get().project.childNb + 1;
+      return {
+        nom: "US" + nextUSNb,
+        description: "description de l'US" + nextUSNb,
+        id: "ID-US" + nextUSNb,
+        priorite: "Mineur",
+        statut: "Non commencé",
+        technologies: "",
+        complexite: "",
+        estimation: "",
+        datesEstimee: "",
+        datesEffectives: "",
+        children: [],
+        type: "US"
+      
+    }
+  },
+  getNewEnsemble: () => {
+    var nextUSNb = get().project.childNb + 1;
+    return {
+      nom: "Ensemble" + nextUSNb,
+      children: [],
+      id: "ID-Ensemble" + nextUSNb,
+      type: "Ensemble"
+    }
+  },
+  getNewSprint: () => {
+    var nextUSNb = get().project.childNb + 1;
+    return {
+      nom: "Sprint" + nextUSNb,
+      children: [],
+      id: "ID-Sprint" + nextUSNb,
+      type: "Sprint"
+    }
+  }
 }));
