@@ -26,22 +26,17 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-import { createUserStoryFormSchema } from "@/schemas/forms/user-story"
+import { userStoryFormSchema } from "@/schemas/forms/user-story"
 import { nativePriorityEnum } from "@/schemas/forms/user-story"
 import { nativeComplexityEnum } from "@/schemas/forms/user-story"
 import { nativeUserStoryStateEnum } from "@/schemas/forms/user-story"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { US } from "@/app/model/projet"
-import { useTreeStore } from "@/components/store/useTreeStore"
 
 export const CreateUserStoryForm = () => {
-  
-  const { project, selectedItem, setSelectedItem, setProject, addItem, deleteItem, editItem } = useTreeStore(); // Ajout de editItem
-
   const form = useForm({
-    resolver: zodResolver(createUserStoryFormSchema),
+    resolver: zodResolver(userStoryFormSchema),
     defaultValues: {
       nom: "",
       description: "",
@@ -61,28 +56,10 @@ export const CreateUserStoryForm = () => {
       commentaires: "",
     }
   })
-  
+
   //TODO: add types
   const onSubmit = (data: any) => {
-    //console.log(selectedItemState)
-    //console.log(data)
-    //console.log("selectedItem : ", selectedItem)
-    let editedItem = {
-      nom: data.nom,
-      description: data.description,
-      id: selectedItem,
-      priorite: data.priorite,
-      statut: data.us_etat,
-      technologies: data.technologies,
-      complexite: data.complexite,
-      estimation: data.estimation_initiale,
-      datesEstimee: data.date_range_estim,
-      datesEffectives: data.date_range_effective,
-      children: [],
-      type: "US"
-    } as US;
-    setSelectedItem(undefined)
-    editItem(editedItem.id, editedItem)
+    console.log(`UserStory Form Submitted with data : ${data}`)
   }
 
   
