@@ -13,20 +13,23 @@ import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { useSelectedItemStore } from '@/components/store/selectedItem';
 
 
+interface CustomTreeItemProps
+  extends Omit<UseTreeItem2Parameters, 'rootRef'>,
+  Omit<React.HTMLAttributes<HTMLLIElement>, 'onFocus'> {
+  itemId: string;
+}
 
 const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   props: CustomTreeItemProps,
   ref: React.Ref<HTMLLIElement>,
 ) {
   const { id, itemId, label, disabled, children, ...other } = props;
-  const { addItem, deleteItem, setSelectedItem, selectedItem } = useTreeStore();
+  const { addItem, deleteItem, setSelectedItem, selectedItem, project } = useTreeStore();
   //const isSelected = selectedItemId == selectedItem;
 
   const handleDeleteItem = (itemId: any) => {
     setSelectedItem(null);
-    console.log(selectedItem);
     deleteItem(itemId);
-    console.log(selectedItem);
   }
 
   const {
@@ -43,6 +46,33 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
     padding: theme.spacing(0.2, 0.5),
   }));
 
+  function getNewEnsemble() {
+    var nextUSNb = project.childNb + 1;
+    return {
+      nom: "Ensemble" + nextUSNb,
+      children: [],
+      id: "ID-Ensemble" + nextUSNb,
+      type: "Ensemble"
+    }
+  }
+
+  function getNewUS() {
+    let nextUSNb = project.childNb + 1;
+    return {
+      nom: "US" + nextUSNb,
+      description: "description de l'US" + nextUSNb,
+      id: "ID-US" + nextUSNb,
+      priorite: "Mineur",
+      statut: "Non commencé",
+      technologies: "",
+      complexite: "",
+      estimation: "",
+      datesEstimee: "",
+      datesEffectives: "",
+      children: [],
+      type: "US"
+    }
+  }
   return (
     <TreeItem2Provider itemId={itemId}>
       <TreeItem2Root {...getRootProps(other)}>
@@ -73,14 +103,9 @@ export default function TreeView() {
   const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
 
-  interface CustomTreeItemProps
-    extends Omit<UseTreeItem2Parameters, 'rootRef'>,
-    Omit<React.HTMLAttributes<HTMLLIElement>, 'onFocus'> {
-    itemId: string;
-  }
 
   function getNewUS() {
-    var nextUSNb = project.childNb + 1;
+    let nextUSNb = project.childNb + 1;
     return {
       nom: "US" + nextUSNb,
       description: "description de l'US" + nextUSNb,
