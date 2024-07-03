@@ -21,7 +21,9 @@ export default function Arborescence() {
     estimation: "",
     datesEstimee:"",
     datesEffectives:"",
-    children:[]
+    children:[],
+    commentaires: "",
+    type:"US"
   });
       
       
@@ -37,7 +39,7 @@ export default function Arborescence() {
   return (
     <div className="flex flex-col p-3 w-full">
       {selectedProject.nom}
-    <TreeView selectedProject={selectedProject} setSelectedProject={setSelectedProject}/>
+    <TreeView />
     <Divider />
     
     </div>

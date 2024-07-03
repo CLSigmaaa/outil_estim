@@ -40,3 +40,11 @@
 .border-yellow {
     border-color: yellow;
 }
+
+.deleteButton{
+    visibility: hidden;
+}
+
+.item:hover .deleteButton, .deleteButton:hover {
+    visibility: visible;
+}

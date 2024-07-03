@@ -36,20 +36,21 @@ import { useForm } from "react-hook-form"
 import { US } from "@/app/model/projet"
 import { useTreeStore } from "@/components/store/useTreeStore"
 
-export const CreateUserStoryForm = () => {
-  
-  const { project, selectedItem, setSelectedItem, setProject, addItem, deleteItem, editItem } = useTreeStore(); // Ajout de editItem
+export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) => {
+
+  const { selectedItem, editItem, setSelectedItem } = useTreeStore(); // Ajout de editItem
+
 
   const form = useForm({
     resolver: zodResolver(createUserStoryFormSchema),
     defaultValues: {
-      nom: "",
-      description: "",
-      priorite: "",
-      us_etat: "",
-      technologies: "",
-      complexite: undefined,
-      estimation_initiale: 0,
+      nom: defaultValues.nom,
+      description: defaultValues.description,
+      priorite: defaultValues.priorite,
+      us_etat: defaultValues.statut,
+      technologies: defaultValues.technologies,
+      complexite: defaultValues.complexite,
+      estimation_initiale: defaultValues.estimation ? parseInt(defaultValues.estimation) : 0,
       date_range_estim: {
         from: new Date(),
         to: new Date(),
@@ -58,19 +59,16 @@ export const CreateUserStoryForm = () => {
         from: new Date(),
         to: new Date(),
       },
-      commentaires: "",
-    }
+      commentaires: defaultValues.commentaires,
+    },
   })
-  
+
   //TODO: add types
   const onSubmit = (data: any) => {
-    //console.log(selectedItemState)
-    //console.log(data)
-    //console.log("selectedItem : ", selectedItem)
     let editedItem = {
       nom: data.nom,
       description: data.description,
-      id: selectedItem,
+      id: selectedItem.id,
       priorite: data.priorite,
       statut: data.us_etat,
       technologies: data.technologies,
@@ -78,14 +76,36 @@ export const CreateUserStoryForm = () => {
       estimation: data.estimation_initiale,
       datesEstimee: data.date_range_estim,
       datesEffectives: data.date_range_effective,
-      children: [],
+      children: selectedItem.children,
       type: "US"
     } as US;
     setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)
   }
 
-  
+  function resetform() {
+    form.reset({
+      nom: selectedItem.nom,
+      description: selectedItem.description,
+      priorite: selectedItem.priorite,
+      us_etat: selectedItem.statut,
+      technologies: selectedItem.technologies,
+      complexite: selectedItem.complexite,
+      estimation_initiale: selectedItem.estimation ? parseInt(selectedItem.estimation) : 0,
+      date_range_estim: {
+        from: new Date(),
+        to: new Date(),
+      },
+      date_range_effective: {
+        from: new Date(),
+        to: new Date(),
+      },
+      commentaires: selectedItem.commentaires,
+    })
+  }
+
+  React.useEffect(resetform, [defaultValues])
+
   // For debug purposes
   //const { errors } = form.formState
   //console.log(errors)
@@ -127,7 +147,7 @@ export const CreateUserStoryForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Priorité</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner une priorité" />
@@ -155,7 +175,7 @@ export const CreateUserStoryForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>États des US</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner un état pour l'US" />
@@ -196,7 +216,7 @@ export const CreateUserStoryForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Complexité</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner un niveau de complexité" />
@@ -349,7 +369,7 @@ export const CreateUserStoryForm = () => {
         <Button
           type="submit"
         >
-          Créer US
+          Modifier US
         </Button>
       </form>
     </Form>

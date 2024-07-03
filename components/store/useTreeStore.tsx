@@ -5,11 +5,11 @@ import { EnsembleUS, Item, Projet, Sprint, US } from "@/app/model/projet/index";
 interface TreeState {
   project: Projet;
   selectedItem: undefined | any;
-  setSelectedItem: (newSelectedItem: any) => void;
   setProject: (newProject: Projet) => void;
+  setSelectedItem: (newSelectedItem: any) => void;
   addItem: (parentId: string, newItem: Item) => void;
   deleteItem: (itemId: string) => void;
-  editItem: (itemId:string, updatedProperties:Item) => void;
+  editItem: (itemId: string, updatedProperties: Item) => void;
   getNewUS: () => US;
   getNewEnsemble: () => EnsembleUS;
   getNewSprint: () => Sprint;
@@ -18,19 +18,22 @@ interface TreeState {
 export const useTreeStore = create<TreeState>((set, get) => ({
   project: {
     // Initialisez avec un projet par défaut ou un objet vide
+    nom: "",
+    description: "",
+    id: "",
     children: [],
     childNb: 0,
   } as Projet,
   selectedItem: undefined,
-  setSelectedItem: (newSelectedItem) => set({ selectedItem: newSelectedItem }),
   setProject: (newProject) => set({ project: newProject }),
+  setSelectedItem: (newSelectedItem) => set({ selectedItem: newSelectedItem }),
   addItem: (parentId, newItem) => set((state) => {
     const findAndAddItem = (items: Item[], parentId: string, newItem: Item): Item[] => {
       return items.map(item => {
         if (item.id === parentId) {
-          return { ...item, children: [...item.children, newItem] };
+          return { ...item, children: [...item.children, newItem] } as Item;
         } else if (item.children.length > 0) {
-          return { ...item, children: findAndAddItem(item.children, parentId, newItem) };
+          return { ...item, children: findAndAddItem(item.children, parentId, newItem) } as Item;
         }
         return item;
       });
@@ -49,14 +52,14 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         .map(item => ({
           ...item,
           children: findAndDeleteItem(item.children, itemId)
-        }));
+        } as Item));
     };
 
     return {
       project: {
         ...state.project,
         children: findAndDeleteItem(state.project.children, itemId),
-      }
+      },
     };
   }),
   editItem: (itemId, updatedProperties) => set((state) => {
@@ -65,7 +68,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         if (item.id === itemId) {
           return { ...item, ...updatedProperties };
         } else if (item.children.length > 0) {
-          return { ...item, children: findAndEditItem(item.children, itemId) };
+          return { ...item, children: findAndEditItem(item.children, itemId) } as Item;
         }
         return item;
       });
@@ -78,29 +81,31 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     };
   }),
   getNewUS: () => {
-      let nextUSNb = get().project.childNb + 1;
-      return {
-        nom: "US" + nextUSNb,
-        description: "description de l'US" + nextUSNb,
-        id: "ID-US" + nextUSNb,
-        priorite: "Mineur",
-        statut: "Non commencé",
-        technologies: "",
-        complexite: "",
-        estimation: "",
-        datesEstimee: "",
-        datesEffectives: "",
-        children: [],
-        type: "US"
-      
+    let nextUSNb = get().project.childNb + 1;
+    return {
+      nom: "US" + nextUSNb,
+      description: "description de l'US" + nextUSNb,
+      id: "ID-US" + nextUSNb,
+      priorite: "Mineur",
+      statut: "",
+      technologies: "",
+      complexite: "",
+      estimation: "",
+      datesEstimee: "",
+      datesEffectives: "",
+      children: [],
+      commentaires: "",
+      type: "US",
     }
   },
   getNewEnsemble: () => {
     var nextUSNb = get().project.childNb + 1;
     return {
       nom: "Ensemble" + nextUSNb,
+      description: "",
       children: [],
       id: "ID-Ensemble" + nextUSNb,
+      commentaires: "",
       type: "Ensemble"
     }
   },
@@ -110,7 +115,9 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       nom: "Sprint" + nextUSNb,
       children: [],
       id: "ID-Sprint" + nextUSNb,
+      commentaires: "",
       type: "Sprint"
     }
   }
 }));
+
