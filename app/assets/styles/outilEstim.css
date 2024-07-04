@@ -48,3 +48,9 @@
 .item:hover > .deleteButton, .deleteButton:hover {
     visibility: visible;
 }
+
+.MuiCollapse-wrapper{
+    position: relative;
+    left: 3px;
+    border-left: 1px solid grey;
+}

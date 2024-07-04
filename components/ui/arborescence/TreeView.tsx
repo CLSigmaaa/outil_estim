@@ -1,16 +1,19 @@
 import * as React from 'react';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import clsx from 'clsx';
 import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarksIcon from '@mui/icons-material/Bookmarks';
+import LoopIcon from '@mui/icons-material/Loop';
 import AddItemButton from './AddToItemButton';
 import AddToProjectButton from './AddToProjectButton';
 import { useTreeStore } from '@/components/store/useTreeStore';
 import { unstable_useTreeItem2 as useTreeItem2, UseTreeItem2Parameters } from '@mui/x-tree-view/useTreeItem2';
-import { TreeItem2Content, TreeItem2IconContainer, TreeItem2GroupTransition, TreeItem2Label, TreeItem2Root, TreeItem2Checkbox } from '@mui/x-tree-view/TreeItem2';
+import { TreeItem2Content, TreeItem2IconContainer, TreeItem2GroupTransition, TreeItem2Label, TreeItem2Checkbox } from '@mui/x-tree-view/TreeItem2';
 import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
-import { US, EnsembleUS, Sprint, Item } from '@/app/model/projet';
-import { treeItemClasses } from '@mui/x-tree-view/TreeItem/treeItemClasses';
+import { Item } from '@/app/model/projet';
 
 
 interface CustomTreeItemProps
@@ -19,15 +22,14 @@ interface CustomTreeItemProps
 }
 
 const CustomTreeItem = React.forwardRef(function CustomTreeItem(
-    props: CustomTreeItemProps,
-    ref: React.Ref<HTMLLIElement>,
-  ) { 
-    const { addItem, deleteItem, setSelectedItem, selectedItem, project, getNewUS: getNewUS, getNewEnsemble } = useTreeStore();
-    
-    const { id, itemId, label, disabled, children, ...other } = props;
+  props: CustomTreeItemProps,
+  ref: React.Ref<HTMLLIElement>,
+) {
+  const { addItem, deleteItem, setSelectedItem, getNewUS: getNewUS, getNewEnsemble } = useTreeStore();
+
+  const { id, itemId, label, disabled, children, ...other } = props;
 
   const {
-    getRootProps,
     getContentProps,
     getIconContainerProps,
     getCheckboxProps,
@@ -37,33 +39,79 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   } = useTreeItem2({ id, itemId, children, label, disabled, rootRef: ref });
 
   const CustomTreeItemContent = styled(TreeItem2Content)(({ theme }) => ({
-    padding: theme.spacing(0.2, 0.5),
+    marginTop: theme.spacing(0.2, 0.5),
   }));
+
+  interface CustomLabelProps {
+    children: React.ReactNode;
+    icon?: React.ElementType;
+  }
+
+  function CustomLabel({
+    icon: Icon,
+    children,
+    ...other
+  }: CustomLabelProps) {
+    return (
+      <TreeItem2Label sx={{ display: 'flex' }}>
+        {Icon && (
+          <Box
+            component={Icon}
+            className="labelIcon"
+            color="inherit"
+            sx={{ mr: 1, fontSize: '1.2rem' }}
+          />
+        )}
+
+        <TreeItem2Label>{children}</TreeItem2Label>
+      </TreeItem2Label>
+    );
+  }
+
   const handleDeleteItem = (itemId: any) => {
     setSelectedItem(null);
     deleteItem(itemId);
   }
-    return (
-      <div style={{}}>
-         <div style={{ display: 'flex', maxWidth: '240px' }} className='item'>
-           <CustomTreeItemContent {...getContentProps()}>
-             <TreeItem2IconContainer {...getIconContainerProps()}>
-               <TreeItem2Icon status={status} />
-             </TreeItem2IconContainer>
-             <Box>
-               <TreeItem2Checkbox {...getCheckboxProps()} />
-               <TreeItem2Label {...getLabelProps()} />
-             </Box>
-           </CustomTreeItemContent>
-   {itemId?.includes("US") ? "" :
-     <AddItemButton itemId={itemId} addEnsembleToItem={() => addItem(itemId, getNewEnsemble())} addUSToItem={() => addItem(itemId, getNewUS())} />}
-   <button className='deleteButton self-end' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
- </div>
-         {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
+  const iconDict = {
+    "US": BookmarkBorderIcon,
+    "Ensemble": BookmarksIcon,
+    "Sprint": LoopIcon
+  }
+
+  function getIconFromId(itemId: string) {
+    if (itemId.includes("US")) {
+      return iconDict["US"]
+    }
+    if (itemId.includes("Ensemble")) {
+      return iconDict["Ensemble"]
+    }
+    if (itemId.includes("Sprint")) {
+      return iconDict["Sprint"]
+    }
+    return undefined;
+  }
+
+  let icon = getIconFromId(itemId)
+  return (
+    <div className='itemContainer'>
+      <div style={{ display: 'flex', maxWidth: '240px' }} className='item'>
+
+        <CustomTreeItemContent {...getContentProps()}>
+          <TreeItem2IconContainer {...getIconContainerProps()}>
+            <TreeItem2Icon status={status} />
+          </TreeItem2IconContainer>
+          <Box>
+            <TreeItem2Checkbox {...getCheckboxProps()} />
+            <CustomLabel {...getLabelProps({ icon })} />
+          </Box>
+        </CustomTreeItemContent>
+        {itemId?.includes("US") ? "" :
+          <AddItemButton itemId={itemId} addEnsembleToItem={() => addItem(itemId, getNewEnsemble())} addUSToItem={() => addItem(itemId, getNewUS())} />}
+        <button className='deleteButton self-end' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
       </div>
-      
-    )
-  },
+      {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
+    </div>
+  )},
 );
 
 
@@ -101,23 +149,8 @@ export default function TreeView() {
   function selectItem(itemId: string) {
     let newSelectedItem = findItemInProject(itemId);
     if (newSelectedItem != undefined) {
-      console.log(newSelectedItem)
-      switch (newSelectedItem.type) {
-        case "US":
-          setSelectedItem(newSelectedItem as US);
-          newSelectedItem = selectedItem;
-          break;
-        case "Ensemble":
-          setSelectedItem(newSelectedItem as EnsembleUS);
-          newSelectedItem = selectedItem;
-          break;
-        case "Sprint":
-          setSelectedItem(newSelectedItem as Sprint);
-          newSelectedItem = selectedItem;
-          break;
-        default:
-          break;
-      }
+      setSelectedItem(newSelectedItem);
+      newSelectedItem = selectedItem;
     }
   }
 
@@ -126,7 +159,6 @@ export default function TreeView() {
       <RichTreeView
         items={project.children}
         onItemFocus={(_event, itemId) => {
-          //setSelectedItemId(itemId);
           selectItem(itemId);
         }}
         getItemLabel={getProjectItemLabel}

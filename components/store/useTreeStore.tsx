@@ -103,7 +103,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     return {
       nom: "Ensemble" + nextUSNb,
       description: "",
-      children: [get().getNewUS()],
+      children: [],
       id: "ID-Ensemble" + nextUSNb,
       commentaires: "",
       type: "Ensemble"

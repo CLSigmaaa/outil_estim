@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-import { userStoryFormSchema } from "@/schemas/forms/user-story"
+import { createUserStoryFormSchema } from "@/schemas/forms/user-story"
 import { nativePriorityEnum } from "@/schemas/forms/user-story"
 import { nativeComplexityEnum } from "@/schemas/forms/user-story"
 import { nativeUserStoryStateEnum } from "@/schemas/forms/user-story"
@@ -36,7 +36,7 @@ import { useForm } from "react-hook-form"
 
 export const CreateUserStoryForm = () => {
   const form = useForm({
-    resolver: zodResolver(userStoryFormSchema),
+    resolver: zodResolver(createUserStoryFormSchema),
     defaultValues: {
       nom: "",
       description: "",

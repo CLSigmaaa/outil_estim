@@ -10,28 +10,13 @@ import "@/app/assets/styles/outilEstim.css"
 
 export default function Arborescence() {
 
-  const us1 = useRef<US>({ 
-    nom: "US0",
-    description: "description de l'US0",
-    id: "ID-US0",
-    priorite: "Mineur",
-    statut: "Non commencé",
-    technologies:"",
-    complexite: "",
-    estimation: "",
-    datesEstimee:"",
-    datesEffectives:"",
-    children:[],
-    commentaires: "",
-    type:"US"
-  });
       
       
   const [selectedProject, setSelectedProject] = useState<Projet>({
       nom: "Project1 Name",
       description: "description",
       id:"id-proj1",
-      children: [us1.current],
+      children: [],
       childNb: 1,
   })
 
