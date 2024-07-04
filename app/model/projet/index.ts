@@ -7,12 +7,15 @@ export class US {
     technologies: string;
     complexite: string;
     estimation: string;
-    datesEstimee: string;
-    datesEffectives: string;
+    datesEstimee: {from: string, to :string};
+    datesEffectives: {from: string, to :string};
     children: Item[];
+    commentaires: string;
     type: string;
 
-    constructor(nom: string, description: string, id: string, priorite: string, statut: string, technologies: string, complexite: string, estimation: string, datesEstimee: string, datesEffectives: string, children: Item[], type: string){
+    constructor(nom: string, description: string, id: string, priorite: string, statut: string, 
+        technologies: string, complexite: string, estimation: string, datesEstimee: {from: string, to :string}, 
+        datesEffectives: {from: string, to :string}, children: Item[], commentaires: string, type: string){
     this.nom = nom;
     this.description = description;
     this.id = id;
@@ -24,6 +27,7 @@ export class US {
     this.datesEstimee = datesEstimee;
     this.datesEffectives = datesEffectives;
     this.children = children;
+    this.commentaires = commentaires;
     this.type = type;
     }
 }
@@ -34,13 +38,17 @@ export type NestedItem = US | EnsembleUS;
 
 export class EnsembleUS {
     nom: string;
+    description: string;
     children: NestedItem[];
     id: string;
+    commentaires: string;
     type: string;
-    constructor(nom: string, children: NestedItem[], id: string, type: string){
+    constructor(nom: string, description: string, children: NestedItem[], id: string,  commentaires: string, type: string){
         this.nom = nom;
+        this.description = description;
         this.children = children;
         this.id = id;
+        this.commentaires = commentaires;
         this.type = type;
     }
 }
@@ -49,11 +57,20 @@ export class Sprint {
     nom: string;
     children: NestedItem[];
     id: string;
+    statut: string;
+    datesEstimee: {from: string, to :string};
+    datesEffectives: {from: string, to :string};
+    commentaires: string;
     type: string
-    constructor(nom: string, children: NestedItem[], id:string, type: string){
+    constructor(nom: string, children: NestedItem[], id:string, statut: string, datesEstimee: {from: string, to :string}, 
+        datesEffectives: {from: string, to :string}, commentaires: string, type: string){
         this.nom = nom;
+        this.statut = statut;
+        this.datesEstimee = datesEstimee;
+        this.datesEffectives = datesEffectives;
         this.children = children;
         this.id = id;
+        this.commentaires = commentaires;
         this.type = type;
     }
 }

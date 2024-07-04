@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddItemButton from './AddToItemButton';
@@ -9,28 +9,22 @@ import { useTreeStore } from '@/components/store/useTreeStore';
 import { unstable_useTreeItem2 as useTreeItem2, UseTreeItem2Parameters } from '@mui/x-tree-view/useTreeItem2';
 import { TreeItem2Content, TreeItem2IconContainer, TreeItem2GroupTransition, TreeItem2Label, TreeItem2Root, TreeItem2Checkbox } from '@mui/x-tree-view/TreeItem2';
 import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
-import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { US, EnsembleUS, Sprint, Item } from '@/app/model/projet';
+import { treeItemClasses } from '@mui/x-tree-view/TreeItem/treeItemClasses';
 
 
 interface CustomTreeItemProps
   extends Omit<UseTreeItem2Parameters, 'rootRef'>,
   Omit<React.HTMLAttributes<HTMLLIElement>, 'onFocus'> {
-  itemId: string;
 }
 
 const CustomTreeItem = React.forwardRef(function CustomTreeItem(
-  props: CustomTreeItemProps,
-  ref: React.Ref<HTMLLIElement>,
-) {
-  const { id, itemId, label, disabled, children, ...other } = props;
-  const { addItem, deleteItem, setSelectedItem, selectedItem, project, getNewUS: getNewUS, getNewEnsemble } = useTreeStore();
-  //const isSelected = selectedItemId == selectedItem;
-
-  const handleDeleteItem = (itemId: any) => {
-    setSelectedItem(null);
-    deleteItem(itemId);
-  }
+    props: CustomTreeItemProps,
+    ref: React.Ref<HTMLLIElement>,
+  ) { 
+    const { addItem, deleteItem, setSelectedItem, selectedItem, project, getNewUS: getNewUS, getNewEnsemble } = useTreeStore();
+    
+    const { id, itemId, label, disabled, children, ...other } = props;
 
   const {
     getRootProps,
@@ -45,32 +39,32 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   const CustomTreeItemContent = styled(TreeItem2Content)(({ theme }) => ({
     padding: theme.spacing(0.2, 0.5),
   }));
-
-
-
-  return (
-    <TreeItem2Provider itemId={itemId}>
-      <TreeItem2Root {...getRootProps(other)}>
-        <div style={{ display: 'flex', maxWidth: '240px' }} className='item'>
-          <CustomTreeItemContent {...getContentProps()}>
-            <TreeItem2IconContainer {...getIconContainerProps()}>
-              <TreeItem2Icon status={status} />
-            </TreeItem2IconContainer>
-
-            <Box>
-              <TreeItem2Checkbox {...getCheckboxProps()} />
-              <TreeItem2Label {...getLabelProps()} />
-            </Box>
-          </CustomTreeItemContent>
-          {itemId?.includes("US") ? "" :
-            <AddItemButton itemId={itemId} addEnsembleToItem={() => addItem(itemId, getNewEnsemble())} addUSToItem={() => addItem(itemId, getNewUS())} />}
-          <button className='deleteButton self-end' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
-        </div>
-        {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
-      </TreeItem2Root>
-    </TreeItem2Provider>
-  );
-});
+  const handleDeleteItem = (itemId: any) => {
+    setSelectedItem(null);
+    deleteItem(itemId);
+  }
+    return (
+      <div style={{}}>
+         <div style={{ display: 'flex', maxWidth: '240px' }} className='item'>
+           <CustomTreeItemContent {...getContentProps()}>
+             <TreeItem2IconContainer {...getIconContainerProps()}>
+               <TreeItem2Icon status={status} />
+             </TreeItem2IconContainer>
+             <Box>
+               <TreeItem2Checkbox {...getCheckboxProps()} />
+               <TreeItem2Label {...getLabelProps()} />
+             </Box>
+           </CustomTreeItemContent>
+   {itemId?.includes("US") ? "" :
+     <AddItemButton itemId={itemId} addEnsembleToItem={() => addItem(itemId, getNewEnsemble())} addUSToItem={() => addItem(itemId, getNewUS())} />}
+   <button className='deleteButton self-end' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
+ </div>
+         {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
+      </div>
+      
+    )
+  },
+);
 
 
 

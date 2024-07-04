@@ -91,8 +91,8 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       technologies: "",
       complexite: "",
       estimation: "",
-      datesEstimee: "",
-      datesEffectives: "",
+      datesEstimee: {from:"", to:""},
+      datesEffectives: {from:"", to:""},
       children: [],
       commentaires: "",
       type: "US",
@@ -103,7 +103,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     return {
       nom: "Ensemble" + nextUSNb,
       description: "",
-      children: [],
+      children: [get().getNewUS()],
       id: "ID-Ensemble" + nextUSNb,
       commentaires: "",
       type: "Ensemble"
@@ -113,10 +113,14 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     var nextUSNb = get().project.childNb + 1;
     return {
       nom: "Sprint" + nextUSNb,
-      children: [],
+      description: "Description du Sprint" + nextUSNb,
       id: "ID-Sprint" + nextUSNb,
+      statut: "",
+      datesEstimee: {from:"", to:""},
+      datesEffectives: {from:"", to:""},
+      children: [],
       commentaires: "",
-      type: "Sprint"
+      type: "Sprint",
     }
   }
 }));

@@ -45,6 +45,6 @@
     visibility: hidden;
 }
 
-.item:hover .deleteButton, .deleteButton:hover {
+.item:hover > .deleteButton, .deleteButton:hover {
     visibility: visible;
 }

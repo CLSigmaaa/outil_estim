@@ -33,24 +33,21 @@ import { nativeUserStoryStateEnum } from "@/schemas/forms/user-story"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { US } from "@/app/model/projet"
+import { Sprint, US } from "@/app/model/projet"
 import { useTreeStore } from "@/components/store/useTreeStore"
+import { createSprintFormSchema } from "@/schemas/forms/sprint"
 
-export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) => {
+export const CreateSprintForm = ({ defaultValues }: { defaultValues: US }) => {
 
   const { selectedItem, editItem, setSelectedItem } = useTreeStore(); // Ajout de editItem
 
 
   const form = useForm({
-    resolver: zodResolver(createUserStoryFormSchema),
+    resolver: zodResolver(createSprintFormSchema),
     defaultValues: {
       nom: defaultValues.nom,
       description: defaultValues.description,
-      priorite: defaultValues.priorite,
       us_etat: defaultValues.statut,
-      technologies: defaultValues.technologies,
-      complexite: defaultValues.complexite,
-      estimation_initiale: defaultValues.estimation ? parseInt(defaultValues.estimation) : 0,
       date_range_estim: {
         from: new Date(),
         to: new Date(),
@@ -69,17 +66,13 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       nom: data.nom,
       description: data.description,
       id: selectedItem.id,
-      priorite: data.priorite,
       statut: data.us_etat,
-      technologies: data.technologies,
-      complexite: data.complexite,
-      estimation: data.estimation_initiale,
       datesEstimee: data.date_range_estim,
       datesEffectives: data.date_range_effective,
       children: selectedItem.children,
       commentaires: data.commentaires,
-      type: "US"
-    } as US;
+      type: "Sprint"
+    } as Sprint;
     setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)
   }
@@ -88,11 +81,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
     form.reset({
       nom: selectedItem.nom,
       description: selectedItem.description,
-      priorite: selectedItem.priorite,
       us_etat: selectedItem.statut,
-      technologies: selectedItem.technologies,
-      complexite: selectedItem.complexite,
-      estimation_initiale: selectedItem.estimation ? parseInt(selectedItem.estimation) : 0,
       date_range_estim: {
         from: selectedItem.datesEstimee.from,
         to: selectedItem.datesEstimee.to,
@@ -144,34 +133,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
         />
         <FormField
           control={form.control}
-          name="priorite"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Priorité</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une priorité" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {Object.keys(nativePriorityEnum).map((item) => {
-                    return (
-                      <SelectItem
-                        key={item}
-                        value={item}>
-                        {item}
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="us_etat"
           render={({ field }) => (
             <FormItem>
@@ -194,60 +155,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                   })}
                 </SelectContent>
               </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="technologies"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Technologies</FormLabel>
-              <FormControl>
-                <Input placeholder="Technologies utilisées" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="complexite"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Complexité</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un niveau de complexité" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {Object.values(nativeComplexityEnum).map((item) => {
-                    return (
-                      <SelectItem
-                        key={item}
-                        value={item}>
-                        {item}
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="estimation_initiale"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Estimation Initiale</FormLabel>
-              <FormControl>
-                <Input placeholder="20 Points" type="number" {...field} />
-              </FormControl>
               <FormMessage />
             </FormItem>
           )}

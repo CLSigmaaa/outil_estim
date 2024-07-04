@@ -1,5 +1,6 @@
 "use client"
 import { CreateEnsembleForm } from "./forms/create-ensemble-form"
+import { CreateSprintForm } from "./forms/create-sprint-form"
 import { CreateUserStoryForm } from "./forms/create-user-story-form"
 import { useTreeStore } from "./store/useTreeStore"
 
@@ -11,7 +12,7 @@ export const RightPanel = () => {
         <div>
           {selectedItem.type == "US" && <CreateUserStoryForm defaultValues={selectedItem} />}
           {selectedItem.type == "Ensemble" && <CreateEnsembleForm defaultValues={selectedItem} />}
-          {selectedItem.type == "Sprint" && "Sprint"}
+          {selectedItem.type == "Sprint" && <CreateSprintForm defaultValues={selectedItem} />}
         </div>
       }
 
