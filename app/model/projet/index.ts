@@ -55,6 +55,7 @@ export class EnsembleUS {
 
 export class Sprint {
     nom: string;
+    description: string;
     children: NestedItem[];
     id: string;
     statut: string;
@@ -62,9 +63,10 @@ export class Sprint {
     datesEffectives: {from: string, to :string};
     commentaires: string;
     type: string
-    constructor(nom: string, children: NestedItem[], id:string, statut: string, datesEstimee: {from: string, to :string}, 
-        datesEffectives: {from: string, to :string}, commentaires: string, type: string){
+    constructor(nom: string, description: string, children: NestedItem[], id:string, statut: string,
+        datesEstimee: {from: string, to :string}, datesEffectives: {from: string, to :string}, commentaires: string, type: string){
         this.nom = nom;
+        this.description = description;
         this.statut = statut;
         this.datesEstimee = datesEstimee;
         this.datesEffectives = datesEffectives;

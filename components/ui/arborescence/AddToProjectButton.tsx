@@ -37,7 +37,7 @@ export default function AddToProjectButton(
             <Menu
                 anchorReference={"anchorPosition"}
                 anchorPosition={anchorBotPos}
-
+                data-testid="add-item-project" 
                 id="add-element-menu"
                 open={isBotOpen}
                 onClose={handleClose}

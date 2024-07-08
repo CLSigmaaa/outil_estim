@@ -37,7 +37,7 @@ import { Sprint, US } from "@/app/model/projet"
 import { useTreeStore } from "@/components/store/useTreeStore"
 import { createSprintFormSchema } from "@/schemas/forms/sprint"
 
-export const CreateSprintForm = ({ defaultValues }: { defaultValues: US }) => {
+export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) => {
 
   const { selectedItem, editItem, setSelectedItem } = useTreeStore(); // Ajout de editItem
 
@@ -276,6 +276,7 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: US }) => {
         />
         <Button
           type="submit"
+          name="submitSprintForm"
         >
           Modifier US
         </Button>

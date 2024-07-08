@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import clsx from 'clsx';
 import { styled, alpha } from '@mui/material/styles';
@@ -25,7 +26,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   props: CustomTreeItemProps,
   ref: React.Ref<HTMLLIElement>,
 ) {
-  const { addItem, deleteItem, setSelectedItem, getNewUS: getNewUS, getNewEnsemble } = useTreeStore();
+  const { addItem, deleteItem, setSelectedItem, getNewUS, getNewEnsemble } = useTreeStore();
 
   const { id, itemId, label, disabled, children, ...other } = props;
 

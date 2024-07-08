@@ -17,7 +17,7 @@ export default function Arborescence() {
       description: "description",
       id:"id-proj1",
       children: [],
-      childNb: 1,
+      childNb: 0,
   })
 
   

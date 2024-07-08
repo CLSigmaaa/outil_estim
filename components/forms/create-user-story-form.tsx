@@ -115,7 +115,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={form.handleSubmit(onSubmit)} aria-label="submitUSForm">
         <FormField
           control={form.control}
           name="nom"
@@ -267,6 +267,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                       "w-full justify-start text-left font-normal",
                       !field.value.from && "text-muted-foreground"
                     )}
+                    aria-label="dateLancementEstimee"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {field.value.from ? (
@@ -316,6 +317,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                       "w-full justify-start text-left font-normal",
                       !field.value.from && "text-muted-foreground"
                     )}
+                    aria-label="dateLancementEffective"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {field.value.from ? (
@@ -369,6 +371,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
         />
         <Button
           type="submit"
+          data-testid="USFormSubmitBtn"
         >
           Modifier US
         </Button>

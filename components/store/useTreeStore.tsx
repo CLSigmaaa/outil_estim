@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { EnsembleUS, Item, Projet, Sprint, US } from "@/app/model/projet/index";
 
-interface TreeState {
+export interface TreeState {
   project: Projet;
   selectedItem: undefined | any;
   setProject: (newProject: Projet) => void;
@@ -86,7 +86,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       nom: "US" + nextUSNb,
       description: "description de l'US" + nextUSNb,
       id: "ID-US" + nextUSNb,
-      priorite: "Mineur",
+      priorite: "",
       statut: "",
       technologies: "",
       complexite: "",
