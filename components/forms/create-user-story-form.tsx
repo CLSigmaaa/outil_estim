@@ -22,9 +22,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "@/components/ui/textarea"
+
+import { Trash2 } from "lucide-react"
 
 import { createUserStoryFormSchema } from "@/schemas/forms/user-story"
 import { nativePriorityEnum } from "@/schemas/forms/user-story"
@@ -32,14 +35,14 @@ import { nativeComplexityEnum } from "@/schemas/forms/user-story"
 import { nativeUserStoryStateEnum } from "@/schemas/forms/user-story"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useFieldArray, useForm } from "react-hook-form"
 import { US } from "@/app/model/projet"
 import { useTreeStore } from "@/components/store/useTreeStore"
+import { Separator } from "../ui/separator"
 
 export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) => {
 
   const { selectedItem, editItem, setSelectedItem } = useTreeStore(); // Ajout de editItem
-
 
   const form = useForm({
     resolver: zodResolver(createUserStoryFormSchema),
@@ -60,8 +63,14 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
         to: new Date(),
       },
       commentaires: defaultValues.commentaires,
+      attachments: defaultValues.attachments,
     },
   })
+
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    control: form.control,
+    name: "attachments",
+  });
 
   //TODO: add types
   const onSubmit = (data: any) => {
@@ -78,7 +87,8 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       datesEffectives: data.date_range_effective,
       children: selectedItem.children,
       commentaires: data.commentaires,
-      type: "US"
+      type: "US",
+      attachments: data.attachments,
     } as US;
     setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)
@@ -104,24 +114,19 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       commentaires: selectedItem.commentaires,
     })
   }
-
   React.useEffect(resetform, [defaultValues])
 
-  // For debug purposes
-  //const { errors } = form.formState
-  //console.log(errors)
-  //const fields = form.watch()
-  //console.log(fields)
-
+  const isUserStoryFinished = form.watch("us_etat") === "Terminée"
+  console.log("isUserStoryFinished", isUserStoryFinished)
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} aria-label="submitUSForm">
+      <form onSubmit={form.handleSubmit(onSubmit)} aria-label="submitUSForm" className="w-full overflow-y-auto">
         <FormField
           control={form.control}
           name="nom"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nom</FormLabel>
+              <FormLabel>Nom {createUserStoryFormSchema.shape['nom'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
               <FormControl>
                 <Input placeholder="Nom User Story" {...field} />
               </FormControl>
@@ -134,7 +139,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Description {createUserStoryFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
               <FormControl>
                 <Input placeholder="Description User Story" {...field} />
               </FormControl>
@@ -147,7 +152,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           name="priorite"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Priorité</FormLabel>
+              <FormLabel>Priorité {createUserStoryFormSchema.shape['priorite'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -175,7 +180,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           name="us_etat"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>États des US</FormLabel>
+              <FormLabel>États des US {createUserStoryFormSchema.shape['us_etat'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -203,7 +208,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           name="technologies"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Technologies</FormLabel>
+              <FormLabel>Technologies {createUserStoryFormSchema.shape['technologies'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
               <FormControl>
                 <Input placeholder="Technologies utilisées" {...field} />
               </FormControl>
@@ -216,7 +221,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           name="complexite"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Complexité</FormLabel>
+              <FormLabel>Complexité {createUserStoryFormSchema.shape['complexite'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -244,7 +249,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           name="estimation_initiale"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Estimation Initiale</FormLabel>
+              <FormLabel>Estimation Initiale {createUserStoryFormSchema.shape['estimation_initiale'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
               <FormControl>
                 <Input placeholder="20 Points" type="number" {...field} />
               </FormControl>
@@ -369,6 +374,41 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             </FormItem>
           )}
         />
+
+        <Separator className="my-6" />
+        <div className="flex flex-col gap-2">
+          <h1>Pièces Jointes </h1>
+          {fields.map((field, index) => (
+            <FormField
+              key={field.id}
+              control={form.control}
+              name={`attachments.${index}`}
+              render={({ field: { value, onChange, ...fieldProps } }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="flex gap-2">
+                      <Input placeholder="Attachment" type="file" {...fieldProps} onChange={(event) => onChange(event.target.files && event.target.files[0])} />
+                      <Button
+                        type="button"
+                        onClick={() => remove(index)}
+                        variant="destructive"
+                      >
+                        <Trash2 />
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
+          <Button
+            type="button"
+            onClick={() => append({})}
+          >
+            Ajouter une pièce jointe
+          </Button>
+        </div>
         <Button
           type="submit"
           data-testid="USFormSubmitBtn"

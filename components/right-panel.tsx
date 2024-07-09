@@ -19,7 +19,7 @@ export const RightPanel = () => {
     Sprint: <CreateSprintForm defaultValues={selectedItem}/>
   }
   return (
-    <div className="border-gray-300 border border-t-0 flex w-3/12 py-4 justify-center">
+    <div className="border-gray-300 border-0 py-4 overflow-y-auto">
       {selectedItem == undefined ? "Sélectionnez un élément de l'aborescence" :
         <div>
           {editForm[selectedItem.type as keyof EditForm]}

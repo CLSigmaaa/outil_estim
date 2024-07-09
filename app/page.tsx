@@ -1,29 +1,7 @@
-import { CreateUserStoryForm } from "@/components/forms/create-user-story-form";
-import { EditUserStoryForm } from "@/components/forms/edit-user-story-form";
-
 import { LeftPanel } from "@/components/left-panel";
 import { MiddlePanel } from "@/components/middle-panel";
 import { RightPanel } from "@/components/right-panel";
 
-//const userStoryTestObject = {
-//  nom: "test user story",
-//  description: "test user story",
-//  identifiant: "1vfzezfzfzfzjfzfijzfjezf",
-//  complexite: "Faible",
-//  technologies: "jsp",
-//  us_etat: "Terminée",
-//  priorite: "Mineure",
-//  estimation_initiale: 1,
-//  date_range_estim: {
-//    from: new Date(),
-//    to: new Date()
-//  },
-//  date_range_effective: {
-//    from: new Date(),
-//    to: new Date()
-//  },
-//  commentaires: "test"
-//}
 import {
   Menubar,
   MenubarContent,
@@ -34,8 +12,13 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar"
 
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 
-export default function Home() {
+export default async function Home() {
   return (
     <>
       <Menubar className="rounded-none">
@@ -92,11 +75,24 @@ export default function Home() {
           </MenubarContent>
         </MenubarMenu>
       </Menubar >
-      <main className="flex flex-1">
-        <LeftPanel />
-        <MiddlePanel />
-        <RightPanel />
-      </main>
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="flex flex-1 overflow-hidden"
+      >
+        <ResizablePanel defaultSize={70} className="w-full h-full p-2">
+          <LeftPanel />
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel defaultSize={300} className="flex justify-center">
+          <MiddlePanel />
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel defaultSize={100} className="w-full h-full">
+          <div className="w-full h-full overflow-y-auto p-4">
+            <RightPanel />
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </>
   );
 }

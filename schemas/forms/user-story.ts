@@ -78,5 +78,6 @@ export const editUserStoryFormSchema = z.object({
     }
   ),
   commentaires: z.string().optional(),
+  attachments: z.array(z.instanceof(File)).optional(),
 })
 

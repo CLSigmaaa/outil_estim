@@ -12,10 +12,11 @@ export class US {
     children: Item[];
     commentaires: string;
     type: string;
+    attachments: File[];
 
     constructor(nom: string, description: string, id: string, priorite: string, statut: string, 
         technologies: string, complexite: string, estimation: string, datesEstimee: {from: string, to :string}, 
-        datesEffectives: {from: string, to :string}, children: Item[], commentaires: string, type: string){
+        datesEffectives: {from: string, to :string}, children: Item[], commentaires: string, type: string, attachments: File[]){
     this.nom = nom;
     this.description = description;
     this.id = id;
@@ -29,6 +30,7 @@ export class US {
     this.children = children;
     this.commentaires = commentaires;
     this.type = type;
+    this.attachments = attachments;
     }
 }
 
