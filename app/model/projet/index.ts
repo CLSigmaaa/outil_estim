@@ -1,3 +1,9 @@
+ export type FileProperty = {
+  nom: string;
+  url: string;
+  extension: string;
+}
+
 export class US {
     nom: string;
     description: string;
@@ -12,11 +18,12 @@ export class US {
     children: Item[];
     commentaires: string;
     type: string;
-    attachments: File[];
+    new_attachments: File[];
+    existing_attachments: FileProperty[]; 
 
     constructor(nom: string, description: string, id: string, priorite: string, statut: string, 
         technologies: string, complexite: string, estimation: string, datesEstimee: {from: string, to :string}, 
-        datesEffectives: {from: string, to :string}, children: Item[], commentaires: string, type: string, attachments: File[]){
+        datesEffectives: {from: string, to :string}, children: Item[], commentaires: string, type: string, new_attachments: File[], existing_attachments: FileProperty[]){
     this.nom = nom;
     this.description = description;
     this.id = id;
@@ -30,7 +37,8 @@ export class US {
     this.children = children;
     this.commentaires = commentaires;
     this.type = type;
-    this.attachments = attachments;
+    this.new_attachments = new_attachments;
+    this.existing_attachments = existing_attachments;
     }
 }
 

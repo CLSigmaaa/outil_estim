@@ -96,6 +96,8 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       children: [],
       commentaires: "",
       type: "US",
+      new_attachments: [],
+      existing_attachments: [],
     }
   },
   getNewEnsemble: () => {

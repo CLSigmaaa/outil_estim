@@ -23,6 +23,7 @@ const complexityEnum = z.nativeEnum(nativeComplexityEnum)
 
 export const createUserStoryFormSchema = z.object({
   nom: z.string(),
+  id: z.string(),
   description: z.string(),
   priorite: priorityEnum,
   us_etat: userStoryStateEnum,
@@ -48,6 +49,12 @@ export const createUserStoryFormSchema = z.object({
     }
   ),
   commentaires: z.string().optional(),
+  new_attachments: z.array(z.instanceof(File)).optional(),
+  existing_attachments: z.array(z.object({
+    nom: z.string(),
+    url: z.string(),
+    extension: z.string(),
+  })).optional(),
 })
 
 export const editUserStoryFormSchema = z.object({
