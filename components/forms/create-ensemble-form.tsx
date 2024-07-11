@@ -81,10 +81,10 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Nom</FormLabel>
+                            <FormMessage />
                             <FormControl>
                                 <Input placeholder="Nom User Story" {...field} />
                             </FormControl>
-                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -94,10 +94,10 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Description</FormLabel>
+                            <FormMessage />
                             <FormControl>
                                 <Input placeholder="Description User Story" {...field} />
                             </FormControl>
-                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -107,6 +107,7 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Commentaires</FormLabel>
+                            <FormMessage />
                             <FormControl>
                                 <Textarea
                                     placeholder="Cette US est mal estimée car ..."
@@ -114,7 +115,6 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
                                     {...field}
                                 />
                             </FormControl>
-                            <FormMessage />
                         </FormItem>
                     )}
                 />

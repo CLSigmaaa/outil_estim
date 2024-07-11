@@ -176,10 +176,10 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nom {createUserStoryFormSchema.shape['nom'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormMessage />
                 <FormControl>
                   <Input placeholder="Nom User Story" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -189,10 +189,10 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description {createUserStoryFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormMessage />
                 <FormControl>
                   <Input placeholder="Description User Story" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -230,6 +230,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>États des US {createUserStoryFormSchema.shape['us_etat'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormMessage />
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -248,7 +249,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                     })}
                   </SelectContent>
                 </Select>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -258,10 +258,10 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Technologies {createUserStoryFormSchema.shape['technologies'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormMessage />
                 <FormControl>
                   <Input placeholder="Technologies utilisées" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -299,10 +299,10 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Estimation Initiale {createUserStoryFormSchema.shape['estimation_initiale'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormMessage />
                 <FormControl>
                   <Input placeholder="20 Points" type="number" {...field} />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -312,6 +312,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Date de lancement et de fin estimée</FormLabel>
+                    <FormMessage />
                 <Popover modal={true}>
                   <PopoverTrigger asChild>
                     <Button
@@ -326,16 +327,18 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {field.value.from ? (
                         field.value.to ? (
-                          <>
-                            {format(field.value.from, "LLL dd, y")} -{" "}
-                            {format(field.value.to, "LLL dd, y")}
-                          </>
-                        ) : (
-                          format(field.value.from, "LLL dd, y")
-                        )
+                          <div aria-label="dateLancementEstimeeFull">
+                          {format(field.value.from, "LLL dd, y")} -{" "}
+                          {format(field.value.to, "LLL dd, y")}
+                        </div>
                       ) : (
-                        <span>Pick a date</span>
-                      )}
+                        <div aria-label="dateLancementEstimeeStart">
+                          {format(field.value.from, "LLL dd, y")}
+                        </div>
+                      )
+                    ) : (
+                      <span aria-label="dateLancementEstimeeEmpty">Pick a date</span>
+                    )}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="center">
@@ -352,7 +355,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                     />
                   </PopoverContent>
                 </Popover>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -362,6 +364,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Date de lancement et fin effective</FormLabel>
+                    <FormMessage />
                 <Popover modal={true}>
                   <PopoverTrigger asChild>
                     <Button
@@ -375,17 +378,19 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {field.value.from ? (
-                        field.value.to ? (
-                          <>
-                            {format(field.value.from, "LLL dd, y")} -{" "}
-                            {format(field.value.to, "LLL dd, y")}
-                          </>
-                        ) : (
-                          format(field.value.from, "LLL dd, y")
-                        )
+                      field.value.to ? (
+                        <div aria-label="dateLancementEffectiveFull">
+                          {format(field.value.from, "LLL dd, y")} -{" "}
+                          {format(field.value.to, "LLL dd, y")}
+                        </div>
                       ) : (
-                        <span>Pick a date</span>
-                      )}
+                        <div aria-label="dateLancementEffectiveStart">
+                          {format(field.value.from, "LLL dd, y")}
+                        </div>
+                      )
+                    ) : (
+                      <span aria-label="dateLancementEffectiveEmpty">Pick a date</span>
+                    )}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="center">
@@ -402,7 +407,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                     />
                   </PopoverContent>
                 </Popover>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -412,6 +416,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Commentaires</FormLabel>
+                <FormMessage />
                 <FormControl>
                   <Textarea
                     placeholder="Cette US est mal estimée car ..."
@@ -419,7 +424,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -472,7 +476,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           <Button
             className="mt-2"
             type="submit"
-            data-testid="USFormSubmitBtn"
+            data-testid="submitUSFormBtn"
           >
             Modifier US
           </Button>
