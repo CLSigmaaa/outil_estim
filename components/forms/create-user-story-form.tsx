@@ -76,7 +76,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
     },
   })
 
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "new_attachments",
   });
@@ -85,7 +85,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
 
 
   // Fonction pour gérer la suppression d'une pièce jointe existante
-  const handleRemoveExistingAttachment = (index) => {
+  const handleRemoveExistingAttachment = (index: number) => {
     // Filtrer la pièce jointe à supprimer
     const updatedAttachments = selectedItem.existing_attachments.filter((_, i) => i !== index);
 
@@ -129,15 +129,15 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       }),
       new_attachments: []
     };
-    const res = await upload(formData)
+    await upload(formData)
     setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)
 
-    if (res) {
-      console.log("File uploaded successfully")
-    } else {
-      console.log("Failed to upload file")
-    }
+    //if (res) {
+    //  console.log("File uploaded successfully")
+    //} else {
+    //  console.log("Failed to upload file")
+    //}
   }
 
   function resetform() {
@@ -161,9 +161,8 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       commentaires: selectedItem.commentaires,
     })
   }
-  React.useEffect(resetform, [defaultValues])
 
-  const isUserStoryFinished = form.watch("us_etat") === "Terminée" // TODO: add conditions for date inputs
+  React.useEffect(resetform, [defaultValues])
 
   return (
     <>
@@ -328,6 +327,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Date de lancement et de fin estimée</FormLabel>
+                <FormMessage />
                 <Popover modal={true}>
                   <PopoverTrigger asChild>
                     <Button
@@ -370,7 +370,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                     />
                   </PopoverContent>
                 </Popover>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -379,8 +378,8 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             name="date_range_effective"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormMessage />
                 <FormLabel>Date de lancement et fin effective</FormLabel>
+                <FormMessage />
                 <Popover modal={true}>
                   <PopoverTrigger asChild>
                     <Button

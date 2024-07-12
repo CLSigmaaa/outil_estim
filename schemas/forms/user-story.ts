@@ -19,16 +19,16 @@ export enum nativeComplexityEnum {
 
 const priorityEnum = z.nativeEnum(nativePriorityEnum, { message: "Champ obligatoire." })
 const userStoryStateEnum = z.nativeEnum(nativeUserStoryStateEnum, { message: "Champ obligatoire." })
-const complexityEnum = z.nativeEnum(nativeComplexityEnum)
+const complexityEnum = z.nativeEnum(nativeComplexityEnum, { message: "Champ obligatoire." })
 
 export const createUserStoryFormSchema = z.object({
-  nom: z.string(),
+  nom: z.string().min(1, { message: "Champ obligatoire." }),
   id: z.string(),
-  description: z.string(),
+  description: z.string().min(1, { message: "Champ obligatoire." }),
   priorite: priorityEnum,
   us_etat: userStoryStateEnum,
-  technologies: z.string(),
-  complexite: complexityEnum.optional(),
+  technologies: z.string().min(1, { message: "Champ obligatoire." }),
+  complexite: complexityEnum,
   estimation_initiale: z.coerce.number().optional(),
   date_range_estim: z.object(
     {
@@ -36,55 +36,22 @@ export const createUserStoryFormSchema = z.object({
       to: z.coerce.date(),
     },
     {
-      required_error: "Veuillez sélectionner une période de temps.",
+      required_error: "Veuillez sélectionner une date de début et une date de fin.",
     }
   ),
   date_range_effective: z.object(
     {
-      from: z.coerce.date(),
+      from: z.coerce.date({
+        required_error: "Veuillez sélectionner une date de début.",
+      }),
       to: z.coerce.date().nullable().optional(),
     },
-    {
-      required_error: "Veuillez sélectionner une date de début.",
-    }
-  ),
+  ).required(),
   commentaires: z.string().optional(),
   new_attachments: z.array(z.instanceof(File)).optional(),
   existing_attachments: z.array(z.object({
-    nom: z.string(),
-    url: z.string(),
-    extension: z.string(),
+    nom: z.string().min(1, { message: "Champ obligatoire." }),
+    url: z.string().min(1, { message: "Champ obligatoire." }),
+    extension: z.string().min(1, { message: "Champ obligatoire." }),
   })).optional(),
 })
-
-export const editUserStoryFormSchema = z.object({
-  nom: z.string(),
-  description: z.string(),
-  identifiant: z.string(),
-  priorite: priorityEnum,
-  us_etat: userStoryStateEnum,
-  technologies: z.string(),
-  complexite: complexityEnum.optional(),
-  estimation_initiale: z.coerce.number().optional(),
-  date_range_estim: z.object(
-    {
-      from: z.coerce.date(),
-      to: z.coerce.date(),
-    },
-    {
-      required_error: "Veuillez sélectionner une période de temps.",
-    }
-  ),
-  date_range_effective: z.object(
-    {
-      from: z.coerce.date(),
-      to: z.coerce.date().nullable().optional(),
-    },
-    {
-      required_error: "Veuillez sélectionner une date de début.",
-    }
-  ),
-  commentaires: z.string().optional(),
-  attachments: z.array(z.instanceof(File)).optional(),
-})
-
