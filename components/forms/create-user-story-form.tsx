@@ -99,11 +99,13 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
   const onSubmit = async (data: any) => {
     const formData = new FormData();
     formData.append("id", data.id);
-    Array.from(data.new_attachments).forEach((file: File, index: number) => {
-      formData.append(`new_attachments`, file);
-    });
-    formData.append("nom", data.nom);
 
+    if (data.new_attachments) {
+      Array.from(data.new_attachments).forEach((file: File, index: number) => {
+        formData.append(`new_attachments`, file);
+      });
+    }
+    formData.append("nom", data.nom);
     formData.append("id", data.id);
 
     const editedItem: US = {
@@ -127,41 +129,41 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       }),
       new_attachments: []
     };
-  const res = await upload(formData)
-  setSelectedItem(undefined)
-  editItem(editedItem.id, editedItem)
+    const res = await upload(formData)
+    setSelectedItem(undefined)
+    editItem(editedItem.id, editedItem)
 
-  if (res) {
-    console.log("File uploaded successfully")
-  } else {
-    console.log("Failed to upload file")
+    if (res) {
+      console.log("File uploaded successfully")
+    } else {
+      console.log("Failed to upload file")
+    }
   }
-}
 
-function resetform() {
-  form.reset({
-    nom: selectedItem.nom,
-    id: selectedItem.id,
-    description: selectedItem.description,
-    priorite: selectedItem.priorite,
-    us_etat: selectedItem.statut,
-    technologies: selectedItem.technologies,
-    complexite: selectedItem.complexite,
-    estimation_initiale: selectedItem.estimation ? parseInt(selectedItem.estimation) : 0,
-    date_range_estim: {
-      from: selectedItem.datesEstimee.from,
-      to: selectedItem.datesEstimee.to,
-    },
-    date_range_effective: {
-      from: selectedItem.datesEffectives.from,
-      to: selectedItem.datesEffectives.to,
-    },
-    commentaires: selectedItem.commentaires,
-  })
-}
-React.useEffect(resetform, [defaultValues])
+  function resetform() {
+    form.reset({
+      nom: selectedItem.nom,
+      id: selectedItem.id,
+      description: selectedItem.description,
+      priorite: selectedItem.priorite,
+      us_etat: selectedItem.statut,
+      technologies: selectedItem.technologies,
+      complexite: selectedItem.complexite,
+      estimation_initiale: selectedItem.estimation ? parseInt(selectedItem.estimation) : 0,
+      date_range_estim: {
+        from: selectedItem.datesEstimee.from,
+        to: selectedItem.datesEstimee.to,
+      },
+      date_range_effective: {
+        from: selectedItem.datesEffectives.from,
+        to: selectedItem.datesEffectives.to,
+      },
+      commentaires: selectedItem.commentaires,
+    })
+  }
+  React.useEffect(resetform, [defaultValues])
 
-const isUserStoryFinished = form.watch("us_etat") === "Terminée" // TODO: add conditions for date inputs
+  const isUserStoryFinished = form.watch("us_etat") === "Terminée" // TODO: add conditions for date inputs
 
   return (
     <>
@@ -244,7 +246,7 @@ const isUserStoryFinished = form.watch("us_etat") === "Terminée" // TODO: add c
             render={({ field }) => (
               <FormItem>
                 <FormLabel>États des US {createUserStoryFormSchema.shape['us_etat'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-                  <FormMessage />
+                <FormMessage />
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -377,7 +379,7 @@ const isUserStoryFinished = form.watch("us_etat") === "Terminée" // TODO: add c
             name="date_range_effective"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                    <FormMessage />
+                <FormMessage />
                 <FormLabel>Date de lancement et fin effective</FormLabel>
                 <Popover modal={true}>
                   <PopoverTrigger asChild>
@@ -440,42 +442,42 @@ const isUserStoryFinished = form.watch("us_etat") === "Terminée" // TODO: add c
             )}
           />
 
-        <Separator className="mt-6" />
-        <div className="flex flex-col gap-2">
-          <h1 className="font-bold mt-2">Pièces Jointes</h1>
-          <h2 className="font-semibold">Existantes :</h2>
+          <Separator className="mt-6" />
+          <div className="flex flex-col gap-2">
+            <h1 className="font-bold mt-2">Pièces Jointes</h1>
+            <h2 className="font-semibold">Existantes :</h2>
 
-          {selectedItem.existing_attachments?.length > 0 ? selectedItem.existing_attachments.map((attachment, index) => (
-            <FileCard
-              key={index}
-              fileProperty={attachment}
-              onRemove={() => handleRemoveExistingAttachment(index)} />
-          )) : "Aucune pièce jointe existante."}
+            {selectedItem.existing_attachments?.length > 0 ? selectedItem.existing_attachments.map((attachment, index) => (
+              <FileCard
+                key={index}
+                fileProperty={attachment}
+                onRemove={() => handleRemoveExistingAttachment(index)} />
+            )) : "Aucune pièce jointe existante."}
 
-          <h2 className="font-semibold">Nouvelles :</h2>
-          {fields.map((field, index) => (
-            <FormField
-              key={field.id}
-              control={form.control}
-              name={`new_attachments.${index}`}
-              render={({ field: { value, onChange, ...fieldProps } }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="flex gap-2">
-                      <Input placeholder="Attachment" type="file" {...fieldProps} onChange={(event) => testHandle(event, onChange)} />
-                      <Button
-                        type="button"
-                        onClick={() => remove(index)}
-                        variant="destructive"
-                      >
-                        <Trash2 />
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <h2 className="font-semibold">Nouvelles :</h2>
+            {fields.map((field, index) => (
+              <FormField
+                key={field.id}
+                control={form.control}
+                name={`new_attachments.${index}`}
+                render={({ field: { value, onChange, ...fieldProps } }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="flex gap-2">
+                        <Input placeholder="Attachment" type="file" {...fieldProps} onChange={(event) => testHandle(event, onChange)} />
+                        <Button
+                          type="button"
+                          onClick={() => remove(index)}
+                          variant="destructive"
+                        >
+                          <Trash2 />
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
             ))}
             <Button

@@ -12,7 +12,7 @@ export default async function upload(formData: any) {
     }
   };
   console.log(files);
-  if (files.length == 0) throw new Error("No file to upload.");
+  if (files.length == 0) return;
 
   const directory = `./public/${formData.get("id")}/`;
 
