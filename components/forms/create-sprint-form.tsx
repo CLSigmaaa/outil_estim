@@ -111,10 +111,10 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
           render={({ field }) => (
             <FormItem>
               <FormLabel>Nom</FormLabel>
+              <FormMessage />
               <FormControl>
                 <Input placeholder="Nom User Story" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -124,6 +124,7 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
+              <FormMessage />
               <FormControl>
                 <Input placeholder="Description User Story" {...field} />
               </FormControl>
@@ -155,7 +156,6 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
                   })}
                 </SelectContent>
               </Select>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -165,6 +165,7 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date de lancement et de fin estimée</FormLabel>
+              <FormMessage />
               <Popover modal={true}>
                 <PopoverTrigger asChild>
                   <Button
@@ -178,15 +179,17 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {field.value.from ? (
                       field.value.to ? (
-                        <>
+                        <div aria-label="dateLancementEstimeeFull">
                           {format(field.value.from, "LLL dd, y")} -{" "}
                           {format(field.value.to, "LLL dd, y")}
-                        </>
+                        </div>
                       ) : (
-                        format(field.value.from, "LLL dd, y")
+                        <div aria-label="dateLancementEstimeeStart">
+                          {format(field.value.from, "LLL dd, y")}
+                        </div>
                       )
                     ) : (
-                      <span>Pick a date</span>
+                      <span aria-label="dateLancementEstimeeEmpty">Pick a date</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -204,7 +207,6 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
                   />
                 </PopoverContent>
               </Popover>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -214,6 +216,7 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date de lancement et fin effective</FormLabel>
+              <FormMessage />
               <Popover modal={true}>
                 <PopoverTrigger asChild>
                   <Button
@@ -227,15 +230,17 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {field.value.from ? (
                       field.value.to ? (
-                        <>
+                        <div aria-label="dateLancementEffectiveFull">
                           {format(field.value.from, "LLL dd, y")} -{" "}
                           {format(field.value.to, "LLL dd, y")}
-                        </>
+                        </div>
                       ) : (
-                        format(field.value.from, "LLL dd, y")
+                        <div aria-label="dateLancementEffectiveStart">
+                          {format(field.value.from, "LLL dd, y")}
+                        </div>
                       )
                     ) : (
-                      <span>Pick a date</span>
+                      <span aria-label="dateLancementEffectiveEmpty">Pick a date</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -253,7 +258,6 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
                   />
                 </PopoverContent>
               </Popover>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -263,6 +267,7 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
           render={({ field }) => (
             <FormItem>
               <FormLabel>Commentaires</FormLabel>
+              <FormMessage />
               <FormControl>
                 <Textarea
                   placeholder="Cette US est mal estimée car ..."
@@ -270,7 +275,6 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
                   {...field}
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />

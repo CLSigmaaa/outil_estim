@@ -163,280 +163,282 @@ React.useEffect(resetform, [defaultValues])
 
 const isUserStoryFinished = form.watch("us_etat") === "Terminée" // TODO: add conditions for date inputs
 
-return (
-  <>
-    <h1 className="font-bold mb-2">Informations sur {defaultValues.nom}</h1>
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        aria-label="submitUSForm"
-        className="w-full overflow-y-auto"
-      >
-        <FormField
-          control={form.control}
-          name="id"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input type="hidden" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="nom"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nom {createUserStoryFormSchema.shape['nom'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-              <FormControl>
-                <Input placeholder="Nom User Story" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description {createUserStoryFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-              <FormControl>
-                <Input placeholder="Description User Story" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="priorite"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Priorité {createUserStoryFormSchema.shape['priorite'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+  return (
+    <>
+      <h1 className="font-bold mb-2">Informations sur {defaultValues.nom}</h1>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          aria-label="submitUSForm"
+          className="w-full overflow-y-auto"
+        >
+          <FormField
+            control={form.control}
+            name="id"
+            render={({ field }) => (
+              <FormItem>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une priorité" />
-                  </SelectTrigger>
+                  <Input type="hidden" {...field} />
                 </FormControl>
-                <SelectContent>
-                  {Object.keys(nativePriorityEnum).map((item) => {
-                    return (
-                      <SelectItem
-                        key={item}
-                        value={item}>
-                        {item}
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="us_etat"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>États des US {createUserStoryFormSchema.shape['us_etat'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="nom"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nom {createUserStoryFormSchema.shape['nom'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormMessage />
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un état pour l'US" />
-                  </SelectTrigger>
+                  <Input placeholder="Nom User Story" {...field} />
                 </FormControl>
-                <SelectContent>
-                  {Object.values(nativeUserStoryStateEnum).map((item) => {
-                    return (
-                      <SelectItem
-                        key={item}
-                        value={item}>
-                        {item}
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="technologies"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Technologies {createUserStoryFormSchema.shape['technologies'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-              <FormControl>
-                <Input placeholder="Technologies utilisées" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="complexite"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Complexité {createUserStoryFormSchema.shape['complexite'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description {createUserStoryFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormMessage />
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un niveau de complexité" />
-                  </SelectTrigger>
+                  <Input placeholder="Description User Story" {...field} />
                 </FormControl>
-                <SelectContent>
-                  {Object.values(nativeComplexityEnum).map((item) => {
-                    return (
-                      <SelectItem
-                        key={item}
-                        value={item}>
-                        {item}
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="estimation_initiale"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Estimation Initiale {createUserStoryFormSchema.shape['estimation_initiale'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-              <FormControl>
-                <Input placeholder="20 Points" type="number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="date_range_estim"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date de lancement et de fin estimée</FormLabel>
-              <Popover modal={true}>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="date"
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !field.value.from && "text-muted-foreground"
-                    )}
-                    aria-label="dateLancementEstimee"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {field.value.from ? (
-                      field.value.to ? (
-                        <>
-                          {format(field.value.from, "LLL dd, y")} -{" "}
-                          {format(field.value.to, "LLL dd, y")}
-                        </>
-                      ) : (
-                        format(field.value.from, "LLL dd, y")
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="priorite"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Priorité {createUserStoryFormSchema.shape['priorite'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une priorité" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.keys(nativePriorityEnum).map((item) => {
+                      return (
+                        <SelectItem
+                          key={item}
+                          value={item}>
+                          {item}
+                        </SelectItem>
                       )
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={field.value.from}
-                    selected={{
-                      from: field.value.from!,
-                      to: field.value.to,
-                    }}
-                    onSelect={field.onChange}
-                    numberOfMonths={2}
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="date_range_effective"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date de lancement et fin effective</FormLabel>
-              <Popover modal={true}>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="date"
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !field.value.from && "text-muted-foreground"
-                    )}
-                    aria-label="dateLancementEffective"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {field.value.from ? (
-                      field.value.to ? (
-                        <>
-                          {format(field.value.from, "LLL dd, y")} -{" "}
-                          {format(field.value.to, "LLL dd, y")}
-                        </>
-                      ) : (
-                        format(field.value.from, "LLL dd, y")
+                    })}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="us_etat"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>États des US {createUserStoryFormSchema.shape['us_etat'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                  <FormMessage />
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un état pour l'US" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.values(nativeUserStoryStateEnum).map((item) => {
+                      return (
+                        <SelectItem
+                          key={item}
+                          value={item}>
+                          {item}
+                        </SelectItem>
                       )
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={field.value.from}
-                    selected={{
-                      from: field.value.from!,
-                      to: field.value.to,
-                    }}
-                    onSelect={field.onChange}
-                    numberOfMonths={2}
+                    })}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="technologies"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Technologies {createUserStoryFormSchema.shape['technologies'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormMessage />
+                <FormControl>
+                  <Input placeholder="Technologies utilisées" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="complexite"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Complexité {createUserStoryFormSchema.shape['complexite'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un niveau de complexité" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.values(nativeComplexityEnum).map((item) => {
+                      return (
+                        <SelectItem
+                          key={item}
+                          value={item}>
+                          {item}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="estimation_initiale"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estimation Initiale {createUserStoryFormSchema.shape['estimation_initiale'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormMessage />
+                <FormControl>
+                  <Input placeholder="20 Points" type="number" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="date_range_estim"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Date de lancement et de fin estimée</FormLabel>
+                <Popover modal={true}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="date"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !field.value.from && "text-muted-foreground"
+                      )}
+                      aria-label="dateLancementEstimee"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {field.value.from ? (
+                        field.value.to ? (
+                          <div aria-label="dateLancementEstimeeFull">
+                            {format(field.value.from, "LLL dd, y")} -{" "}
+                            {format(field.value.to, "LLL dd, y")}
+                          </div>
+                        ) : (
+                          <div aria-label="dateLancementEstimeeStart">
+                            {format(field.value.from, "LLL dd, y")}
+                          </div>
+                        )
+                      ) : (
+                        <span aria-label="dateLancementEstimeeEmpty">Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center">
+                    <Calendar
+                      initialFocus
+                      mode="range"
+                      defaultMonth={field.value.from}
+                      selected={{
+                        from: field.value.from!,
+                        to: field.value.to,
+                      }}
+                      onSelect={field.onChange}
+                      numberOfMonths={2}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="date_range_effective"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                    <FormMessage />
+                <FormLabel>Date de lancement et fin effective</FormLabel>
+                <Popover modal={true}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="date"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !field.value.from && "text-muted-foreground"
+                      )}
+                      aria-label="dateLancementEffective"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {field.value.from ? (
+                        field.value.to ? (
+                          <>
+                            {format(field.value.from, "LLL dd, y")} -{" "}
+                            {format(field.value.to, "LLL dd, y")}
+                          </>
+                        ) : (
+                          format(field.value.from, "LLL dd, y")
+                        )
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center">
+                    <Calendar
+                      initialFocus
+                      mode="range"
+                      defaultMonth={field.value.from}
+                      selected={{
+                        from: field.value.from!,
+                        to: field.value.to,
+                      }}
+                      onSelect={field.onChange}
+                      numberOfMonths={2}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="commentaires"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Commentaires</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Cette US est mal estimée car ..."
+                    className="resize-none"
+                    {...field}
                   />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="commentaires"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Commentaires</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Cette US est mal estimée car ..."
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
         <Separator className="mt-6" />
         <div className="flex flex-col gap-2">
@@ -475,23 +477,23 @@ return (
               )}
             />
 
-          ))}
+            ))}
+            <Button
+              type="button"
+              onClick={() => append({})}
+            >
+              Ajouter une pièce jointe
+            </Button>
+          </div>
           <Button
-            type="button"
-            onClick={() => append({})}
+            className="mt-2"
+            type="submit"
+            data-testid="USFormSubmitBtn"
           >
-            Ajouter une pièce jointe
+            Modifier US
           </Button>
-        </div>
-        <Button
-          className="mt-2"
-          type="submit"
-          data-testid="USFormSubmitBtn"
-        >
-          Modifier US
-        </Button>
-      </form>
-    </Form>
-  </>
-)
+        </form>
+      </Form>
+    </>
+  )
 }
