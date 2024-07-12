@@ -81,8 +81,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
     name: "new_attachments",
   });
 
-  console.log(form.getValues())
-
 
   // Fonction pour gérer la suppression d'une pièce jointe existante
   const handleRemoveExistingAttachment = (index: number) => {

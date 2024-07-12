@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import clsx from 'clsx';
-import { styled, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
@@ -41,6 +39,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
 
   const CustomTreeItemContent = styled(TreeItem2Content)(({ theme }) => ({
     marginTop: theme.spacing(0.2, 0.5),
+    gap: '2px'
   }));
 
   interface CustomLabelProps {
@@ -54,13 +53,13 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
     ...other
   }: CustomLabelProps) {
     return (
-      <TreeItem2Label sx={{ display: 'flex' }}>
+      <TreeItem2Label sx={{ display: 'flex'}}>
         {Icon && (
           <Box
             component={Icon}
             className="labelIcon"
             color="inherit"
-            sx={{ mr: 1, fontSize: '1.2rem' }}
+            sx={{ mr: 1 }}
           />
         )}
 
@@ -94,10 +93,9 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
 
   let icon = getIconFromId(itemId)
   return (
-    <div className='itemContainer'>
-      <div style={{ display: 'flex', maxWidth: '240px' }} className='item'>
-
-        <CustomTreeItemContent {...getContentProps()}>
+    <div className='itemContainer  '>
+      <div className='flex item justify-between '>
+        <CustomTreeItemContent {...getContentProps()} style={{ padding: '4px 2px', overflow: 'hidden'}}>
           <TreeItem2IconContainer {...getIconContainerProps()}>
             <TreeItem2Icon status={status} />
           </TreeItem2IconContainer>
@@ -106,10 +104,12 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
             <CustomLabel {...getLabelProps({ icon })} />
           </Box>
         </CustomTreeItemContent>
+       <div className='flex justify-end min-w-12'>
         {itemId?.includes("US") ? "" :
           <AddItemButton itemId={itemId} addEnsembleToItem={() => addItem(itemId, getNewEnsemble())} addUSToItem={() => addItem(itemId, getNewUS())} />}
-        <button className='deleteButton self-end' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
-      </div>
+        <button className='deleteButton align-center max-h max-w-6' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
+        </div>
+        </div>
       {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
     </div>
   )},
@@ -156,7 +156,7 @@ export default function TreeView() {
   }
 
   return (
-    <Box>
+    <Box >
       <RichTreeView
         items={project.children}
         onItemFocus={(_event, itemId) => {

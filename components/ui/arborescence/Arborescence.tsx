@@ -22,10 +22,10 @@ export default function Arborescence() {
 
   
   return (
-    <div className="flex flex-col p-3 w-full">
-      {selectedProject.nom}
-    <TreeView />
+    <div className="flex flex-col w-full">
+      <p className="p-2 font-semibold">{selectedProject.nom}</p>
     <Divider />
+    <TreeView />
     
     </div>
   );

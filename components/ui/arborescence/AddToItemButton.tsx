@@ -20,20 +20,19 @@ export default function AddToItemButton(
     };
 
     return (
-        <div style={{ display: 'flex' }}>
-            <Button
+        <div className='flex'>
+            <button
+                className='max-w-6'
                 id="add-element-button"
                 aria-controls={open ? 'add-element-menu' : undefined}
                 aria-haspopup="true"
-                sx={{ padding: 0, minWidth: 0 }}
                 aria-expanded={open ? 'true' : undefined}
                 onClick={(event) => { 
-                    
                     handleClick(event);
                  }}
-                startIcon={<AddIcon />}
             >
-            </Button>
+                <AddIcon/>
+            </button>
             <Menu
                 anchorReference={"anchorPosition"}
                 anchorPosition={anchorPos}

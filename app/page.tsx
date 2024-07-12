@@ -79,7 +79,7 @@ export default async function Home() {
         direction="horizontal"
         className="flex flex-1 overflow-hidden"
       >
-        <ResizablePanel defaultSize={70} className="w-full h-full p-2">
+        <ResizablePanel defaultSize={70} className="h-full p-2 " >
           <LeftPanel />
         </ResizablePanel>
         <ResizableHandle />
