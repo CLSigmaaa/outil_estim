@@ -18,20 +18,19 @@ export default async function upload(formData: any) {
 
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: false });
-  } else {
-    for (const file of files) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const path = directory + file.name;
+  }
+  for (const file of files) {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const path = directory + file.name;
 
-      try {
-        await writeFile(
-          path,
-          buffer
-        );
-        return file.name;
-      } catch (error) {
-        throw new Error("Failed to upload file.");
-      }
+    try {
+      await writeFile(
+        path,
+        buffer
+      );
+      return file.name;
+    } catch (error) {
+      throw new Error("Failed to upload file.");
     }
   }
 }
