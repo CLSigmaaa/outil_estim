@@ -28,7 +28,6 @@ export default async function upload(formData: any) {
         path,
         buffer
       );
-      return file.name;
     } catch (error) {
       throw new Error("Failed to upload file.");
     }
