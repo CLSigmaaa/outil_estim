@@ -88,7 +88,7 @@ export default async function Home() {
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel defaultSize={100} className="w-full h-full">
-          <div className="w-full h-full overflow-y-auto p-4">
+          <div className="w-full h-full overflow-y-auto p-2">
             <RightPanel />
           </div>
         </ResizablePanel>

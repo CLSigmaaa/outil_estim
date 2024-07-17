@@ -31,9 +31,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Trash2 } from "lucide-react"
 
 import { createUserStoryFormSchema } from "@/schemas/forms/user-story"
-import { nativePriorityEnum } from "@/schemas/forms/user-story"
-import { nativeComplexityEnum } from "@/schemas/forms/user-story"
-import { nativeUserStoryStateEnum } from "@/schemas/forms/user-story"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useFieldArray, useForm } from "react-hook-form"
@@ -42,6 +39,7 @@ import { useTreeStore } from "@/components/store/useTreeStore"
 import { Separator } from "../ui/separator"
 
 import { FileCard } from "@/components/file-card"
+import { nativePriorityEnum, nativeStateEnum, nativeMasteryEnum } from "@/app/model/projet/itemEnum"
 
 const testHandle = (event: any, onChange: any) => {
   console.log(event.target.files && event.target.files[0])
@@ -58,14 +56,10 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       id: defaultValues.id,
       description: defaultValues.description,
       priorite: defaultValues.priorite,
-      us_etat: defaultValues.statut,
-      technologies: defaultValues.technologies,
-      complexite: defaultValues.complexite,
+      statut: defaultValues.statut,
+      version: defaultValues.version,
+      maitrise: defaultValues.maitrise,
       estimation_initiale: defaultValues.estimation ? parseInt(defaultValues.estimation) : 0,
-      date_range_estim: {
-        from: new Date(),
-        to: new Date(),
-      },
       date_range_effective: {
         from: new Date(),
         to: new Date(),
@@ -105,17 +99,22 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
     }
     formData.append("nom", data.nom);
     formData.append("id", data.id);
-
+    if(data.date_range_effective.from == undefined && data.statut == nativeStateEnum.En_Cours){
+        data.date_range_effective.from = new Date()
+    }
+    if (data.date_range_effective.to == undefined && data.statut == nativeStateEnum.Terminee){
+        data.date_range_effective.to = new Date()
+    }
+    
     const editedItem: US = {
       ...selectedItem,
       nom: data.nom,
       description: data.description,
       priorite: data.priorite,
-      statut: data.us_etat,
-      technologies: data.technologies,
-      complexite: data.complexite,
+      statut: data.statut,
+      version: data.version,
+      maitrise: data.maitrise,
       estimation: data.estimation_initiale,
-      datesEstimee: data.date_range_estim,
       datesEffectives: data.date_range_effective,
       commentaires: data.commentaires,
       existing_attachments: data.new_attachments?.map((file: any) => {
@@ -131,11 +130,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
     setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)
 
-    //if (res) {
-    //  console.log("File uploaded successfully")
-    //} else {
-    //  console.log("Failed to upload file")
-    //}
   }
 
   function resetform() {
@@ -144,14 +138,10 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       id: selectedItem.id,
       description: selectedItem.description,
       priorite: selectedItem.priorite,
-      us_etat: selectedItem.statut,
-      technologies: selectedItem.technologies,
-      complexite: selectedItem.complexite,
+      statut: selectedItem.statut,
+      version: selectedItem.version,
+      maitrise: selectedItem.maitrise,
       estimation_initiale: selectedItem.estimation ? parseInt(selectedItem.estimation) : 0,
-      date_range_estim: {
-        from: selectedItem.datesEstimee.from,
-        to: selectedItem.datesEstimee.to,
-      },
       date_range_effective: {
         from: selectedItem.datesEffectives.from,
         to: selectedItem.datesEffectives.to,
@@ -164,12 +154,12 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
 
   return (
     <>
-      <h1 className="font-bold mb-2">Informations sur {defaultValues.nom}</h1>
+      <h1 className="font-bold mb-2 p-1">Informations sur {defaultValues.nom}</h1>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           aria-label="submitUSForm"
-          className="w-full overflow-y-auto"
+          className="w-full overflow-y-auto px-1"
         >
           <FormField
             control={form.control}
@@ -204,8 +194,12 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                 <FormLabel>Description {createUserStoryFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <FormControl>
-                  <Input placeholder="Description User Story" {...field} />
-                </FormControl>
+                  <Textarea
+                      placeholder="Description de l'User Story"
+                      className="resize-none"
+                      {...field}
+                    />
+              </FormControl>
               </FormItem>
             )}
           />
@@ -239,10 +233,10 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           />
           <FormField
             control={form.control}
-            name="us_etat"
+            name="statut"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>États des US {createUserStoryFormSchema.shape['us_etat'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>État des US {createUserStoryFormSchema.shape['statut'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
@@ -251,7 +245,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {Object.values(nativeUserStoryStateEnum).map((item) => {
+                    {Object.values(nativeStateEnum).map((item) => {
                       return (
                         <SelectItem
                           key={item}
@@ -267,31 +261,31 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           />
           <FormField
             control={form.control}
-            name="technologies"
+            name="version"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Technologies {createUserStoryFormSchema.shape['technologies'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>Version {createUserStoryFormSchema.shape['version'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <FormControl>
-                  <Input placeholder="Technologies utilisées" {...field} />
+                  <Input placeholder="Version cible" {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name="complexite"
+            name="maitrise"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Complexité {createUserStoryFormSchema.shape['complexite'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>Maîtrise {createUserStoryFormSchema.shape['maitrise'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un niveau de complexité" />
+                      <SelectValue placeholder="Sélectionner un niveau de maitrise" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {Object.values(nativeComplexityEnum).map((item) => {
+                    {Object.values(nativeMasteryEnum).map((item) => {
                       return (
                         <SelectItem
                           key={item}
@@ -321,58 +315,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           />
           <FormField
             control={form.control}
-            name="date_range_estim"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date de lancement et de fin estimée</FormLabel>
-                <FormMessage />
-                <Popover modal={true}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="date"
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !field.value.from && "text-muted-foreground"
-                      )}
-                      aria-label="dateLancementEstimee"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {field.value.from ? (
-                        field.value.to ? (
-                          <div aria-label="dateLancementEstimeeFull">
-                            {format(field.value.from, "LLL dd, y")} -{" "}
-                            {format(field.value.to, "LLL dd, y")}
-                          </div>
-                        ) : (
-                          <div aria-label="dateLancementEstimeeStart">
-                            {format(field.value.from, "LLL dd, y")}
-                          </div>
-                        )
-                      ) : (
-                        <span aria-label="dateLancementEstimeeEmpty">Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="center">
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      defaultMonth={field.value.from}
-                      selected={{
-                        from: field.value.from!,
-                        to: field.value.to,
-                      }}
-                      onSelect={field.onChange}
-                      numberOfMonths={2}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
             name="date_range_effective"
             render={({ field }) => (
               <FormItem className="flex flex-col">
@@ -391,17 +333,19 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {field.value.from ? (
-                        field.value.to ? (
-                          <>
-                            {format(field.value.from, "LLL dd, y")} -{" "}
-                            {format(field.value.to, "LLL dd, y")}
-                          </>
-                        ) : (
-                          format(field.value.from, "LLL dd, y")
-                        )
+                      field.value.to ? (
+                        <div aria-label="dateLancementEffectiveFull">
+                          {format(field.value.from, "LLL dd, y")} -{" "}
+                          {format(field.value.to, "LLL dd, y")}
+                        </div>
                       ) : (
-                        <span>Pick a date</span>
-                      )}
+                        <div aria-label="dateLancementEffectiveStart">
+                          {format(field.value.from, "LLL dd, y")}
+                        </div>
+                      )
+                    ) : (
+                      <span aria-label="dateLancementEffectiveEmpty">Pick a date</span>
+                    )}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="center">

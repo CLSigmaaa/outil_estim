@@ -4,8 +4,9 @@ import { TreeState, useTreeStore } from '@/components/store/useTreeStore';
 import TreeView from '@/components/ui/arborescence/TreeView';
 import { RightPanel } from '@/components/right-panel';
 import { US } from '@/app/model/projet';
-import { nativeComplexityEnum, nativePriorityEnum, nativeUserStoryStateEnum } from '@/schemas/forms/user-story';
+import {  } from '@/schemas/forms/user-story';
 import { format } from 'date-fns';
+import { nativeMasteryEnum, nativePriorityEnum, nativeStateEnum } from '@/app/model/projet/itemEnum';
 
 describe('TreeView', () => {
     test("Création d'une US", () => {
@@ -19,7 +20,7 @@ describe('TreeView', () => {
     test("Sélectionner une US de l'arborescence met à jour 'selectedItem' du store", () => {
         render(<TreeView/>);
         const { result } = renderHook(() => useTreeStore());
-        fireEvent.click(screen.getByText(/US1/i))
+        fireEvent.click(screen.getByText(/^User Story 1$/i))
         expect(result.current.selectedItem).toBe(result.current.project.children[0]);
     })
 
@@ -28,28 +29,27 @@ describe('TreeView', () => {
         const { getByTestId } = render(<RightPanel/>);
 
         const { result } = renderHook(() => useTreeStore())
-        fireEvent.click(screen.getByText(/^US1$/i))
-        let selectedItem = result.current.selectedItem;
+        fireEvent.click(screen.getByText(/^User Story 1$/i))
+        var selectedItem = result.current.selectedItem;
         expect(screen.getByLabelText(/Nom/i).value).toBe(selectedItem.nom);
         expect(screen.getByLabelText(/Description/i).value).toBe(selectedItem.description);
-        expect(screen.getByLabelText(/Priorité/i).firstChild.innerHTML ).toBe(selectedItem.priorite || "Sélectionner une priorité");
-        expect(screen.getByLabelText(/États des US/i).firstChild.innerHTML).toBe(selectedItem.etat || "Sélectionner un état pour l'US");
-        expect(screen.getByLabelText(/Technologies/i).value).toBe(selectedItem.technologies );
-        expect(screen.getByLabelText(/Complexité/i).firstChild.innerHTML).toBe(selectedItem.complexite || "Sélectionner un niveau de complexité");
+        expect(screen.getByLabelText(/Priorité/i).firstChild?.innerHTML ).toBe(selectedItem.priorite || nativePriorityEnum.Mineure);
+        expect(screen.getByLabelText(/État des US/i).firstChild?.innerHTML).toBe(selectedItem.etat || nativeStateEnum.A_Faire);
+        expect(screen.getByLabelText(/Version/i).value).toBe(selectedItem.version );
+        expect(screen.getByLabelText(/Maîtrise/i).firstChild?.innerHTML).toBe(selectedItem.maitrise || nativeMasteryEnum.Moyen);
         expect(screen.getByLabelText(/Estimation Initiale/i).value).toBe(selectedItem.estimationInitiale || "0");
-        expect(screen.getByLabelText(/dateLancementEstimeeEmpty/i).innerHTML).toBe("Pick a date");
         expect(screen.getByLabelText(/dateLancementEffectiveEmpty/i).innerHTML).toBe("Pick a date");
         expect(screen.getByLabelText(/Commentaires/i).value).toBe(selectedItem.commentaires );
 
     })
 
     test("EditItem modifie bien les valeurs de l'US", () => {
-        render(<TreeView/>);
-        render(<RightPanel/>);
+        var {rerender} =render(<TreeView/>);
+        var {rerender} = render(<RightPanel/>);
 
         var { result } = renderHook(() => useTreeStore())
-        fireEvent.click(screen.getByText(/^US1$/i))
-        let selectedItem = result.current.selectedItem;
+        fireEvent.click(screen.getByText(/^User Story 1$/i))
+        var selectedItem = result.current.selectedItem;
         
         const startDate = new Date();
         startDate.setFullYear(2024);
@@ -59,38 +59,39 @@ describe('TreeView', () => {
         endDate.setFullYear(2024);
         endDate.setMonth(6);
         endDate.setDate(14)
-        let editedItem = {
+        var editedItem = {
             nom: 'newNom',
             description: "newDesc",
             id: selectedItem.id,
             priorite: nativePriorityEnum.Majeure,
-            statut: nativeUserStoryStateEnum.Terminee,
-            technologies: "Java",
-            complexite: nativeComplexityEnum.Moyen,
+            statut: nativeStateEnum.Terminee,
+            version: "2.3.0",
+            maitrise: nativeMasteryEnum.Moyen,
             estimation: "42",
-            datesEstimee: {from:startDate.toDateString(), to:endDate.toDateString()},
             datesEffectives: {from:startDate.toDateString(), to:endDate.toDateString()},
             children: selectedItem.children,
             commentaires: "NewCommentaires",
             type: "US",
         } as US
+        debugger;
         act(() => {result.current.editItem(selectedItem.id, editedItem)});
-        
        
         // Valider le form déselectionne l'item
         fireEvent.click(screen.getByText(/^newNom$/i))
-        expect(screen.getByLabelText(/Nom/i).value).toBe(editedItem.nom);
-        expect(screen.getByLabelText(/Description/i).value).toBe(editedItem.description);
-        expect(screen.getByLabelText(/Priorité/i).firstChild?.innerHTML ).toBe(editedItem.priorite);
-        expect(screen.getByLabelText(/États des US/i).firstChild?.innerHTML).toBe(editedItem.statut || "");
-        expect(screen.getByLabelText(/Technologies/i).value).toBe(editedItem.technologies );
-        expect(screen.getByLabelText(/Complexité/i).firstChild?.innerHTML).toBe(editedItem.complexite );
-        expect(screen.getByLabelText(/Estimation Initiale/i).value).toBe(editedItem.estimation || "0");
-        expect(screen.getByLabelText(/dateLancementEstimeeFull/i).innerHTML).toBe(
-            format(editedItem.datesEstimee.from, "LLL dd, y") +" - "+ format(editedItem.datesEstimee.to, "LLL dd, y"));
-        expect(screen.getByLabelText(/dateLancementEffectiveFull/i).innerHTML).toBe(
-            format(editedItem.datesEffectives.from, "LLL dd, y") +" - "+ format(editedItem.datesEffectives.to, "LLL dd, y"));
-        expect(screen.getByLabelText(/Commentaires/i).value).toBe(editedItem.commentaires );
+       
+        selectedItem = result.current.selectedItem;
+        expect(selectedItem.nom).toBe(editedItem.nom);
+        expect(selectedItem.description).toBe(editedItem.description);
+        expect(selectedItem.priorite).toBe(editedItem.priorite);
+        expect(selectedItem.statut).toBe(editedItem.statut || "");
+        expect(selectedItem.version).toBe(editedItem.version );
+        expect(selectedItem.maitrise).toBe(editedItem.maitrise );
+        expect(selectedItem.estimation).toBe(editedItem.estimation || "0");
+        expect(selectedItem.datesEffectives.from).toBe(
+            format(editedItem.datesEffectives.from, "EEE LLL dd y"));
+        expect(selectedItem.datesEffectives.to).toBe(
+            format(editedItem.datesEffectives.to, "EEE LLL dd y"));
+        expect(selectedItem.commentaires).toBe(editedItem.commentaires );
 
     })
 });

@@ -6,6 +6,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import LoopIcon from '@mui/icons-material/Loop';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import AddItemButton from './AddToItemButton';
 import AddToProjectButton from './AddToProjectButton';
 import { useTreeStore } from '@/components/store/useTreeStore';
@@ -13,6 +14,7 @@ import { unstable_useTreeItem2 as useTreeItem2, UseTreeItem2Parameters } from '@
 import { TreeItem2Content, TreeItem2IconContainer, TreeItem2GroupTransition, TreeItem2Label, TreeItem2Checkbox } from '@mui/x-tree-view/TreeItem2';
 import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
 import { Item } from '@/app/model/projet';
+import { nativeItemTypeEnum } from '@/app/model/projet/itemEnum';
 
 
 interface CustomTreeItemProps
@@ -24,7 +26,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   props: CustomTreeItemProps,
   ref: React.Ref<HTMLLIElement>,
 ) {
-  const { addItem, deleteItem, setSelectedItem, getNewUS, getNewEnsemble } = useTreeStore();
+  const { addItem, deleteItem, selectedItem, setSelectedItem, getNewUS, getNewEnsemble } = useTreeStore();
 
   const { id, itemId, label, disabled, children, ...other } = props;
 
@@ -69,29 +71,31 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   }
 
   const handleDeleteItem = (itemId: any) => {
-    setSelectedItem(null);
+    if (selectedItem?.id == itemId){
+      setSelectedItem(null);
+    }
     deleteItem(itemId);
   }
   const iconDict = {
-    "US": BookmarkBorderIcon,
-    "Ensemble": BookmarksIcon,
-    "Sprint": LoopIcon
+    [nativeItemTypeEnum.US]: BookmarkBorderIcon,
+    [nativeItemTypeEnum.Ensemble]: BookmarksIcon,
+    [nativeItemTypeEnum.Sprint]: LoopIcon,
   }
 
   function getIconFromId(itemId: string) {
-    if (itemId.includes("US")) {
-      return iconDict["US"]
+    if (itemId.includes(nativeItemTypeEnum.US)) {
+      return iconDict[nativeItemTypeEnum.US]
     }
-    if (itemId.includes("Ensemble")) {
-      return iconDict["Ensemble"]
+    if (itemId.includes(nativeItemTypeEnum.Ensemble)) {
+      return iconDict[nativeItemTypeEnum.Ensemble]
     }
-    if (itemId.includes("Sprint")) {
-      return iconDict["Sprint"]
+    if (itemId.includes(nativeItemTypeEnum.Sprint)) {
+      return iconDict[nativeItemTypeEnum.Sprint]
     }
     return undefined;
   }
 
-  let icon = getIconFromId(itemId)
+  var icon = getIconFromId(itemId)
   return (
     <div className='itemContainer  '>
       <div className='flex item justify-between '>
@@ -105,7 +109,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
           </Box>
         </CustomTreeItemContent>
        <div className='flex justify-end min-w-12'>
-        {itemId?.includes("US") ? "" :
+        {(itemId?.includes(nativeItemTypeEnum.US) || itemId?.includes(nativeItemTypeEnum.Tache)) ? "" :
           <AddItemButton itemId={itemId} addEnsembleToItem={() => addItem(itemId, getNewEnsemble())} addUSToItem={() => addItem(itemId, getNewUS())} />}
         <button className='deleteButton align-center max-h max-w-6' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
         </div>
@@ -140,6 +144,9 @@ export default function TreeView() {
       if (item.children && item.children.length > 0) {
         const found = findItemAux(item.children, itemId);
         if (found) {
+          if (found.type == nativeItemTypeEnum.Tache){ // On n'affiche pas les tâches mais l'US les contenant
+            return item;
+          }
           return found;
         }
       }
@@ -148,7 +155,7 @@ export default function TreeView() {
   }
 
   function selectItem(itemId: string) {
-    let newSelectedItem = findItemInProject(itemId);
+    var newSelectedItem = findItemInProject(itemId);
     if (newSelectedItem != undefined) {
       setSelectedItem(newSelectedItem);
       newSelectedItem = selectedItem;
