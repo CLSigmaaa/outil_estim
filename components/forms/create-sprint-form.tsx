@@ -27,15 +27,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "@/components/ui/textarea"
 
 import { createUserStoryFormSchema } from "@/schemas/forms/user-story"
-import { nativePriorityEnum } from "@/schemas/forms/user-story"
-import { nativeComplexityEnum } from "@/schemas/forms/user-story"
-import { nativeUserStoryStateEnum } from "@/schemas/forms/user-story"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Sprint, US } from "@/app/model/projet"
 import { useTreeStore } from "@/components/store/useTreeStore"
 import { createSprintFormSchema } from "@/schemas/forms/sprint"
+import { nativeStateEnum } from "@/app/model/projet/itemEnum"
 
 export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) => {
 
@@ -48,10 +46,6 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
       nom: defaultValues.nom,
       description: defaultValues.description,
       us_etat: defaultValues.statut,
-      date_range_estim: {
-        from: new Date(),
-        to: new Date(),
-      },
       date_range_effective: {
         from: new Date(),
         to: new Date(),
@@ -59,15 +53,15 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
       commentaires: defaultValues.commentaires,
     },
   })
-
+  
   //TODO: add types
   const onSubmit = (data: any) => {
-    let editedItem = {
+    console.log(data.date_range_effective)
+    var editedItem = {
       nom: data.nom,
       description: data.description,
       id: selectedItem.id,
       statut: data.us_etat,
-      datesEstimee: data.date_range_estim,
       datesEffectives: data.date_range_effective,
       children: selectedItem.children,
       commentaires: data.commentaires,
@@ -82,10 +76,6 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
       nom: selectedItem.nom,
       description: selectedItem.description,
       us_etat: selectedItem.statut,
-      date_range_estim: {
-        from: selectedItem.datesEstimee.from,
-        to: selectedItem.datesEstimee.to,
-      },
       date_range_effective: {
         from: selectedItem.datesEffectives.from,
         to: selectedItem.datesEffectives.to,
@@ -103,8 +93,10 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
   //console.log(fields)
 
   return (
+    <>
+    <h1 className="font-bold mb-2">Informations sur {defaultValues.nom}</h1>
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full overflow-y-auto px-1">
         <FormField
           control={form.control}
           name="nom"
@@ -126,7 +118,11 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
               <FormLabel>Description</FormLabel>
               <FormMessage />
               <FormControl>
-                <Input placeholder="Description User Story" {...field} />
+              <Textarea
+                   placeholder="Description du Sprint"
+                  className="resize-none"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -137,15 +133,15 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
           name="us_etat"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>États des US</FormLabel>
+              <FormLabel>État des US</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un état pour l'US" />
+                    <SelectValue placeholder="Sélectionner un état pour le Sprint" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {Object.values(nativeUserStoryStateEnum).map((item) => {
+                  {Object.values(nativeStateEnum).map((item) => {
                     return (
                       <SelectItem
                         key={item}
@@ -156,57 +152,6 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
                   })}
                 </SelectContent>
               </Select>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="date_range_estim"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date de lancement et de fin estimée</FormLabel>
-              <FormMessage />
-              <Popover modal={true}>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="date"
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !field.value.from && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {field.value.from ? (
-                      field.value.to ? (
-                        <div aria-label="dateLancementEstimeeFull">
-                          {format(field.value.from, "LLL dd, y")} -{" "}
-                          {format(field.value.to, "LLL dd, y")}
-                        </div>
-                      ) : (
-                        <div aria-label="dateLancementEstimeeStart">
-                          {format(field.value.from, "LLL dd, y")}
-                        </div>
-                      )
-                    ) : (
-                      <span aria-label="dateLancementEstimeeEmpty">Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={field.value.from}
-                    selected={{
-                      from: field.value.from!,
-                      to: field.value.to,
-                    }}
-                    onSelect={field.onChange}
-                    numberOfMonths={2}
-                  />
-                </PopoverContent>
-              </Popover>
             </FormItem>
           )}
         />
@@ -282,9 +227,10 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
           type="submit"
           name="submitSprintForm"
         >
-          Modifier US
+          Modifier Sprint
         </Button>
       </form>
     </Form>
+  </>
   )
 }

@@ -1,18 +1,19 @@
 
 import { create } from 'zustand';
-import { EnsembleUS, Item, Projet, Sprint, US } from "@/app/model/projet/index";
+import { EnsembleUS, Item, Projet, Sprint, Tache, US } from "@/app/model/projet/index";
+import { nativeMasteryEnum, nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from '@/app/model/projet/itemEnum';
 
 export interface TreeState {
   project: Projet;
   selectedItem: undefined | any;
   setProject: (newProject: Projet) => void;
   setSelectedItem: (newSelectedItem: any) => void;
-  addItem: (parentId: string, newItem: Item) => void;
+  addItem: (parentId: string, newItem: Item | Tache) => void;
   deleteItem: (itemId: string) => void;
-  editItem: (itemId: string, updatedProperties: Item) => void;
-  getNewUS: () => US;
+  editItem: (itemId: string, updatedProperties: Item | Tache) => void;
+  getNewUS: (statut?: string) => US;
   getNewEnsemble: () => EnsembleUS;
-  getNewSprint: () => Sprint;
+  getNewSprint: (statut?: string) => Sprint;
 }
 
 export const useTreeStore = create<TreeState>((set, get) => ({
@@ -31,8 +32,9 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     const findAndAddItem = (items: Item[], parentId: string, newItem: Item): Item[] => {
       return items.map(item => {
         if (item.id === parentId) {
+          state.setSelectedItem({ ...item, children: [...item.children, newItem] })
           return { ...item, children: [...item.children, newItem] } as Item;
-        } else if (item.children.length > 0) {
+        } else if (item.children?.length > 0) { // Les taches ne possèdent pas d'enfant
           return { ...item, children: findAndAddItem(item.children, parentId, newItem) } as Item;
         }
         return item;
@@ -48,7 +50,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   }),
   deleteItem: (itemId) => set((state) => {
     const findAndDeleteItem = (items: Item[], itemId: string): Item[] => {
-      return items.filter(item => item.id !== itemId)
+      return items?.filter(item => item.id !== itemId)
         .map(item => ({
           ...item,
           children: findAndDeleteItem(item.children, itemId)
@@ -67,7 +69,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       return items.map(item => {
         if (item.id === itemId) {
           return { ...item, ...updatedProperties };
-        } else if (item.children.length > 0) {
+        } else if (item.children?.length > 0) {
           return { ...item, children: findAndEditItem(item.children, itemId) } as Item;
         }
         return item;
@@ -80,22 +82,21 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       }
     };
   }),
-  getNewUS: () => {
-    let nextUSNb = get().project.childNb + 1;
+  getNewUS: (statut = "") => {
+    var nextUSNb = get().project.childNb + 1;
     return {
-      nom: "US" + nextUSNb,
-      description: "description de l'US" + nextUSNb,
-      id: "ID-US" + nextUSNb,
-      priorite: "",
-      statut: "",
-      technologies: "",
-      complexite: "",
+      nom: nativeItemTypeEnum.US +" "+ nextUSNb,
+      description: "",
+      id: "ID-"+nativeItemTypeEnum.US + nextUSNb,
+      priorite: nativePriorityEnum.Mineure,
+      statut: statut ? statut : nativeStateEnum.A_Faire,
+      version: "",
+      maitrise: nativeMasteryEnum.Faible,
       estimation: "",
-      datesEstimee: {from:"", to:""},
       datesEffectives: {from:"", to:""},
       children: [],
       commentaires: "",
-      type: "US",
+      type: nativeItemTypeEnum.US,
       new_attachments: [],
       existing_attachments: [],
     }
@@ -103,26 +104,25 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   getNewEnsemble: () => {
     var nextUSNb = get().project.childNb + 1;
     return {
-      nom: "Ensemble" + nextUSNb,
+      nom: nativeItemTypeEnum.Ensemble +" "+ nextUSNb,
       description: "",
       children: [],
-      id: "ID-Ensemble" + nextUSNb,
+      id: "ID-"+nativeItemTypeEnum.Ensemble + nextUSNb,
       commentaires: "",
-      type: "Ensemble"
+      type: nativeItemTypeEnum.Ensemble
     }
   },
-  getNewSprint: () => {
+  getNewSprint: (statut = "") => {
     var nextUSNb = get().project.childNb + 1;
     return {
-      nom: "Sprint" + nextUSNb,
-      description: "Description du Sprint" + nextUSNb,
-      id: "ID-Sprint" + nextUSNb,
-      statut: "",
-      datesEstimee: {from:"", to:""},
+      nom: nativeItemTypeEnum.Sprint +" "+ nextUSNb,
+      description: "",
+      id: "ID-"+nativeItemTypeEnum.Sprint + nextUSNb,
+      statut: statut ? statut : nativeStateEnum.A_Faire,
       datesEffectives: {from:"", to:""},
       children: [],
       commentaires: "",
-      type: "Sprint",
+      type: nativeItemTypeEnum.Sprint,
     }
   }
 }));

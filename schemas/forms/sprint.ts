@@ -1,34 +1,21 @@
+import { nativeStateEnum } from "@/app/model/projet/itemEnum";
 import { z } from "zod";
 
-export enum nativeUserStoryStateEnum {
-  Non_Commencee = "Non commencée",
-  Terminee = "Terminée",
-}
+const userStoryStateEnum = z.nativeEnum(nativeStateEnum, { message: "Champ obligatoire." })
 
-const userStoryStateEnum = z.nativeEnum(nativeUserStoryStateEnum, { message: "Champ obligatoire." })
+const coerceDate = z.preprocess(
+  (val) => (val === '' || val === null || val === undefined ? undefined : val),
+  z.coerce.date().optional()
+);
 
 export const createSprintFormSchema = z.object({
   nom: z.string(),
   description: z.string(),
   us_etat: userStoryStateEnum,
   estimation_initiale: z.coerce.number().optional(),
-  date_range_estim: z.object(
-    {
-      from: z.coerce.date(),
-      to: z.coerce.date(),
-    },
-    {
-      required_error: "Veuillez sélectionner une période de temps.",
-    }
-  ),
-  date_range_effective: z.object(
-    {
-      from: z.coerce.date(),
-      to: z.coerce.date().nullable().optional(),
-    },
-    {
-      required_error: "Veuillez sélectionner une date de début.",
-    }
-  ),
+  date_range_effective: z.object({
+    from: coerceDate,
+    to: coerceDate,
+  }),
   commentaires: z.string().optional(),
 })

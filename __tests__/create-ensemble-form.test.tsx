@@ -4,8 +4,7 @@ import { TreeState, useTreeStore } from '@/components/store/useTreeStore';
 import TreeView from '@/components/ui/arborescence/TreeView';
 import { RightPanel } from '@/components/right-panel';
 import { EnsembleUS, US } from '@/app/model/projet';
-import { nativeComplexityEnum, nativePriorityEnum, nativeUserStoryStateEnum } from '@/schemas/forms/user-story';
-import userEvent from "@testing-library/user-event";
+import {  } from '@/schemas/forms/user-story';
 import { format } from 'date-fns';
 
 jest.mock('../components/forms/create-ensemble-form');
@@ -23,7 +22,7 @@ describe('TreeView', () => {
     test("Sélectionner un ensemble de l'arborescence met à jour 'selectedItem' du store", () => {
         render(<TreeView/>);
         const { result } = renderHook(() => useTreeStore());
-        fireEvent.click(screen.getByText(/Ensemble1/i))
+        fireEvent.click(screen.getByText(/^Ensemble 1$/i))
         expect(result.current.selectedItem).toBe(result.current.project.children[0]);
     })
 
@@ -32,9 +31,9 @@ describe('TreeView', () => {
         const { getByTestId } = render(<RightPanel/>);
 
         const { result } = renderHook(() => useTreeStore())
-        fireEvent.click(screen.getByText(/Ensemble1/i))
+        fireEvent.click(screen.getByText(/^Ensemble 1$/i))
         // userEvent.selectOptions(getByTestId("select-multiple"), ["1", "3"]);
-        let selectedItem = result.current.selectedItem;
+        var selectedItem = result.current.selectedItem;
         expect(screen.getByLabelText(/Nom/i).value).toBe(selectedItem.nom);
         expect(screen.getByLabelText(/Description/i).value).toBe(selectedItem.description);
         expect(screen.getByLabelText(/Commentaires/i).value).toBe(selectedItem.commentaires );
@@ -46,10 +45,10 @@ describe('TreeView', () => {
         render(<RightPanel/>);
 
         var { result } = renderHook(() => useTreeStore())
-        fireEvent.click(screen.getByText(/Ensemble1/i))
-        let selectedItem = result.current.selectedItem;
+        fireEvent.click(screen.getByText(/^Ensemble 1$/i))
+        var selectedItem = result.current.selectedItem;
       
-        let editedEnsemble = {
+        var editedEnsemble = {
             nom: 'newNom',
             description: "newDesc",
             id: selectedItem.id,

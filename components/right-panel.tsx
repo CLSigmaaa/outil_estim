@@ -1,4 +1,5 @@
 "use client"
+import { nativeItemTypeEnum } from "@/app/model/projet/itemEnum"
 import { CreateEnsembleForm } from "./forms/create-ensemble-form"
 import { CreateSprintForm } from "./forms/create-sprint-form"
 import { CreateUserStoryForm } from "./forms/create-user-story-form"
@@ -8,18 +9,18 @@ export const RightPanel = () => {
   const { selectedItem } = useTreeStore();
 
   interface EditForm {
-    US: JSX.Element;
-    Ensemble: JSX.Element;
-    Sprint: JSX.Element;
+    [nativeItemTypeEnum.US]: JSX.Element;
+    [nativeItemTypeEnum.Ensemble]: JSX.Element;
+    [nativeItemTypeEnum.Sprint]: JSX.Element;
   }
 
   const editForm:EditForm = {
-    US:  <CreateUserStoryForm defaultValues={selectedItem} />,
-    Ensemble: <CreateEnsembleForm defaultValues={selectedItem} />,
-    Sprint: <CreateSprintForm defaultValues={selectedItem}/>
+    [nativeItemTypeEnum.US]:  <CreateUserStoryForm defaultValues={selectedItem} />,
+    [nativeItemTypeEnum.Ensemble]: <CreateEnsembleForm defaultValues={selectedItem} />,
+    [nativeItemTypeEnum.Sprint]: <CreateSprintForm defaultValues={selectedItem}/>
   }
   return (
-    <div className="border-gray-300 border-0 py-4 overflow-y-auto">
+    <div className="border-gray-300 border-0 py-2 overflow-y-auto">
       {selectedItem == undefined ? "Sélectionnez un élément de l'aborescence" :
         <div>
           {editForm[selectedItem.type as keyof EditForm]}

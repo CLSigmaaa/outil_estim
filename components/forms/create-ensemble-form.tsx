@@ -1,17 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
-
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
 
 import {
     Form,
@@ -46,7 +36,7 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
 
     //TODO: add types
     const onSubmit = (data: any) => {
-        let editedEnsemble = {
+        var editedEnsemble = {
             nom: data.nom,
             description: data.description,
             id: defaultValues.id,
@@ -73,8 +63,10 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
     //console.log(fields)
 
     return (
+        <>
+        <h1 className="font-bold mb-2">Informations sur {defaultValues.nom}</h1>
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full overflow-y-auto px-1">
                 <FormField
                     control={form.control}
                     name="nom"
@@ -96,7 +88,13 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
                             <FormLabel>Description</FormLabel>
                             <FormMessage />
                             <FormControl>
-                                <Input placeholder="Description User Story" {...field} />
+                            <FormControl>
+              <Textarea
+                   placeholder="Description de l'ensemble"
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
                             </FormControl>
                         </FormItem>
                     )}
@@ -125,5 +123,6 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
                 </Button>
             </form>
         </Form>
+    </>
     )
 }

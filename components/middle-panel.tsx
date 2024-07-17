@@ -1,21 +1,25 @@
 "use client"
+import { nativeItemTypeEnum } from "@/app/model/projet/itemEnum";
+import { useTreeStore } from "@/components/store/useTreeStore"
+import Kanban from "./kanban/Kanban"
+
 import { DashboardUSLayout, DashboardEnsembleUSLayout, DashboardSprintLayout } from "@/components/dashboard-layouts"
 
-import { useTreeStore } from "@/components/store/useTreeStore"
 
 type DashboardLayoutsType = {
   [key: string]: JSX.Element;
 };
 
 const dashboardLayouts: DashboardLayoutsType = {
-  "US": <DashboardUSLayout />,
-  "Sprint": <DashboardSprintLayout />,
-  "Ensemble": <DashboardEnsembleUSLayout />,
+  [nativeItemTypeEnum.US]: <DashboardUSLayout />,
+  [nativeItemTypeEnum.Sprint]: <DashboardSprintLayout />,
+  [nativeItemTypeEnum.Ensemble]: <DashboardEnsembleUSLayout />,
 }
+
 
 export const MiddlePanel = () => {
   const { selectedItem } = useTreeStore();
-
+  
   if (!selectedItem) return null;
 
   return (

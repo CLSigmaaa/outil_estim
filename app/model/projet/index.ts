@@ -10,10 +10,9 @@ export class US {
     id: string;
     priorite: string;
     statut: string;
-    technologies: string;
-    complexite: string;
+    version: string;
+    maitrise: string;
     estimation: string;
-    datesEstimee: {from: string, to :string};
     datesEffectives: {from: string, to :string};
     children: Item[];
     commentaires: string;
@@ -21,18 +20,17 @@ export class US {
     new_attachments: any[];
     existing_attachments: FileProperty[]; 
 
-    constructor(nom: string, description: string, id: string, priorite: string, statut: string, 
-        technologies: string, complexite: string, estimation: string, datesEstimee: {from: string, to :string}, 
-        datesEffectives: {from: string, to :string}, children: Item[], commentaires: string, type: string, new_attachments: any[], existing_attachments: FileProperty[]){
+    constructor(nom: string, description: string, id: string, priorite: string, statut: string, technologies: string, 
+        maitrise: string, estimation: string, datesEffectives: {from: string, to :string}, 
+        children: Item[], commentaires: string, type: string, new_attachments: any[], existing_attachments: FileProperty[]){
     this.nom = nom;
     this.description = description;
     this.id = id;
     this.priorite = priorite;
     this.statut = statut;
-    this.technologies = technologies;
-    this.complexite = complexite;
+    this.version = technologies;
+    this.maitrise = maitrise;
     this.estimation = estimation;
-    this.datesEstimee = datesEstimee;
     this.datesEffectives = datesEffectives;
     this.children = children;
     this.commentaires = commentaires;
@@ -41,8 +39,7 @@ export class US {
     this.existing_attachments = existing_attachments;
     }
 }
-
-export type Item =  US | EnsembleUS | Sprint ;
+export type Item =  US | EnsembleUS | Sprint  ;
 
 export type NestedItem = US | EnsembleUS;
 
@@ -69,7 +66,6 @@ export class Sprint {
     children: NestedItem[];
     id: string;
     statut: string;
-    datesEstimee: {from: string, to :string};
     datesEffectives: {from: string, to :string};
     commentaires: string;
     type: string
@@ -78,7 +74,6 @@ export class Sprint {
         this.nom = nom;
         this.description = description;
         this.statut = statut;
-        this.datesEstimee = datesEstimee;
         this.datesEffectives = datesEffectives;
         this.children = children;
         this.id = id;
