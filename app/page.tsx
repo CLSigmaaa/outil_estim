@@ -83,7 +83,7 @@ export default async function Home() {
           <LeftPanel />
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel defaultSize={300} className="flex justify-center">
+        <ResizablePanel defaultSize={300} className="h-full w-full !overflow-y-auto">
           <MiddlePanel />
         </ResizablePanel>
         <ResizableHandle />
