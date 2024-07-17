@@ -5,7 +5,7 @@ import { DynamicDashboard, chartData, chartConfig, PlaceholderChart, BaseDashboa
 export const DashboardUSLayout: React.FC = () => {
   return (
     <DynamicDashboard>
-      <BaseDashboardCase title="Kanban des tâches" resizable={false}>
+      <BaseDashboardCase title="Kanban des tâches" resizable="both">
         <span>Insérer Kanban ici.</span>
       </BaseDashboardCase>
     </DynamicDashboard>

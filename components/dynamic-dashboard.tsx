@@ -12,7 +12,7 @@ import { Bar, BarChart, XAxis } from "recharts"
 
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
 
-import { useResizableWidth } from '@/hooks/use-resizable';
+import { useResizable } from '@/hooks/use-resizable';
 
 import { Scaling } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,7 @@ type DashboardCaseProps = {
   children?: React.ReactNode;
   resizable?: boolean;
   width?: number;
+  height?: number;
 }
 
 export const chartData = [
@@ -63,15 +64,18 @@ export const PlaceholderChart: React.FC = ({ chartConfig, chartData }: any) => {
 }
 
 
-export const BaseDashboardCase: React.FC<DashboardCaseProps> = ({ title, children, resizable = false, width = 500 }) => {
-  const { currentWidth, startResizing } = useResizableWidth(width, resizable);
+export const BaseDashboardCase: React.FC<DashboardCaseProps> = ({ title, children, resizable = "both", width = 500, height = 500 }) => {
+  const { currentWidth, currentHeight, startResizing } = useResizable(width, height, resizable);
+
+  console.log((!resizable || resizable == "height"))
+  console.log(resizable)
 
   return (
     <div
-      style={{ width: `${currentWidth / 16}rem`, minWidth: '20rem' }}
+      style={{ width: `${currentWidth / 16}rem`, minWidth: '20rem', height: `${currentHeight / 16}rem` }}
       className={cn(
         "select-none",
-        !resizable && "flex-grow",
+        (!resizable || resizable == "height") && "flex-grow",
       )}
     >
       <Card className="w-full h-full relative">
@@ -81,7 +85,7 @@ export const BaseDashboardCase: React.FC<DashboardCaseProps> = ({ title, childre
         <CardContent>
           {children}
         </CardContent>
-        {resizable && (
+        {resizable != undefined && (
           <span className="cursor-w-resize">
             <Scaling
               className="w-4 h-4 absolute bottom-2 right-2"
@@ -91,24 +95,6 @@ export const BaseDashboardCase: React.FC<DashboardCaseProps> = ({ title, childre
         )}
       </Card>
     </div>
-  );
-}
-
-export const AnalyticsDashboardCase: React.FC<DashboardCaseProps> = ({ title, children, resizable = false }) => {
-  return (
-    <BaseDashboardCase title={title} resizable={resizable}>
-      <div className="flex flex-col gap-4 select-none">
-        {children}
-      </div>
-    </BaseDashboardCase>
-  );
-}
-
-export const ChartDashboardCase: React.FC<DashboardCaseProps> = ({ title, children, resizable = false }) => {
-  return (
-    <BaseDashboardCase title={title} resizable={resizable}>
-      {children}
-    </BaseDashboardCase>
   );
 }
 

@@ -2,8 +2,11 @@
 import * as React from "react"
 
 
-export const useResizableWidth = (initialWidth: number, resizable: boolean) => {
+//type ResizableDirection = 'width' | 'height' | 'both' | false;
+
+export const useResizable = (initialWidth: number = 250, initialHeight: number = 250, resizable: any) => {
   const [currentWidth, setWidth] = React.useState(initialWidth);
+  const [currentHeight, setHeight] = React.useState(initialHeight);
   const isResizing = React.useRef(false);
 
   React.useEffect(() => {
@@ -11,7 +14,12 @@ export const useResizableWidth = (initialWidth: number, resizable: boolean) => {
 
     const handleMouseMove = (e: MouseEvent) => {
       if (isResizing.current) {
-        setWidth((prev) => prev + (e.movementX / 2));
+        if (resizable === 'width' || resizable === 'both') {
+          setWidth((prev) => prev + (e.movementX / 2));
+        }
+        if (resizable === 'height' || resizable === 'both') {
+          setHeight((prev) => prev + (e.movementY / 2));
+        }
       }
     };
 
@@ -34,5 +42,5 @@ export const useResizableWidth = (initialWidth: number, resizable: boolean) => {
     }
   };
 
-  return { currentWidth, startResizing };
+  return { currentWidth, currentHeight, startResizing };
 };
