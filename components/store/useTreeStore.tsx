@@ -11,7 +11,9 @@ export interface TreeState {
   addItem: (parentId: string, newItem: Item | Tache) => void;
   deleteItem: (itemId: string) => void;
   editItem: (itemId: string, updatedProperties: Item | Tache) => void;
+  editItemState: (itemId: string, updatedState: string) => void;
   getNewUS: (statut?: string) => US;
+  getNewTache: (statut?: string) => Tache;
   getNewEnsemble: () => EnsembleUS;
   getNewSprint: (statut?: string) => Sprint;
 }
@@ -82,6 +84,33 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       }
     };
   }),
+  editItemState: (itemId, updatedState) => set((state) => {
+    const findAndEditItemState = (parent: any, itemId: string): Item[] => {
+      var items: Item[] = parent.children;
+      var found: boolean = false;
+      return items.map(item => {
+        if (item.id === itemId) {
+          found = true;
+          state.setSelectedItem({
+            ...parent, 
+            children: items.map(child => child.id === itemId ? { ...child, statut: updatedState } : child)
+          })
+          return { ...item, statut: updatedState };
+        } else if (found){
+          return item;
+        } else if (item.children?.length > 0) {
+          return { ...item, children: findAndEditItemState(item, itemId) } as Item;
+        }
+        return item;
+      });
+    };
+    return {
+      project: {
+        ...state.project,
+        children: findAndEditItemState(state.project, itemId),
+      }
+    };
+  }),
   getNewUS: (statut = "") => {
     var nextUSNb = get().project.childNb + 1;
     return {
@@ -99,6 +128,16 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       type: nativeItemTypeEnum.US,
       new_attachments: [],
       existing_attachments: [],
+    }
+  },
+  getNewTache: (statut = "") => {
+    var nextUSNb = get().project.childNb + 1;
+    return {
+      nom: nativeItemTypeEnum.Tache +" "+ nextUSNb,
+      description: "",
+      statut: statut ? statut : nativeStateEnum.A_Faire,
+      id: "ID"+nativeItemTypeEnum.Tache + nextUSNb,
+      type: nativeItemTypeEnum.Tache
     }
   },
   getNewEnsemble: () => {

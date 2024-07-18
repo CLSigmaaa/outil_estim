@@ -64,21 +64,18 @@ export const PlaceholderChart: React.FC = ({ chartConfig, chartData }: any) => {
 }
 
 
-export const BaseDashboardCase: React.FC<DashboardCaseProps> = ({ title, children, resizable = "both", width = 500, height = 500 }) => {
+export const BaseDashboardCase: React.FC<DashboardCaseProps> = ({ title, children, resizable = "both", width = 250, height = 250 }) => {
   const { currentWidth, currentHeight, startResizing } = useResizable(width, height, resizable);
-
-  console.log((!resizable || resizable == "height"))
-  console.log(resizable)
 
   return (
     <div
-      style={{ width: `${currentWidth / 16}rem`, minWidth: '20rem', height: `${currentHeight / 16}rem` }}
+      style={{ width: `${currentWidth / 4}rem`, minWidth: 'fit-content', height: `${currentHeight / 8}rem`, minHeight: '10rem' }}
       className={cn(
         "select-none",
         (!resizable || resizable == "height") && "flex-grow",
       )}
     >
-      <Card className="w-full h-full relative">
+      <Card className="w-full h-full relative overflow-y-auto">
         <CardHeader>
           <CardTitle>{title}</CardTitle>
         </CardHeader>

@@ -80,6 +80,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
     [nativeItemTypeEnum.US]: BookmarkBorderIcon,
     [nativeItemTypeEnum.Ensemble]: BookmarksIcon,
     [nativeItemTypeEnum.Sprint]: LoopIcon,
+    [nativeItemTypeEnum.Tache]: TaskAltIcon
   }
 
   function getIconFromId(itemId: string) {
@@ -91,6 +92,9 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
     }
     if (itemId.includes(nativeItemTypeEnum.Sprint)) {
       return iconDict[nativeItemTypeEnum.Sprint]
+    }
+    if (itemId.includes(nativeItemTypeEnum.Tache)) {
+      return iconDict[nativeItemTypeEnum.Tache]
     }
     return undefined;
   }

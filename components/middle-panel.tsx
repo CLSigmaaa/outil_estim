@@ -1,7 +1,6 @@
 "use client"
 import { nativeItemTypeEnum } from "@/app/model/projet/itemEnum";
 import { useTreeStore } from "@/components/store/useTreeStore"
-import Kanban from "./kanban/Kanban"
 
 import { DashboardUSLayout, DashboardEnsembleUSLayout, DashboardSprintLayout } from "@/components/dashboard-layouts"
 
@@ -25,7 +24,7 @@ export const MiddlePanel = () => {
   return (
     <>
       <h1 className="font-bold text-3xl mt-3 ml-3">Dashboard</h1>
-      <div className="flex justify-center overflow-y-auto">
+      <div className="flex justify-center">
           {dashboardLayouts[selectedItem.type]}
       </div>
     </>

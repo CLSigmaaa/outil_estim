@@ -1,12 +1,13 @@
 "use client"
 import * as React from 'react';
 import { DynamicDashboard, chartData, chartConfig, PlaceholderChart, BaseDashboardCase } from '@/components/dynamic-dashboard';
+import Kanban from './kanban/Kanban';
 
 export const DashboardUSLayout: React.FC = () => {
   return (
     <DynamicDashboard>
       <BaseDashboardCase title="Kanban des tâches" resizable="both">
-        <span>Insérer Kanban ici.</span>
+        <Kanban isUSKanban={true}/>
       </BaseDashboardCase>
     </DynamicDashboard>
   )
@@ -14,9 +15,9 @@ export const DashboardUSLayout: React.FC = () => {
 
 export const DashboardSprintLayout: React.FC = () => {
   return (
-    <div>
-      <h1>Dashboard Sprint Layout</h1>
-    </div>
+    <BaseDashboardCase title="Kanban des user stories" resizable="both">
+      <Kanban isUSKanban={false}/>
+      </BaseDashboardCase>
   )
 }
 

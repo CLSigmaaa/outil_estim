@@ -39,6 +39,21 @@ export class US {
     this.existing_attachments = existing_attachments;
     }
 }
+
+export class Tache {
+    nom: string;
+    description: string;
+    statut: string;
+    id: string;
+
+    constructor(nom: string, description: string, statut: string, id: string){
+        this.nom = nom;
+        this.description = description;
+        this.statut = statut;
+        this.id = id;
+    }
+}
+
 export type Item =  US | EnsembleUS | Sprint  ;
 
 export type NestedItem = US | EnsembleUS;
