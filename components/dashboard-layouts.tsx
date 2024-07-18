@@ -1,23 +1,40 @@
 "use client"
 import * as React from 'react';
-import { DynamicDashboard, chartData, chartConfig, PlaceholderChart, BaseDashboardCase } from '@/components/dynamic-dashboard';
+import { DashboardRow, DashboardCase, BaseDashboardLayout, chartData, chartConfig, PlaceholderChart } from '@/components/dynamic-dashboard';
 import Kanban from './kanban/Kanban';
 
 export const DashboardUSLayout: React.FC = () => {
   return (
-    <DynamicDashboard>
-      <BaseDashboardCase title="Kanban des tâches" resizable="both">
-        <Kanban isUSKanban={true}/>
-      </BaseDashboardCase>
-    </DynamicDashboard>
+    <BaseDashboardLayout>
+      <DashboardRow>
+        <DashboardCase title="User stories" className="flex-grow">
+          <PlaceholderChart chartConfig={chartConfig} chartData={chartData} />
+        </DashboardCase>
+        <DashboardCase title="User stories" className="flex-grow">
+          <PlaceholderChart chartConfig={chartConfig} chartData={chartData} />
+        </DashboardCase>
+      </DashboardRow>
+      <DashboardRow className="flex-row">
+        <DashboardCase title="User stories" className='flex-grow'>
+          <span>test</span>
+        </DashboardCase>
+        <DashboardCase title="User stories"className='flex-grow'>
+          <span>test</span>
+        </DashboardCase>
+        <DashboardCase title="User stories"className='flex-grow'>
+          <span>test</span>
+        </DashboardCase>
+        <DashboardCase title="User stories" className='flex-grow'>
+          <span>test</span>
+        </DashboardCase>
+      </DashboardRow>
+    </BaseDashboardLayout>
   )
 }
 
 export const DashboardSprintLayout: React.FC = () => {
   return (
-    <BaseDashboardCase title="Kanban des user stories" resizable="both">
-      <Kanban isUSKanban={false}/>
-      </BaseDashboardCase>
+    <div></div>
   )
 }
 

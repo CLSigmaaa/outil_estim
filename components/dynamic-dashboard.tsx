@@ -12,17 +12,36 @@ import { Bar, BarChart, XAxis } from "recharts"
 
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
 
-import { useResizable } from '@/hooks/use-resizable';
-
-import { Scaling } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type DashboardCaseProps = {
-  title: string;
-  children?: React.ReactNode;
-  resizable?: boolean;
-  width?: number;
-  height?: number;
+interface DashboardCaseProps {
+  children: React.ReactNode;
+  className?: string;
+  title?: string;
+  description?: string;
+  footer?: string;
+}
+
+interface DashboardRowProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface BaseDashboardLayoutProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface PlaceholderChartProps {
+  chartConfig: {
+    desktop: { color: string };
+    mobile: { color: string };
+  };
+  chartData: Array<{
+    month: string;
+    desktop: number;
+    mobile: number;
+  }>;
 }
 
 export const chartData = [
@@ -45,7 +64,7 @@ export const chartConfig = {
   },
 } satisfies ChartConfig
 
-export const PlaceholderChart: React.FC = ({ chartConfig, chartData }: any) => {
+export const PlaceholderChart: React.FC<PlaceholderChartProps> = ({ chartConfig, chartData }) => {
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
       <BarChart accessibilityLayer data={chartData}>
@@ -63,42 +82,29 @@ export const PlaceholderChart: React.FC = ({ chartConfig, chartData }: any) => {
   )
 }
 
-
-export const BaseDashboardCase: React.FC<DashboardCaseProps> = ({ title, children, resizable = "both", width = 250, height = 250 }) => {
-  const { currentWidth, currentHeight, startResizing } = useResizable(width, height, resizable);
-
+export const DashboardCase: React.FC<DashboardCaseProps> = ({ children, className, title, description, footer }) => {
   return (
-    <div
-      style={{ width: `${currentWidth / 4}rem`, minWidth: 'fit-content', height: `${currentHeight / 8}rem`, minHeight: '10rem' }}
-      className={cn(
-        "select-none",
-        (!resizable || resizable == "height") && "flex-grow",
-      )}
+    <Card
+      className={className}
     >
-      <Card className="w-full h-full relative overflow-y-auto">
+      {title && (
         <CardHeader>
           <CardTitle>{title}</CardTitle>
+          {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
-        <CardContent>
-          {children}
-        </CardContent>
-        {resizable != undefined && (
-          <span className="cursor-w-resize">
-            <Scaling
-              className="w-4 h-4 absolute bottom-2 right-2"
-              onMouseDown={startResizing}
-            />
-          </span>
-        )}
-      </Card>
-    </div>
-  );
+      )}
+      <CardContent>
+        {children}
+      </CardContent>
+      {footer && <CardFooter>{footer}</CardFooter>}
+    </Card>
+  )
 }
 
-export const DynamicDashboard = ({ children }: any) => {
-  return (
-    <div className="flex flex-wrap gap-4 justify-center p-3 w-full">
-      {children}
-    </div>
-  )
+export const DashboardRow: React.FC<DashboardRowProps> = ({ children, className }) => {
+  return <div className={cn("flex flex-row flex-wrap w-full", className ? className : "gap-x-4")}>{children}</div>
+}
+
+export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({ children, className }) => {
+  return <div className={cn("flex flex-col w-full", className ? className : "gap-y-4 p-4")}>{children}</div>
 }
