@@ -28,17 +28,13 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-import { Trash2 } from "lucide-react"
-
 import { createUserStoryFormSchema } from "@/schemas/forms/user-story"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useFieldArray, useForm } from "react-hook-form"
 import { US } from "@/app/model/projet"
 import { useTreeStore } from "@/components/store/useTreeStore"
-import { Separator } from "../ui/separator"
 
-import { FileCard } from "@/components/file-card"
 import { nativePriorityEnum, nativeStateEnum, nativeMasteryEnum } from "@/app/model/projet/itemEnum"
 
 const testHandle = (event: any, onChange: any) => {
@@ -58,53 +54,17 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       priorite: defaultValues.priorite,
       statut: defaultValues.statut,
       version: defaultValues.version,
-      maitrise: defaultValues.maitrise,
       estimation_initiale: defaultValues.estimation ? parseInt(defaultValues.estimation) : 0,
-      date_range_effective: {
-        from: new Date(),
-        to: new Date(),
-      },
       commentaires: defaultValues.commentaires,
-      new_attachments: defaultValues.new_attachments,
-      existing_attachments: defaultValues.existing_attachments,
     },
   })
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "new_attachments",
-  });
-
-
-  // Fonction pour gérer la suppression d'une pièce jointe existante
-  const handleRemoveExistingAttachment = (index: number) => {
-    // Filtrer la pièce jointe à supprimer
-    const updatedAttachments = selectedItem.existing_attachments.filter((_, i) => i !== index);
-
-    // Mettre à jour l'état avec la nouvelle liste de pièces jointes
-    setSelectedItem({
-      ...selectedItem,
-      existing_attachments: updatedAttachments,
-    });
-  };
 
   const onSubmit = async (data: any) => {
     const formData = new FormData();
-    formData.append("id", data.id);
-
-    if (data.new_attachments) {
-      Array.from(data.new_attachments).forEach((file: File, index: number) => {
-        formData.append(`new_attachments`, file);
-      });
-    }
+    
     formData.append("nom", data.nom);
     formData.append("id", data.id);
-    if(data.date_range_effective.from == undefined && data.statut == nativeStateEnum.En_Cours){
-        data.date_range_effective.from = new Date()
-    }
-    if (data.date_range_effective.to == undefined && data.statut == nativeStateEnum.Terminee){
-        data.date_range_effective.to = new Date()
-    }
     
     const editedItem: US = {
       ...selectedItem,
@@ -113,20 +73,9 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       priorite: data.priorite,
       statut: data.statut,
       version: data.version,
-      maitrise: data.maitrise,
       estimation: data.estimation_initiale,
-      datesEffectives: data.date_range_effective,
       commentaires: data.commentaires,
-      existing_attachments: data.new_attachments?.map((file: any) => {
-        return {
-          nom: file.name,
-          url: `http://localhost:3000/${selectedItem.id}/${file.name}`,
-          extension: file.type,
-        }
-      }),
-      new_attachments: []
     };
-    await upload(formData)
     setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)
 
@@ -140,12 +89,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       priorite: selectedItem.priorite,
       statut: selectedItem.statut,
       version: selectedItem.version,
-      maitrise: selectedItem.maitrise,
       estimation_initiale: selectedItem.estimation ? parseInt(selectedItem.estimation) : 0,
-      date_range_effective: {
-        from: selectedItem.datesEffectives.from,
-        to: selectedItem.datesEffectives.to,
-      },
       commentaires: selectedItem.commentaires,
     })
   }
@@ -261,47 +205,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           />
           <FormField
             control={form.control}
-            name="version"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Version {createUserStoryFormSchema.shape['version'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-                <FormMessage />
-                <FormControl>
-                  <Input placeholder="Version cible" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="maitrise"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Maîtrise {createUserStoryFormSchema.shape['maitrise'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un niveau de maitrise" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {Object.values(nativeMasteryEnum).map((item) => {
-                      return (
-                        <SelectItem
-                          key={item}
-                          value={item}>
-                          {item}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
             name="estimation_initiale"
             render={({ field }) => (
               <FormItem>
@@ -315,53 +218,14 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           />
           <FormField
             control={form.control}
-            name="date_range_effective"
+            name="version"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date de lancement et fin effective</FormLabel>
+              <FormItem>
+                <FormLabel>Version {createUserStoryFormSchema.shape['version'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
-                <Popover modal={true}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="date"
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !field.value.from && "text-muted-foreground"
-                      )}
-                      aria-label="dateLancementEffective"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {field.value.from ? (
-                      field.value.to ? (
-                        <div aria-label="dateLancementEffectiveFull">
-                          {format(field.value.from, "LLL dd, y")} -{" "}
-                          {format(field.value.to, "LLL dd, y")}
-                        </div>
-                      ) : (
-                        <div aria-label="dateLancementEffectiveStart">
-                          {format(field.value.from, "LLL dd, y")}
-                        </div>
-                      )
-                    ) : (
-                      <span aria-label="dateLancementEffectiveEmpty">Pick a date</span>
-                    )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="center">
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      defaultMonth={field.value.from}
-                      selected={{
-                        from: field.value.from!,
-                        to: field.value.to,
-                      }}
-                      onSelect={field.onChange}
-                      numberOfMonths={2}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <FormControl>
+                  <Input placeholder="Version cible" {...field} />
+                </FormControl>
               </FormItem>
             )}
           />
@@ -382,52 +246,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
               </FormItem>
             )}
           />
-
-          <Separator className="mt-6" />
-          <div className="flex flex-col gap-2">
-            <h1 className="font-bold mt-2">Pièces Jointes</h1>
-            <h2 className="font-semibold">Existantes :</h2>
-
-            {selectedItem.existing_attachments?.length > 0 ? selectedItem.existing_attachments.map((attachment, index) => (
-              <FileCard
-                key={index}
-                fileProperty={attachment}
-                onRemove={() => handleRemoveExistingAttachment(index)} />
-            )) : "Aucune pièce jointe existante."}
-
-            <h2 className="font-semibold">Nouvelles :</h2>
-            {fields.map((field, index) => (
-              <FormField
-                key={field.id}
-                control={form.control}
-                name={`new_attachments.${index}`}
-                render={({ field: { value, onChange, ...fieldProps } }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div className="flex gap-2">
-                        <Input placeholder="Attachment" type="file" {...fieldProps} onChange={(event) => testHandle(event, onChange)} />
-                        <Button
-                          type="button"
-                          onClick={() => remove(index)}
-                          variant="destructive"
-                        >
-                          <Trash2 />
-                        </Button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-            ))}
-            <Button
-              type="button"
-              onClick={() => append({})}
-            >
-              Ajouter une pièce jointe
-            </Button>
-          </div>
           <Button
             className="mt-2"
             type="submit"

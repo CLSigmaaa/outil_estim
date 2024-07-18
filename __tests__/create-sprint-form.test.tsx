@@ -34,8 +34,7 @@ describe('TreeView', () => {
         var selectedItem = result.current.selectedItem;
         expect(screen.getByLabelText(/Nom/i).value).toBe(selectedItem.nom);
         expect(screen.getByLabelText(/Description/i).value).toBe(selectedItem.description);
-        expect(screen.getByLabelText(/État des US/i).firstChild?.innerHTML).toBe(selectedItem.etat || nativeStateEnum.A_Faire);
-        expect(screen.getByLabelText(/dateLancementEffectiveEmpty/i).innerHTML).toBe("Pick a date");
+        expect(screen.getByLabelText(/État du Sprint/i).firstChild?.innerHTML).toBe(selectedItem.etat || nativeStateEnum.A_Faire);
         expect(screen.getByLabelText(/Commentaires/i).value).toBe(selectedItem.commentaires );
 
     })
@@ -73,9 +72,7 @@ describe('TreeView', () => {
         fireEvent.click(screen.getByText(/newNom/i))
         expect(screen.getByLabelText(/Nom/i).value).toBe(editedItem.nom);
         expect(screen.getByLabelText(/Description/i).value).toBe(editedItem.description);
-        expect(screen.getByLabelText(/État des US/i).firstChild?.innerHTML).toBe(editedItem.statut || "");
-        expect(screen.getByLabelText(/dateLancementEffectiveFull/i).innerHTML).toBe(
-            format(editedItem.datesEffectives.from, "LLL dd, y") +" - "+ format(editedItem.datesEffectives.to, "LLL dd, y"));
+        expect(screen.getByLabelText(/État du Sprint/i).firstChild?.innerHTML).toBe(editedItem.statut || "");
         expect(screen.getByLabelText(/Commentaires/i).value).toBe(editedItem.commentaires );
 
     })

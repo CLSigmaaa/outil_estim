@@ -115,12 +115,11 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     var nextUSNb = get().project.childNb + 1;
     return {
       nom: nativeItemTypeEnum.US +" "+ nextUSNb,
-      description: "",
+      description: "Description" + nativeItemTypeEnum.US +" "+ nextUSNb,
       id: "ID-"+nativeItemTypeEnum.US + nextUSNb,
       priorite: nativePriorityEnum.Mineure,
       statut: statut ? statut : nativeStateEnum.A_Faire,
       version: "",
-      maitrise: nativeMasteryEnum.Faible,
       estimation: "",
       datesEffectives: {from:"", to:""},
       children: [],
@@ -134,7 +133,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     var nextUSNb = get().project.childNb + 1;
     return {
       nom: nativeItemTypeEnum.Tache +" "+ nextUSNb,
-      description: "",
+      description: "Description" + nativeItemTypeEnum.Tache +" "+ nextUSNb,
       statut: statut ? statut : nativeStateEnum.A_Faire,
       id: "ID"+nativeItemTypeEnum.Tache + nextUSNb,
       type: nativeItemTypeEnum.Tache
@@ -144,7 +143,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     var nextUSNb = get().project.childNb + 1;
     return {
       nom: nativeItemTypeEnum.Ensemble +" "+ nextUSNb,
-      description: "",
+      description: "Description" + nativeItemTypeEnum.Ensemble +" "+ nextUSNb,
       children: [],
       id: "ID-"+nativeItemTypeEnum.Ensemble + nextUSNb,
       commentaires: "",
@@ -155,7 +154,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     var nextUSNb = get().project.childNb + 1;
     return {
       nom: nativeItemTypeEnum.Sprint +" "+ nextUSNb,
-      description: "",
+      description: "Description" + nativeItemTypeEnum.Sprint +" "+ nextUSNb,
       id: "ID-"+nativeItemTypeEnum.Sprint + nextUSNb,
       statut: statut ? statut : nativeStateEnum.A_Faire,
       datesEffectives: {from:"", to:""},

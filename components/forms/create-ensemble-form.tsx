@@ -37,11 +37,9 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
     //TODO: add types
     const onSubmit = (data: any) => {
         var editedEnsemble = {
+            ...selectedItem,
             nom: data.nom,
             description: data.description,
-            id: defaultValues.id,
-            children: defaultValues.children,
-            type: "Ensemble"
         } as EnsembleUS;
         setSelectedItem(undefined)
         editItem(editedEnsemble.id, editedEnsemble)
@@ -56,11 +54,6 @@ export const CreateEnsembleForm = ({ defaultValues }: { defaultValues: EnsembleU
     }
 
     React.useEffect(resetform, [defaultValues])
-    // For debug purposes
-    //const { errors } = form.formState
-    //console.log(errors)
-    //const fields = form.watch()
-    //console.log(fields)
 
     return (
         <>

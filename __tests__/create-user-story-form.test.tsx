@@ -36,9 +36,7 @@ describe('TreeView', () => {
         expect(screen.getByLabelText(/Priorité/i).firstChild?.innerHTML ).toBe(selectedItem.priorite || nativePriorityEnum.Mineure);
         expect(screen.getByLabelText(/État des US/i).firstChild?.innerHTML).toBe(selectedItem.etat || nativeStateEnum.A_Faire);
         expect(screen.getByLabelText(/Version/i).value).toBe(selectedItem.version );
-        expect(screen.getByLabelText(/Maîtrise/i).firstChild?.innerHTML).toBe(selectedItem.maitrise || nativeMasteryEnum.Moyen);
         expect(screen.getByLabelText(/Estimation Initiale/i).value).toBe(selectedItem.estimationInitiale || "0");
-        expect(screen.getByLabelText(/dateLancementEffectiveEmpty/i).innerHTML).toBe("Pick a date");
         expect(screen.getByLabelText(/Commentaires/i).value).toBe(selectedItem.commentaires );
 
     })
@@ -66,7 +64,6 @@ describe('TreeView', () => {
             priorite: nativePriorityEnum.Majeure,
             statut: nativeStateEnum.Terminee,
             version: "2.3.0",
-            maitrise: nativeMasteryEnum.Moyen,
             estimation: "42",
             datesEffectives: {from:startDate.toDateString(), to:endDate.toDateString()},
             children: selectedItem.children,
@@ -85,7 +82,6 @@ describe('TreeView', () => {
         expect(selectedItem.priorite).toBe(editedItem.priorite);
         expect(selectedItem.statut).toBe(editedItem.statut || "");
         expect(selectedItem.version).toBe(editedItem.version );
-        expect(selectedItem.maitrise).toBe(editedItem.maitrise );
         expect(selectedItem.estimation).toBe(editedItem.estimation || "0");
         expect(selectedItem.datesEffectives.from).toBe(
             format(editedItem.datesEffectives.from, "EEE LLL dd y"));

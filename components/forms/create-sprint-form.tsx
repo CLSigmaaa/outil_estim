@@ -1,22 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
-
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,14 +14,12 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-import { createUserStoryFormSchema } from "@/schemas/forms/user-story"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Sprint, US } from "@/app/model/projet"
+import { Sprint } from "@/app/model/projet"
 import { useTreeStore } from "@/components/store/useTreeStore"
 import { createSprintFormSchema } from "@/schemas/forms/sprint"
-import { nativeStateEnum } from "@/app/model/projet/itemEnum"
+import { nativeItemTypeEnum, nativeStateEnum } from "@/app/model/projet/itemEnum"
 
 export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) => {
 
@@ -45,7 +31,7 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
     defaultValues: {
       nom: defaultValues.nom,
       description: defaultValues.description,
-      us_etat: defaultValues.statut,
+      statut: defaultValues.statut,
       date_range_effective: {
         from: new Date(),
         to: new Date(),
@@ -56,16 +42,12 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
   
   //TODO: add types
   const onSubmit = (data: any) => {
-    console.log(data.date_range_effective)
     var editedItem = {
+      ...selectedItem,
       nom: data.nom,
       description: data.description,
-      id: selectedItem.id,
-      statut: data.us_etat,
-      datesEffectives: data.date_range_effective,
-      children: selectedItem.children,
+      statut: data.statut,
       commentaires: data.commentaires,
-      type: "Sprint"
     } as Sprint;
     setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)
@@ -75,7 +57,7 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
     form.reset({
       nom: selectedItem.nom,
       description: selectedItem.description,
-      us_etat: selectedItem.statut,
+      statut: selectedItem.statut,
       date_range_effective: {
         from: selectedItem.datesEffectives.from,
         to: selectedItem.datesEffectives.to,
@@ -130,10 +112,10 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
         />
         <FormField
           control={form.control}
-          name="us_etat"
+          name="statut"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>État des US</FormLabel>
+              <FormLabel>État du Sprint</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -152,57 +134,6 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
                   })}
                 </SelectContent>
               </Select>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="date_range_effective"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date de lancement et fin effective</FormLabel>
-              <FormMessage />
-              <Popover modal={true}>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="date"
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !field.value.from && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {field.value.from ? (
-                      field.value.to ? (
-                        <div aria-label="dateLancementEffectiveFull">
-                          {format(field.value.from, "LLL dd, y")} -{" "}
-                          {format(field.value.to, "LLL dd, y")}
-                        </div>
-                      ) : (
-                        <div aria-label="dateLancementEffectiveStart">
-                          {format(field.value.from, "LLL dd, y")}
-                        </div>
-                      )
-                    ) : (
-                      <span aria-label="dateLancementEffectiveEmpty">Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={field.value.from}
-                    selected={{
-                      from: field.value.from!,
-                      to: field.value.to,
-                    }}
-                    onSelect={field.onChange}
-                    numberOfMonths={2}
-                  />
-                </PopoverContent>
-              </Popover>
             </FormItem>
           )}
         />

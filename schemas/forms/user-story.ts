@@ -20,17 +20,6 @@ export const createUserStoryFormSchema = z.object({
   priorite: priorityEnum,
   statut: userStoryStateEnum,
   version: z.string().optional(),
-  maitrise: complexityEnum,
   estimation_initiale: z.coerce.number().optional(),
-  date_range_effective: z.object({
-    from: coerceDate,
-    to: coerceDate,
-  }),
   commentaires: z.string().optional(),
-  new_attachments: z.array(z.instanceof(File)).optional(),
-  existing_attachments: z.array(z.object({
-    nom: z.string().min(1, { message: "Champ obligatoire." }),
-    url: z.string().min(1, { message: "Champ obligatoire." }),
-    extension: z.string().min(1, { message: "Champ obligatoire." }),
-  })).optional(),
 })

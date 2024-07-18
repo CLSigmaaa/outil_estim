@@ -9,6 +9,8 @@ import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { useTreeStore } from "../store/useTreeStore";
 import { CreateTacheForm } from "../forms/create-tache-form";
 import { nativeItemTypeEnum } from "@/app/model/projet/itemEnum";
+
+
 export default function ColonneKanban({
   selectedItem,
   statut,
@@ -21,13 +23,13 @@ export default function ColonneKanban({
   const styles = {
     dragger: `px-4 py-4 my-2 transition-colors duration-150 ease-in-out bg-white rounded-lg shadow hover:bg-gray-100`,
     dropper: "px-4 flex flex-col w-full h-full",
-    draggerContent: `flex flex-col items-center space-x-3 text-base`,
+    draggerContent: `flex justify-evenly items-center space-x-3 text-base`,
     draggerIcon: `inline-flex items-center justify-center rounded-full p-1.5 text-white bg-teal-100 text-teal-700`,
     dragging: `bg-gray-300`,
     dropOver: `bg-gray-100`,
   };
 
-  const { addItem, getNewUS, getNewTache } = useTreeStore();
+  const { setSelectedItem, addItem, getNewUS, getNewTache } = useTreeStore();
 
   function addItemInColum() {
     addItem(
@@ -70,9 +72,9 @@ export default function ColonneKanban({
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                             >
-                              <div className={styles.draggerContent}>
-                                <div className="font-semibold">{item.nom}</div>
-                                <div>{item.description}</div>
+                              <div className={styles.draggerContent} onClick={() => setSelectedItem(item)}>
+                                <div className="">{item.nom}</div>
+                                <div>{itemType == nativeItemTypeEnum.US ? item.estimation : "" }</div>
                               </div>
                             </div>
                           </PopoverTrigger>
