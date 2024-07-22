@@ -66,7 +66,7 @@ export const chartConfig = {
 
 export const PlaceholderChart: React.FC<PlaceholderChartProps> = ({ chartConfig, chartData }) => {
   return (
-    <ChartContainer config={chartConfig} className=" w-full">
+    <ChartContainer config={chartConfig} className="w-full">
       <BarChart accessibilityLayer data={chartData}>
         <XAxis
           dataKey="month"

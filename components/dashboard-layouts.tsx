@@ -35,25 +35,19 @@ export const DashboardUSLayout: React.FC = () => {
 
 export const DashboardSprintLayout: React.FC = () => {
   return (
-    <BaseDashboardLayout>
-    <DashboardRow>
-      <DashboardCase title="User stories" className="w-full">
-        <BurnDown />
-      </DashboardCase>
-    </DashboardRow>
-    <DashboardRow>
-      <DashboardCase title="User stories" className="w-full">
-       <Kanban isUSKanban={false}/>
-      </DashboardCase>
-    </DashboardRow>
-  </BaseDashboardLayout>
+    <div></div>
   )
 }
 
 export const DashboardEnsembleUSLayout: React.FC = () => {
   return (
-    <div>
-      <h1>Dashboard Ensemble US Layout</h1>
-    </div>
+    <BaseDashboardLayout>
+      <DashboardRow>
+        <DashboardCase title="Kanban US" description="Gestion des tâches d'une US" className="w-full">
+        </DashboardCase>
+        <DashboardCase title="Kanban US" description="Gestion des tâches d'une US" className="w-full">
+        </DashboardCase>
+      </DashboardRow>
+    </BaseDashboardLayout>
   )
 }

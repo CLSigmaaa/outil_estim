@@ -79,15 +79,15 @@ export default async function Home() {
         direction="horizontal"
         className="flex flex-1 overflow-hidden"
       >
-        <ResizablePanel defaultSize={20} minSize={15} maxSize={30}   className="h-full p-2 " >
+        <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="h-full p-2 " >
           <LeftPanel />
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel defaultSize={50} minSize={40} maxSize={65}  className="h-full w-full !overflow-y-auto">
+        <ResizablePanel defaultSize={55} minSize={40} maxSize={65} className="h-full w-full !overflow-y-auto">
           <MiddlePanel />
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel defaultSize={30} minSize={20}  maxSize={40} className="w-full h-full">
+        <ResizablePanel defaultSize={25} minSize={20} maxSize={40} className="w-full h-full">
           <div className="w-full h-full overflow-y-auto p-2">
             <RightPanel />
           </div>

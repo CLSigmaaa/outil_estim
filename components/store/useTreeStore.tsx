@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { EnsembleUS, Item, Projet, Sprint, Tache, US } from "@/app/model/projet/index";
 import { nativeMasteryEnum, nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from '@/app/model/projet/itemEnum';
@@ -279,11 +278,11 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         if (item.id === itemId) {
           found = true;
           state.setSelectedItem({
-            ...parent, 
+            ...parent,
             children: items.map(child => child.id === itemId ? { ...child, statut: updatedState } : child)
           })
           return { ...item, statut: updatedState };
-        } else if (found){
+        } else if (found) {
           return item;
         } else if (item.children?.length > 0) {
           return { ...item, children: findAndEditItemState(item, itemId) } as Item;
@@ -301,9 +300,9 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   getNewUS: (statut = nativeStateEnum.A_Faire) => {
     var nextUSNb = get().project.childNb + 1;
     return {
-      nom: nativeItemTypeEnum.US +" "+ nextUSNb,
-      description: "Description" + nativeItemTypeEnum.US +" "+ nextUSNb,
-      id: "ID-"+nativeItemTypeEnum.US + nextUSNb,
+      nom: nativeItemTypeEnum.US + " " + nextUSNb,
+      description: "Description" + nativeItemTypeEnum.US + " " + nextUSNb,
+      id: "ID-" + nativeItemTypeEnum.US + nextUSNb,
       priorite: nativePriorityEnum.Mineure,
       statut: statut,
       version: "",
@@ -317,20 +316,20 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   getNewTache: (statut = "") => {
     var nextUSNb = get().project.childNb + 1;
     return {
-      nom: nativeItemTypeEnum.Tache +" "+ nextUSNb,
-      description: "Description" + nativeItemTypeEnum.Tache +" "+ nextUSNb,
+      nom: nativeItemTypeEnum.Tache + " " + nextUSNb,
+      description: "Description" + nativeItemTypeEnum.Tache + " " + nextUSNb,
       statut: statut ? statut : nativeStateEnum.A_Faire,
-      id: "ID"+nativeItemTypeEnum.Tache + nextUSNb,
+      id: "ID" + nativeItemTypeEnum.Tache + nextUSNb,
       type: nativeItemTypeEnum.Tache
     }
   },
   getNewEnsemble: () => {
     var nextUSNb = get().project.childNb + 1;
     return {
-      nom: nativeItemTypeEnum.Ensemble +" "+ nextUSNb,
-      description: "Description" + nativeItemTypeEnum.Ensemble +" "+ nextUSNb,
+      nom: nativeItemTypeEnum.Ensemble + " " + nextUSNb,
+      description: "Description" + nativeItemTypeEnum.Ensemble + " " + nextUSNb,
       children: [],
-      id: "ID-"+nativeItemTypeEnum.Ensemble + nextUSNb,
+      id: "ID-" + nativeItemTypeEnum.Ensemble + nextUSNb,
       commentaires: "",
       type: nativeItemTypeEnum.Ensemble
     }
@@ -338,11 +337,11 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   getNewSprint: (statut = "") => {
     var nextUSNb = get().project.childNb + 1;
     return {
-      nom: nativeItemTypeEnum.Sprint +" "+ nextUSNb,
-      description: "Description" + nativeItemTypeEnum.Sprint +" "+ nextUSNb,
-      id: "ID-"+nativeItemTypeEnum.Sprint + nextUSNb,
+      nom: nativeItemTypeEnum.Sprint + " " + nextUSNb,
+      description: "Description" + nativeItemTypeEnum.Sprint + " " + nextUSNb,
+      id: "ID-" + nativeItemTypeEnum.Sprint + nextUSNb,
       statut: statut ? statut : nativeStateEnum.A_Faire,
-      datesEffectives: {from:"", to:""},
+      datesEffectives: { from: "", to: "" },
       children: [],
       commentaires: "",
       type: nativeItemTypeEnum.Sprint,
