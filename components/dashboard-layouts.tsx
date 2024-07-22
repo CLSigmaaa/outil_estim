@@ -2,29 +2,30 @@
 import * as React from 'react';
 import { DashboardRow, DashboardCase, BaseDashboardLayout, chartData, chartConfig, PlaceholderChart } from '@/components/dynamic-dashboard';
 import Kanban from './kanban/Kanban';
+import BurnDown from './burn-down/BurnDown';
 
 export const DashboardUSLayout: React.FC = () => {
   return (
     <BaseDashboardLayout>
       <DashboardRow>
-        <DashboardCase title="User stories" className="flex-grow">
-          <PlaceholderChart chartConfig={chartConfig} chartData={chartData} />
+        <DashboardCase title="User stories" className="w-full">
+        <PlaceholderChart chartConfig={chartConfig} chartData={chartData} />
         </DashboardCase>
-        <DashboardCase title="User stories" className="flex-grow">
+        <DashboardCase title="User stories" className="w-full">
           <PlaceholderChart chartConfig={chartConfig} chartData={chartData} />
         </DashboardCase>
       </DashboardRow>
-      <DashboardRow className="flex-row">
-        <DashboardCase title="User stories" className='flex-grow'>
+      <DashboardRow className="w-full">
+        <DashboardCase title="User stories" className='w-full'>
           <span>test</span>
         </DashboardCase>
-        <DashboardCase title="User stories"className='flex-grow'>
+        <DashboardCase title="User stories"className='w-full'>
           <span>test</span>
         </DashboardCase>
-        <DashboardCase title="User stories"className='flex-grow'>
+        <DashboardCase title="User stories"className='w-full'>
           <span>test</span>
         </DashboardCase>
-        <DashboardCase title="User stories" className='flex-grow'>
+        <DashboardCase title="User stories" className='w-full'>
           <span>test</span>
         </DashboardCase>
       </DashboardRow>
@@ -34,7 +35,18 @@ export const DashboardUSLayout: React.FC = () => {
 
 export const DashboardSprintLayout: React.FC = () => {
   return (
-    <div></div>
+    <BaseDashboardLayout>
+    <DashboardRow>
+      <DashboardCase title="User stories" className="w-full">
+        <BurnDown />
+      </DashboardCase>
+    </DashboardRow>
+    <DashboardRow>
+      <DashboardCase title="User stories" className="w-full">
+       <Kanban isUSKanban={false}/>
+      </DashboardCase>
+    </DashboardRow>
+  </BaseDashboardLayout>
   )
 }
 

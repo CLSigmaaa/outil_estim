@@ -48,6 +48,7 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
       description: data.description,
       statut: data.statut,
       commentaires: data.commentaires,
+      datesEffectives: datesEffectives,
     } as Sprint;
     setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)

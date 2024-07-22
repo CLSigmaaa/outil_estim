@@ -54,7 +54,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       priorite: defaultValues.priorite,
       statut: defaultValues.statut,
       version: defaultValues.version,
-      estimation_initiale: defaultValues.estimation ? parseInt(defaultValues.estimation) : 0,
+      estimation_initiale: defaultValues.estimation || 0,
       commentaires: defaultValues.commentaires,
     },
   })
@@ -89,7 +89,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       priorite: selectedItem.priorite,
       statut: selectedItem.statut,
       version: selectedItem.version,
-      estimation_initiale: selectedItem.estimation ? parseInt(selectedItem.estimation) : 0,
+      estimation_initiale: selectedItem.estimation || 0,
       commentaires: selectedItem.commentaires,
     })
   }

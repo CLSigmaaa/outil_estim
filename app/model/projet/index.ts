@@ -1,19 +1,21 @@
+import { nativePriorityEnum, nativeStateEnum } from "./itemEnum";
+
 export class US {
     nom: string;
     description: string;
     id: string;
-    priorite: string;
-    statut: string;
+    priorite: nativePriorityEnum;
+    statut: nativeStateEnum;
     version: string;
-    estimation: string;
+    estimation: number;
     datesEffectives: {from: string, to :string};
     children: Item[];
     commentaires: string;
     type: string;
 
-    constructor(nom: string, description: string, id: string, priorite: string, statut: string, version: string, 
-       estimation: string, datesEffectives: {from: string, to :string}, 
-        children: Item[], commentaires: string, type: string, new_attachments: any[], existing_attachments: FileProperty[]){
+    constructor(nom: string, description: string, id: string, priorite: nativePriorityEnum, statut: nativeStateEnum, version: string, 
+       estimation: number, datesEffectives: {from: string, to :string}, 
+        children: Item[], commentaires: string, type: string){
     this.nom = nom;
     this.description = description;
     this.id = id;

@@ -21,7 +21,7 @@ export default function Kanban({ isUSKanban}: {isUSKanban: boolean}) {
   
 
   return (
-    <div className={(`flex flex-row p-4 w-full`)} >
+    <div className={(`flex flex-row p-4 w-full h-full`)} >
       <DragDropContext onDragEnd={onDragEnd}>
         <ColonneKanban selectedItem={selectedItem} itemType={itemType} statut={nativeStateEnum.A_Faire}/>
         <ColonneKanban selectedItem={selectedItem} itemType={itemType} statut={nativeStateEnum.En_Cours}/>

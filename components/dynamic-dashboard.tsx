@@ -66,7 +66,7 @@ export const chartConfig = {
 
 export const PlaceholderChart: React.FC<PlaceholderChartProps> = ({ chartConfig, chartData }) => {
   return (
-    <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+    <ChartContainer config={chartConfig} className=" w-full">
       <BarChart accessibilityLayer data={chartData}>
         <XAxis
           dataKey="month"
@@ -102,7 +102,7 @@ export const DashboardCase: React.FC<DashboardCaseProps> = ({ children, classNam
 }
 
 export const DashboardRow: React.FC<DashboardRowProps> = ({ children, className }) => {
-  return <div className={cn("flex flex-row flex-wrap w-full", className ? className : "gap-x-4")}>{children}</div>
+  return <div className={cn("flex flex-row w-full", className ? className : "gap-x-4")}>{children}</div>
 }
 
 export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({ children, className }) => {
