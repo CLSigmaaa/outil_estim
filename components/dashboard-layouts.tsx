@@ -9,7 +9,7 @@ export const DashboardUSLayout: React.FC = () => {
     <BaseDashboardLayout>
       <DashboardRow>
         <DashboardCase title="User stories" className="w-full">
-        <PlaceholderChart chartConfig={chartConfig} chartData={chartData} />
+          <PlaceholderChart chartConfig={chartConfig} chartData={chartData} />
         </DashboardCase>
         <DashboardCase title="User stories" className="w-full">
           <PlaceholderChart chartConfig={chartConfig} chartData={chartData} />
@@ -19,10 +19,10 @@ export const DashboardUSLayout: React.FC = () => {
         <DashboardCase title="User stories" className='w-full'>
           <span>test</span>
         </DashboardCase>
-        <DashboardCase title="User stories"className='w-full'>
+        <DashboardCase title="User stories" className='w-full'>
           <span>test</span>
         </DashboardCase>
-        <DashboardCase title="User stories"className='w-full'>
+        <DashboardCase title="User stories" className='w-full'>
           <span>test</span>
         </DashboardCase>
         <DashboardCase title="User stories" className='w-full'>
@@ -35,7 +35,13 @@ export const DashboardUSLayout: React.FC = () => {
 
 export const DashboardSprintLayout: React.FC = () => {
   return (
-    <div></div>
+    <BaseDashboardLayout>
+      <DashboardRow>
+        <DashboardCase title="Sprint" className="w-full">
+          <BurnDown />
+        </DashboardCase>
+      </DashboardRow>
+    </BaseDashboardLayout>
   )
 }
 

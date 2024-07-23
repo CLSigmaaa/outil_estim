@@ -1,10 +1,41 @@
 import { create } from 'zustand';
 import { EnsembleUS, Item, Projet, Sprint, Tache, US } from "@/app/model/projet/index";
 import { nativeMasteryEnum, nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from '@/app/model/projet/itemEnum';
+import { differenceInDays, addDays, format } from "date-fns"
+
+type Sprint_Data = {
+  burn: BurnCharts,
+  totalPoints: number,
+  usState: US_States,
+  usPriority: US_Priorities
+}
+
+type BurnCharts = {
+  up: {
+    date: string,
+    pointsRestants: number
+  };
+  down: {
+    date: string,
+    pointsRestants: number
+  };
+}
+
+type US_States = {
+  [nativeStateEnum.Terminee]: number;
+  [nativeStateEnum.En_Cours]: number;
+  [nativeStateEnum.A_Faire]: number;
+};
+
+type US_Priorities = {
+  [nativePriorityEnum.Mineure]: number;
+  [nativePriorityEnum.Majeure]: number;
+  [nativePriorityEnum.Critique]: number;
+};
 
 export interface TreeState {
   project: Projet;
-  selectedItem: undefined | any;
+  selectedItem: undefined | Item;
   setProject: (newProject: Projet) => void;
   setSelectedItem: (newSelectedItem: any) => void;
   addItem: (parentId: string, newItem: Item | Tache) => void;
@@ -15,187 +46,198 @@ export interface TreeState {
   getNewTache: (statut?: string) => Tache;
   getNewEnsemble: () => EnsembleUS;
   getNewSprint: (statut?: string) => Sprint;
+  getTimeData: (sprint: Sprint) => any;
+  getPointData: (chartData: any, item: Sprint | EnsembleUS) => any;
+  getSprintStats: (sprint: Sprint) => {
+    points: number,
+    usStates: US_States,
+    usPriorities: US_Priorities
+  };
+  getSprintPointsAndCompletedAux: (itemList: Item[], acc: { points: number, usStates: US_States, usPriorities: US_Priorities }) => { points: number, usStates: US_States, usPriorities: US_Priorities };
+  getBurnUpAndDown: (data: any, totalPoints: number) => any;
+  getItemData: (item: Item) => { burn: BurnCharts, usState: US_States };
 }
 
 const mockProjet = {
   nom: "Project1 Name",
   description: "description",
-  id:"id-proj1",
+  id: "id-proj1",
   children: [
-    {"nom": "Sprint 1",
-        "description": "DescriptionUser Sprint 1",
-        "id": "ID-Sprint1",
-        "statut": "Terminée",
-        "datesEffectives": {
-            "from": "2024-07-01T12:23:21.335Z",
+    {
+      "nom": "Sprint 1",
+      "description": "DescriptionUser Sprint 1",
+      "id": "ID-Sprint1",
+      "statut": "Terminée",
+      "datesEffectives": {
+        "from": "2024-07-01T12:23:21.335Z",
+        "to": "2024-07-30T12:23:21.335Z"
+      },
+      "children": [
+        {
+          "nom": "User Story 2",
+          "description": "DescriptionUser Story 2",
+          "id": "ID-User Story2",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 10,
+          "datesEffectives": {
+            "from": "",
+            "to": "2024-07-09T12:23:21.335Z"
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
+        },
+        {
+          "nom": "User Story 3",
+          "description": "DescriptionUser Story 3",
+          "id": "ID-User Story3",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 15,
+          "datesEffectives": {
+            "from": "",
+            "to": "2024-07-12T12:23:21.335Z"
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
+        },
+        {
+          "nom": "User Story 4",
+          "description": "DescriptionUser Story 4",
+          "id": "ID-User Story4",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 20,
+          "datesEffectives": {
+            "from": "",
+            "to": "2024-07-15T12:23:21.335Z"
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
+        },
+        {
+          "nom": "User Story 5",
+          "description": "DescriptionUser Story 5",
+          "id": "ID-User Story5",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 25,
+          "datesEffectives": {
+            "from": "",
+            "to": "2024-07-21T12:23:21.335Z"
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
+        },
+        {
+          "nom": "User Story 6",
+          "description": "DescriptionUser Story 6",
+          "id": "ID-User Story6",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 30,
+          "datesEffectives": {
+            "from": "",
+            "to": "2024-07-23T12:23:21.335Z"
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
+        },
+        {
+          "nom": "User Story 7",
+          "description": "DescriptionUser Story 7",
+          "id": "ID-User Story7",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 35,
+          "datesEffectives": {
+            "from": "",
+            "to": "2024-07-25T12:23:21.335Z"
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
+        },
+        {
+          "nom": "User Story 8",
+          "description": "DescriptionUser Story 8",
+          "id": "ID-User Story8",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 25,
+          "datesEffectives": {
+            "from": "",
+            "to": "2024-07-26T12:23:21.335Z"
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
+        },
+        {
+          "nom": "User Story 9",
+          "description": "DescriptionUser Story 9",
+          "id": "ID-User Story9",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 35,
+          "datesEffectives": {
+            "from": "",
+            "to": "2024-07-28T12:23:21.335Z"
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
+        },
+        {
+          "nom": "User Story 10",
+          "description": "DescriptionUser Story 10",
+          "id": "ID-User Story10",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 15,
+          "datesEffectives": {
+            "from": "",
+            "to": "2024-07-28T12:23:21.335Z"
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
+        },
+        {
+          "nom": "User Story 11",
+          "description": "DescriptionUser Story 11",
+          "id": "ID-User Story11",
+          "priorite": "Mineure",
+          "statut": "Terminée",
+          "version": "",
+          "estimation": 30,
+          "datesEffectives": {
+            "from": "",
             "to": "2024-07-30T12:23:21.335Z"
-        },
-        "children": [
-          {
-            "nom": "User Story 2",
-            "description": "DescriptionUser Story 2",
-            "id": "ID-User Story2",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 10,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-09T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
-        },
-        {
-            "nom": "User Story 3",
-            "description": "DescriptionUser Story 3",
-            "id": "ID-User Story3",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 15,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-12T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
-        },
-        {
-            "nom": "User Story 4",
-            "description": "DescriptionUser Story 4",
-            "id": "ID-User Story4",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 20,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-15T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
-        },
-        {
-            "nom": "User Story 5",
-            "description": "DescriptionUser Story 5",
-            "id": "ID-User Story5",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 25,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-21T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
-        },
-        {
-            "nom": "User Story 6",
-            "description": "DescriptionUser Story 6",
-            "id": "ID-User Story6",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 30,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-23T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
-        },
-        {
-            "nom": "User Story 7",
-            "description": "DescriptionUser Story 7",
-            "id": "ID-User Story7",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 35,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-25T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
-        },
-        {
-            "nom": "User Story 8",
-            "description": "DescriptionUser Story 8",
-            "id": "ID-User Story8",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 25,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-26T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
-        },
-        {
-            "nom": "User Story 9",
-            "description": "DescriptionUser Story 9",
-            "id": "ID-User Story9",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 35,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-28T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
-        },
-        {
-            "nom": "User Story 10",
-            "description": "DescriptionUser Story 10",
-            "id": "ID-User Story10",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 15,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-28T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
-        },
-        {
-            "nom": "User Story 11",
-            "description": "DescriptionUser Story 11",
-            "id": "ID-User Story11",
-            "priorite": "Mineure",
-            "statut": "Terminée",
-            "version": "",
-            "estimation": 30,
-            "datesEffectives": {
-                "from": "",
-                "to": "2024-07-30T12:23:21.335Z"
-            },
-            "children": [],
-            "commentaires": "",
-            "type": "User Story",
+          },
+          "children": [],
+          "commentaires": "",
+          "type": "User Story",
         }
-        ],
-        "commentaires": "",
-        "type": "Sprint"
-      }
-],
+      ],
+      "commentaires": "",
+      "type": "Sprint"
+    }
+  ],
   childNb: 12,
 } as Projet
 
@@ -213,7 +255,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   setProject: (newProject) => set({ project: newProject }),
   setSelectedItem: (newSelectedItem) => set({ selectedItem: newSelectedItem }),
   addItem: (parentId, newItem) => set((state) => {
-    const findAndAddItem = (items: Item[], parentId: string, newItem: Item |Tache): Item[] => {
+    const findAndAddItem = (items: Item[], parentId: string, newItem: Item | Tache): Item[] => {
       return items.map(item => {
         if (item.id === parentId) {
           state.setSelectedItem({ ...item, children: [...item.children, newItem] })
@@ -248,7 +290,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       },
     };
   }),
-  editItem: (itemId, updatedProperties) => set((state) => {
+  editItem: (itemId, updatedProperties : any) => set((state) => {
     const findAndEditItem = (items: Item[], itemId: string): Item[] => {
       return items.map(item => {
         if (item.id === itemId) {
@@ -259,8 +301,8 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         return item;
       });
     };
-    
-    if (updatedProperties.statut == nativeStateEnum.Terminee){
+
+    if (updatedProperties.statut == nativeStateEnum.Terminee) {
       updatedProperties.datesEffectives.to = new Date()
     }
     return {
@@ -307,7 +349,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       statut: statut,
       version: "",
       estimation: 0,
-      datesEffectives: {from:"", to:""},
+      datesEffectives: { from: "", to: "" },
       children: [],
       commentaires: "",
       type: nativeItemTypeEnum.US,
@@ -346,6 +388,64 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       commentaires: "",
       type: nativeItemTypeEnum.Sprint,
     }
+  },
+  getTimeData: (sprint) => {
+    const startDate = sprint.datesEffectives.from
+    const sprintPeriod = differenceInDays(sprint.datesEffectives.to, startDate);
+    var chartData: any = {};
+    for (let dayNb = 0; dayNb <= sprintPeriod + 1; dayNb++) { // +1 pour le graphique
+      chartData[format(addDays(new Date(startDate), dayNb), 'MMM-dd')] = 0
+    }
+    return chartData;
+  },
+  getPointData: (chartData, item) => {
+    item.children?.forEach(child => {
+      if (child.type == nativeItemTypeEnum.US && (child as US).statut == nativeStateEnum.Terminee) {
+        chartData[format((child as US).datesEffectives.to, "MMM-dd")] += (child as US).estimation;
+      } else if (child.type == nativeItemTypeEnum.Ensemble && child.children && child.children.length > 0) {
+        chartData = get().getPointData(chartData, child);
+      }
+    });
+    return chartData;
+  },
+  getSprintStats: (sprint: Sprint): { points: number, usStates: US_States, usPriorities: US_Priorities } => {
+    var { points, usStates, usPriorities } = { points: 0, usStates: { [nativeStateEnum.Terminee]: 0, [nativeStateEnum.En_Cours]: 0, [nativeStateEnum.A_Faire]: 0 }, usPriorities: { [nativePriorityEnum.Mineure]: 0, [nativePriorityEnum.Majeure]: 0, [nativePriorityEnum.Critique]: 0 } };
+    return get().getSprintPointsAndCompletedAux(sprint.children, { points, usStates, usPriorities });
+  },
+  getSprintPointsAndCompletedAux: (itemList, acc) => {
+    itemList?.forEach(item => {
+      if (item.type == nativeItemTypeEnum.US) {
+        acc.points += (item as US).estimation;
+        acc.usStates[(item as US).statut]++;
+        acc.usPriorities[(item as US).priorite]++;
+      } else if (item.type == nativeItemTypeEnum.Ensemble && item.children && item.children.length > 0) {
+        acc = get().getSprintPointsAndCompletedAux(item.children, acc);
+      }
+    });
+    return acc;
+  },
+  getBurnUpAndDown: (data, totalPoints) => {
+    var acc = 0;
+    var burn: { up: any[], down: any[] } = { up: [{}], down: [{}] }
+    Object.keys(data).forEach(date => {
+      acc += parseInt(data[date] || 0);
+      burn.up.push({
+        date: date,
+        pointsRestants: acc
+      });
+      burn.down.push({
+        date: date,
+        pointsRestants: totalPoints - acc
+      });
+    })
+    return burn;
+  },
+  getItemData: (item: Item) => {
+    var sprintStats = get().getSprintStats(item as Sprint);
+    var chartData = get().getTimeData(item as Sprint);
+    chartData = get().getPointData(chartData, item);
+    var chart = get().getBurnUpAndDown(chartData, sprintStats.points);
+    return { burn: chart, usState: sprintStats.usStates };
   }
 }));
 
