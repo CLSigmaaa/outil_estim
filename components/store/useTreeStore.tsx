@@ -48,7 +48,7 @@ export interface TreeState {
   getNewSprint: (statut?: string) => Sprint;
   getTimeData: (sprint: Sprint) => any;
   getPointData: (chartData: any, item: Sprint | EnsembleUS) => any;
-  getSprintStats: (sprint: Sprint) => {
+  getSprintStats: (sprint: Item) => {
     points: number,
     usStates: US_States,
     usPriorities: US_Priorities
@@ -290,7 +290,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       },
     };
   }),
-  editItem: (itemId, updatedProperties : any) => set((state) => {
+  editItem: (itemId, updatedProperties: any) => set((state) => {
     const findAndEditItem = (items: Item[], itemId: string): Item[] => {
       return items.map(item => {
         if (item.id === itemId) {
@@ -408,7 +408,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     });
     return chartData;
   },
-  getSprintStats: (sprint: Sprint): { points: number, usStates: US_States, usPriorities: US_Priorities } => {
+  getSprintStats: (sprint: Item): { points: number, usStates: US_States, usPriorities: US_Priorities } => {
     var { points, usStates, usPriorities } = { points: 0, usStates: { [nativeStateEnum.Terminee]: 0, [nativeStateEnum.En_Cours]: 0, [nativeStateEnum.A_Faire]: 0 }, usPriorities: { [nativePriorityEnum.Mineure]: 0, [nativePriorityEnum.Majeure]: 0, [nativePriorityEnum.Critique]: 0 } };
     return get().getSprintPointsAndCompletedAux(sprint.children, { points, usStates, usPriorities });
   },
