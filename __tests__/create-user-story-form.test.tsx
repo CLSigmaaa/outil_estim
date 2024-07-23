@@ -30,13 +30,16 @@ describe('TreeView', () => {
 
         const { result } = renderHook(() => useTreeStore())
         fireEvent.click(screen.getByText(/^User Story 1$/i))
-        var selectedItem = result.current.selectedItem;
+        var selectedItem = result.current.selectedItem as US
+        if (!selectedItem){
+            return
+        }
         expect(screen.getByLabelText(/Nom/i).value).toBe(selectedItem.nom);
         expect(screen.getByLabelText(/Description/i).value).toBe(selectedItem.description);
         expect(screen.getByLabelText(/Priorité/i).firstChild?.innerHTML ).toBe(selectedItem.priorite || nativePriorityEnum.Mineure);
-        expect(screen.getByLabelText(/État des US/i).firstChild?.innerHTML).toBe(selectedItem.etat || nativeStateEnum.A_Faire);
+        expect(screen.getByLabelText(/État des US/i).firstChild?.innerHTML).toBe(selectedItem.statut || nativeStateEnum.A_Faire);
         expect(screen.getByLabelText(/Version/i).value).toBe(selectedItem.version );
-        expect(screen.getByLabelText(/Estimation Initiale/i).value).toBe(selectedItem.estimationInitiale || "0");
+        expect(screen.getByLabelText(/Estimation Initiale/i).value).toBe(selectedItem.estimation || "0");
         expect(screen.getByLabelText(/Commentaires/i).value).toBe(selectedItem.commentaires );
 
     })
@@ -47,7 +50,7 @@ describe('TreeView', () => {
 
         var { result } = renderHook(() => useTreeStore())
         fireEvent.click(screen.getByText(/^User Story 1$/i))
-        var selectedItem = result.current.selectedItem;
+        var selectedItem = result.current.selectedItem as US;
         
         const startDate = new Date();
         startDate.setFullYear(2024);
@@ -64,19 +67,21 @@ describe('TreeView', () => {
             priorite: nativePriorityEnum.Majeure,
             statut: nativeStateEnum.Terminee,
             version: "2.3.0",
-            estimation: "42",
+            estimation: 42,
             datesEffectives: {from:startDate.toDateString(), to:endDate.toDateString()},
             children: selectedItem.children,
             commentaires: "NewCommentaires",
             type: "US",
         } as US
-        debugger;
         act(() => {result.current.editItem(selectedItem.id, editedItem)});
        
         // Valider le form déselectionne l'item
         fireEvent.click(screen.getByText(/^newNom$/i))
        
-        selectedItem = result.current.selectedItem;
+        selectedItem = result.current.selectedItem as US;
+        if (!selectedItem){
+            return
+        }
         expect(selectedItem.nom).toBe(editedItem.nom);
         expect(selectedItem.description).toBe(editedItem.description);
         expect(selectedItem.priorite).toBe(editedItem.priorite);

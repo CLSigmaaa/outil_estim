@@ -1,29 +1,31 @@
-import React, { useCallback, useReducer } from "react";
-import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import React, { useCallback } from "react";
+import { DragDropContext } from "@hello-pangea/dnd";
 import { useTreeStore } from "@/components/store/useTreeStore";
 import ColonneKanban from "@/components/kanban/ColonneKanban";
-import { nativeItemTypeEnum, nativeStateEnum } from "@/app/model/projet/itemEnum";
+import { nativeStateEnum } from "@/app/model/projet/itemEnum";
 
-export default function Kanban({ isUSKanban }: { isUSKanban: boolean }) {
-  const { selectedItem, editItemState } = useTreeStore();
-
-  const itemType = isUSKanban ? nativeItemTypeEnum.Tache : nativeItemTypeEnum.US;
+export default function Kanban() {
+  const { selectedItem, setSelectedItem, findItemInProject, editItemState } = useTreeStore();
 
   const onDragEnd = useCallback((result: any) => {
     if (result.reason === "DROP") {
-      if (!result.destination) {
+      if (!result.destination || result.source.droppableId == result.destination.droppableId) {
         return;
       }
+
       editItemState(result.draggableId, result.destination.droppableId)
+      if (selectedItem){
+        setSelectedItem(findItemInProject(selectedItem.id ));
+      }
     }
   }, []);
 
   return (
-    <div className="flex flex-row p-4 w-full">
+    <div className="flex flex-row w-full">
       <DragDropContext onDragEnd={onDragEnd}>
-        <ColonneKanban selectedItem={selectedItem} itemType={itemType} statut={nativeStateEnum.A_Faire} />
-        <ColonneKanban selectedItem={selectedItem} itemType={itemType} statut={nativeStateEnum.En_Cours} />
-        <ColonneKanban selectedItem={selectedItem} itemType={itemType} statut={nativeStateEnum.Terminee} />
+        <ColonneKanban selectedItem={selectedItem} statut={nativeStateEnum.A_Faire} />
+        <ColonneKanban selectedItem={selectedItem} statut={nativeStateEnum.En_Cours} />
+        <ColonneKanban selectedItem={selectedItem} statut={nativeStateEnum.Terminee} />
       </DragDropContext>
     </div>
   );

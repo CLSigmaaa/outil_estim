@@ -23,3 +23,7 @@ export const createUserStoryFormSchema = z.object({
   estimation_initiale: z.coerce.number().optional(),
   commentaires: z.string().optional(),
 })
+
+export const createUserStoryEstimFormSchema = z.object({
+  estimation_initiale: z.coerce.number().optional(),
+})

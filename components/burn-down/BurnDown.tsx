@@ -25,7 +25,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 
 
-export default function BurnDown() {
+export default function BurnDown({ className }: { className: string }) {
 
     const { selectedItem, getItemData } = useTreeStore();
 
@@ -46,43 +46,42 @@ export default function BurnDown() {
     } satisfies ChartConfig
 
     return (
-        <>
-            <Switch onClick={switchBurnGraph} />
-            <Label> Burn Down / Burn Up</Label>
-            <Card>
-                <CardHeader>
-                    <CardTitle>{isBurnUpDisplayed ? "Burn Up" : "Burn Down"}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ChartContainer config={chartConfig}>
-                        <LineChart
-                            accessibilityLayer
-                            data={chartData as any}
-                            dataKey={"date"}
-                            margin={{
-                                left: 12,
-                                right: 12,
-                            }}
-                        >
-                            <XAxis dataKey="date" />
-                            <YAxis domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1 / 10) * 10]} //   10% de marge 
-                                tickCount={10} />
-                            <ChartLegend />
-                            <CartesianGrid vertical={false} />
-                            <ChartTooltip
-                            />
-                            <Line
-                                dataKey="pointsRestants"
-                                name="Points restants"
-                                type="stepAfter"
-                                stroke="green"
-                                dot={false}
-                            />
-                        </LineChart>
-                    </ChartContainer>
-                </CardContent>
-            </Card>
-        </>
+        <Card className={className}>
+            <CardHeader className="flex flex-row justify-between ">
+                <CardTitle>{isBurnUpDisplayed ? "Burn Up" : "Burn Down"}</CardTitle>
+                <div className="flex items-center gap-2">
+                    <Switch onClick={switchBurnGraph} />
+                    <Label> Burn Down / Burn Up </Label>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="max-h-[400px]">
+                    <LineChart
+                        accessibilityLayer
+                        data={chartData as any}
+                        dataKey={"date"}
+                        margin={{
+                            left: 12,
+                            right: 12,
+                        }}
+                    >
+                        <XAxis dataKey="date" />
+                        <YAxis domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1 / 10) * 10]} //   10% de marge 
+                            tickCount={10} />
+                        <ChartLegend />
+                        <CartesianGrid vertical={false} />
+                        <ChartTooltip />
+                        <Line
+                            dataKey="pointsRestants"
+                            name="Points restants"
+                            type="stepAfter"
+                            stroke="green"
+                            dot={false}
+                        />
+                    </LineChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
     )
 }
 

@@ -20,5 +20,4 @@ export enum nativeItemTypeEnum {
     US = "User Story",
     Ensemble = "Ensemble",
     Sprint = "Sprint",
-    Tache = "Tache",
 }

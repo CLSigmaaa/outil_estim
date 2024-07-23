@@ -21,65 +21,11 @@ import {
 export default async function Home() {
   return (
     <>
-      <Menubar className="rounded-none">
-        <MenubarMenu>
-          <MenubarTrigger>File</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>
-              New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-            </MenubarItem>
-            <MenubarItem>New Window</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>Share</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>Print</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-        <MenubarMenu>
-          <MenubarTrigger>Edit</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>
-              New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-            </MenubarItem>
-            <MenubarItem>New Window</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>Share</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>Print</MenubarItem>
-          </MenubarContent>
-          <MenubarMenu>
-            <MenubarTrigger>View</MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem>
-                New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem>New Window</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Share</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Print</MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-        </MenubarMenu>
-        <MenubarMenu>
-          <MenubarTrigger>Profile</MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem>
-              New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-            </MenubarItem>
-            <MenubarItem>New Window</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>Share</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem>Print</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-      </Menubar >
       <ResizablePanelGroup
         direction="horizontal"
         className="flex flex-1 overflow-hidden"
       >
-        <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="h-full p-2 " >
+        <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="h-full p-2 !overflow-y-visible" >
           <LeftPanel />
         </ResizablePanel>
         <ResizableHandle />

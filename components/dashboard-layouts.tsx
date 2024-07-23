@@ -17,6 +17,7 @@ import {
 import { useTreeStore } from "@/components/store/useTreeStore"
 import { nativeEnum } from 'zod';
 import { nativeStateEnum } from '@/app/model/projet/itemEnum';
+import Kanban from './kanban/Kanban';
 
 export const DashboardUSLayout: React.FC = () => {
   return (
@@ -54,18 +55,22 @@ export const DashboardSprintLayout: React.FC = () => {
   return (
     <BaseDashboardLayout>
       <DashboardRow>
-        <DashboardCase title="Sprint" className="w-full">
-          <BurnDown />
+        <DashboardCase title="Kanban" className="w-full">
+          <Kanban />
         </DashboardCase>
       </DashboardRow>
-
+      <DashboardRow>
+       <BurnDown className='w-full max-h-[500px]'/>
+      </DashboardRow>
       <DashboardRow>
         <DashboardCase title="Indice de prédictibilité" className="w-full">
-          <span>{(Number(data.points_realises) / Number(data.points)).toFixed(1)}</span>
+          <span>{(Number(data.donePoints) / Number(data.totalPoints)).toFixed(1)}</span>
+          <button onClick={() => console.log(data.donePoints)}> gggg</button>
+          <button onClick={() => console.log(data.totalPoints)}> ffff</button>
         </DashboardCase>
         <DashboardCase title="US restantes / US Total" className="w-full">
           <span>
-            {data.usStates[nativeStateEnum.Terminee]} / {data.usStates[nativeStateEnum.A_Faire] + data.usStates[nativeStateEnum.En_Cours] + data.usStates[nativeStateEnum.Terminee]}
+            {data.stateStats[nativeStateEnum.Terminee]} / {data.stateStats[nativeStateEnum.A_Faire] + data.stateStats[nativeStateEnum.En_Cours] + data.stateStats[nativeStateEnum.Terminee]}
           </span>
         </DashboardCase>
       </DashboardRow>
@@ -86,9 +91,9 @@ const BarChartByPriority: React.FC = () => {
   const data = getSprintStats(selectedItem);
 
   const newChartData = [
-    { priorité: "Critique", Nombre: data.usPriorities.Critique },
-    { priorité: "Majeure", Nombre: data.usPriorities.Majeure },
-    { priorité: "Mineure", Nombre: data.usPriorities.Mineure },
+    { priorité: "Critique", Nombre: data.priorityStats.Critique },
+    { priorité: "Majeure", Nombre: data.priorityStats.Majeure },
+    { priorité: "Mineure", Nombre: data.priorityStats.Mineure },
   ]
   return (
 
@@ -109,13 +114,12 @@ const BarChartByState: React.FC = () => {
 
   if (selectedItem === null || selectedItem === undefined) return null;
   if (selectedItem.type !== "Ensemble") return null;
-
   const data = getSprintStats(selectedItem);
 
   const newChartData = [
-    { état: "A faire", Nombre: data.usStates[nativeStateEnum.A_Faire] },
-    { état: "En cours", Nombre: data.usStates[nativeStateEnum.En_Cours] },
-    { état: "Terminée", Nombre: data.usStates[nativeStateEnum.Terminee] },
+    { état: "A faire", Nombre: data.stateStats[nativeStateEnum.A_Faire] },
+    { état: "En cours", Nombre: data.stateStats[nativeStateEnum.En_Cours] },
+    { état: "Terminée", Nombre: data.stateStats[nativeStateEnum.Terminee] },
   ]
   return (
     <ChartContainer config={chartConfig} className="h-full w-full mt-6">
@@ -139,7 +143,6 @@ export const DashboardEnsembleUSLayout: React.FC = () => {
   const { selectedItem, getSprintStats } = useTreeStore();
   const data = getSprintStats(selectedItem);
 
-  console.log(data)
   return (
     <BaseDashboardLayout>
       <DashboardRow>
@@ -149,11 +152,11 @@ export const DashboardEnsembleUSLayout: React.FC = () => {
       </DashboardRow>
       <DashboardRow>
         <DashboardCase title="Indice de prédictibilité" className="w-full">
-          <span>{(Number(data.points_realises) / Number(data.points)).toFixed(1)}</span>
+          <span>{(Number(data.donePoints) / Number(data.totalPoints)).toFixed(1)}</span>
         </DashboardCase>
         <DashboardCase title="US restantes / US Total" className="w-full">
           <span>
-            {data.usStates[nativeStateEnum.Terminee]} / {data.usStates[nativeStateEnum.A_Faire] + data.usStates[nativeStateEnum.En_Cours] + data.usStates[nativeStateEnum.Terminee]}
+            {data.stateStats[nativeStateEnum.Terminee]} / {data.stateStats[nativeStateEnum.A_Faire] + data.stateStats[nativeStateEnum.En_Cours] + data.stateStats[nativeStateEnum.Terminee]}
           </span>
         </DashboardCase>
       </DashboardRow>

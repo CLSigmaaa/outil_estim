@@ -1,61 +1,27 @@
 import { create } from 'zustand';
-import { EnsembleUS, Item, Projet, Sprint, Tache, US } from "@/app/model/projet/index";
-import { nativeMasteryEnum, nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from '@/app/model/projet/itemEnum';
+import { BurnCharts, Ensemble_Data, EnsembleUS, Item, Projet, Sprint, US, prorityStats, stateStats } from "@/app/model/projet/index";
+import { nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from '@/app/model/projet/itemEnum';
 import { differenceInDays, addDays, format } from "date-fns"
-
-type Sprint_Data = {
-  burn: BurnCharts,
-  totalPoints: number,
-  usState: US_States,
-  usPriority: US_Priorities
-}
-
-type BurnCharts = {
-  up: {
-    date: string,
-    pointsRestants: number
-  };
-  down: {
-    date: string,
-    pointsRestants: number
-  };
-}
-
-type US_States = {
-  [nativeStateEnum.Terminee]: number;
-  [nativeStateEnum.En_Cours]: number;
-  [nativeStateEnum.A_Faire]: number;
-};
-
-type US_Priorities = {
-  [nativePriorityEnum.Mineure]: number;
-  [nativePriorityEnum.Majeure]: number;
-  [nativePriorityEnum.Critique]: number;
-};
 
 export interface TreeState {
   project: Projet;
   selectedItem: undefined | Item;
   setProject: (newProject: Projet) => void;
+  findItemInProject: (itemId: string) => Item | undefined;
   setSelectedItem: (newSelectedItem: any) => void;
-  addItem: (parentId: string, newItem: Item | Tache) => void;
+  addItem: (parentId: string, newItem: Item ) => void;
   deleteItem: (itemId: string) => void;
-  editItem: (itemId: string, updatedProperties: Item | Tache) => void;
+  editItem: (itemId: string, updatedProperties: Item ) => void;
   editItemState: (itemId: string, updatedState: string) => void;
   getNewUS: (statut?: nativeStateEnum) => US;
-  getNewTache: (statut?: string) => Tache;
   getNewEnsemble: () => EnsembleUS;
   getNewSprint: (statut?: string) => Sprint;
   getTimeData: (sprint: Sprint) => any;
   getPointData: (chartData: any, item: Sprint | EnsembleUS) => any;
-  getSprintStats: (sprint: Item) => {
-    points: number,
-    usStates: US_States,
-    usPriorities: US_Priorities
-  };
-  getSprintPointsAndCompletedAux: (itemList: Item[], acc: { points: number, usStates: US_States, usPriorities: US_Priorities }) => { points: number, usStates: US_States, usPriorities: US_Priorities };
+  getSprintStats: (sprint: Item) => Ensemble_Data;
+  getSprintPointsAndCompletedAux: (itemList: Item[], acc: Ensemble_Data) => Ensemble_Data;
   getBurnUpAndDown: (data: any, totalPoints: number) => any;
-  getItemData: (item: Item) => { burn: BurnCharts, usState: US_States };
+  getItemData: (item: Item) => { burn: BurnCharts, stateStats: stateStats };
 }
 
 const mockProjet = {
@@ -63,199 +29,272 @@ const mockProjet = {
   description: "description",
   id: "id-proj1",
   children: [
-    {
-      "nom": "Sprint 1",
-      "description": "DescriptionUser Sprint 1",
-      "id": "ID-Sprint1",
-      "statut": "Terminée",
-      "datesEffectives": {
-        "from": "2024-07-01T12:23:21.335Z",
-        "to": "2024-07-30T12:23:21.335Z"
+  {
+    "nom": "Sprint 1",
+    "description": "DescriptionUser Sprint 1",
+    "id": "ID-Sprint1",
+    "statut": "Terminée",
+    "datesEffectives": {
+      "from": "2024-07-01T12:23:21.335Z",
+      "to": "2024-07-30T12:23:21.335Z"
+    },
+    "children": [
+      {
+        "nom": "User Story 2",
+        "description": "DescriptionUser Story 2",
+        "id": "ID-User Story2",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 10,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-09T12:23:21.335Z"
+        },
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
       },
-      "children": [
-        {
-          "nom": "User Story 2",
-          "description": "DescriptionUser Story 2",
-          "id": "ID-User Story2",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 10,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-09T12:23:21.335Z"
-          },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
+      {
+        "nom": "User Story 3",
+        "description": "DescriptionUser Story 3",
+        "id": "ID-User Story3",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 15,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-12T12:23:21.335Z"
         },
-        {
-          "nom": "User Story 3",
-          "description": "DescriptionUser Story 3",
-          "id": "ID-User Story3",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 15,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-12T12:23:21.335Z"
-          },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
+      },
+      {
+        "nom": "User Story 4",
+        "description": "DescriptionUser Story 4",
+        "id": "ID-User Story4",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 20,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-15T12:23:21.335Z"
         },
-        {
-          "nom": "User Story 4",
-          "description": "DescriptionUser Story 4",
-          "id": "ID-User Story4",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 20,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-15T12:23:21.335Z"
-          },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
+      },
+      {
+        "nom": "User Story 5",
+        "description": "DescriptionUser Story 5",
+        "id": "ID-User Story5",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 25,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-21T12:23:21.335Z"
         },
-        {
-          "nom": "User Story 5",
-          "description": "DescriptionUser Story 5",
-          "id": "ID-User Story5",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 25,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-21T12:23:21.335Z"
-          },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
+      },
+      {
+        "nom": "User Story 6",
+        "description": "DescriptionUser Story 6",
+        "id": "ID-User Story6",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 30,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-23T12:23:21.335Z"
         },
-        {
-          "nom": "User Story 6",
-          "description": "DescriptionUser Story 6",
-          "id": "ID-User Story6",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 30,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-23T12:23:21.335Z"
-          },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
+      },
+      {
+        "nom": "User Story 7",
+        "description": "DescriptionUser Story 7",
+        "id": "ID-User Story7",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 35,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-25T12:23:21.335Z"
         },
-        {
-          "nom": "User Story 7",
-          "description": "DescriptionUser Story 7",
-          "id": "ID-User Story7",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 35,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-25T12:23:21.335Z"
-          },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
+      },
+      {
+        "nom": "User Story 8",
+        "description": "DescriptionUser Story 8",
+        "id": "ID-User Story8",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 25,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-26T12:23:21.335Z"
         },
-        {
-          "nom": "User Story 8",
-          "description": "DescriptionUser Story 8",
-          "id": "ID-User Story8",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 25,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-26T12:23:21.335Z"
-          },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
+      },
+      {
+        "nom": "User Story 9",
+        "description": "DescriptionUser Story 9",
+        "id": "ID-User Story9",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 35,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-28T12:23:21.335Z"
         },
-        {
-          "nom": "User Story 9",
-          "description": "DescriptionUser Story 9",
-          "id": "ID-User Story9",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 35,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-28T12:23:21.335Z"
-          },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
+      },
+      {
+        "nom": "User Story 10",
+        "description": "DescriptionUser Story 10",
+        "id": "ID-User Story10",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 15,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-28T12:23:21.335Z"
         },
-        {
-          "nom": "User Story 10",
-          "description": "DescriptionUser Story 10",
-          "id": "ID-User Story10",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 15,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-28T12:23:21.335Z"
-          },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
+      },
+      {
+        "nom": "User Story 11",
+        "description": "DescriptionUser Story 11",
+        "id": "ID-User Story11",
+        "priorite": "Mineure",
+        "statut": "Terminée",
+        "version": "",
+        "estimation": 30,
+        "datesEffectives": {
+          "from": "",
+          "to": "2024-07-30T12:23:21.335Z"
         },
-        {
-          "nom": "User Story 11",
-          "description": "DescriptionUser Story 11",
-          "id": "ID-User Story11",
-          "priorite": "Mineure",
-          "statut": "Terminée",
-          "version": "",
-          "estimation": 30,
-          "datesEffectives": {
-            "from": "",
-            "to": "2024-07-30T12:23:21.335Z"
+        "children": [],
+        "commentaires": "",
+        "type": "User Story",
+      },
+      {
+        "nom": "Ensemble 13",
+        "description": "DescriptionEnsemble 13",
+        "children": [
+          {
+            "nom": "User Story 14",
+            "description": "DescriptionUser Story 14",
+            "id": "ID-User Story14",
+            "priorite": "Majeure",
+            "statut": "Terminée",
+            "version": "",
+            "estimation": 15,
+            "datesEffectives": {
+              "from": "",
+              "to": "2024-07-18T09:29:19.240Z"
+            },
+            "children": [],
+            "commentaires": "",
+            "type": "User Story"
           },
-          "children": [],
-          "commentaires": "",
-          "type": "User Story",
-        }
-      ],
-      "commentaires": "",
-      "type": "Sprint"
-    }
+          {
+            "nom": "Ensemble 15",
+            "description": "DescriptionEnsemble 15",
+            "children": [
+              {
+                "nom": "User Story 16",
+                "description": "DescriptionUser Story 16",
+                "id": "ID-User Story16",
+                "priorite": "Mineure",
+                "statut": "Terminée",
+                "version": "",
+                "estimation": 30,
+                "datesEffectives": {
+                  "from": "",
+                  "to": "2024-07-24T09:29:32.603Z"
+                },
+                "children": [],
+                "commentaires": "",
+                "type": "User Story"
+              }
+            ],
+            "id": "ID-Ensemble15",
+            "commentaires": "",
+            "type": "Ensemble"
+          }
+        ],
+        "id": "ID-Ensemble13",
+        "commentaires": "",
+        "type": "Ensemble"
+      }
+    ],
+    commentaires: "",
+    type: "Sprint"
+  }
   ],
-  childNb: 12,
+  "commentaires": "",
+  "type": "Sprint",
+  childNb: 16,
 } as Projet
 
 export const useTreeStore = create<TreeState>((set, get) => ({
-  project: mockProjet,
-  // {
-  //   // Initialisez avec un projet par défaut ou un objet vide
-  //   nom: "",
-  //   description: "",
-  //   id: "",
-  //   children: [],
-  //   childNb: 0,
-  // } as Projet,
+  project: //mockProjet,
+  {
+    // Initialisez avec un projet par défaut ou un objet vide
+    nom: "",
+    description: "",
+    id: "",
+    children: [],
+    childNb: 0,
+  } as Projet,
   selectedItem: undefined,
   setProject: (newProject) => set({ project: newProject }),
+  findItemInProject: (itemId: string): Item | undefined => {
+    const findItemAux = (children: Item[], itemId: string): Item | undefined => {
+      for (const item of children) {
+        if (item == undefined) {
+          return
+        }
+        if (item.id == itemId) {
+          return item
+        }
+        if (item.children && item.children.length > 0) {
+          const found = findItemAux(item.children, itemId);
+          if (found) {
+            return found;
+          }
+        }
+      }
+      return undefined;
+    }
+
+    return findItemAux(get().project.children, itemId);
+  },
   setSelectedItem: (newSelectedItem) => set({ selectedItem: newSelectedItem }),
   addItem: (parentId, newItem) => set((state) => {
-    const findAndAddItem = (items: Item[], parentId: string, newItem: Item | Tache): Item[] => {
+    const findAndAddItem = (items: Item[], parentId: string, newItem: Item ): Item[] => {
       return items.map(item => {
         if (item.id === parentId) {
           state.setSelectedItem({ ...item, children: [...item.children, newItem] })
@@ -302,8 +341,10 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       });
     };
 
-    if (updatedProperties.statut == nativeStateEnum.Terminee) {
-      updatedProperties.datesEffectives.to = new Date()
+    if (updatedProperties.statut == nativeStateEnum.En_Cours) {
+      updatedProperties.datesEffectives.from = format(new Date(), "EEE LLL dd y")
+    } else if (updatedProperties.statut == nativeStateEnum.Terminee) {
+      updatedProperties.datesEffectives.to = format(new Date(), "EEE LLL dd y")
     }
     return {
       project: {
@@ -319,11 +360,13 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       return items.map(item => {
         if (item.id === itemId) {
           found = true;
-          state.setSelectedItem({
-            ...parent,
-            children: items.map(child => child.id === itemId ? { ...child, statut: updatedState } : child)
-          })
-          return { ...item, statut: updatedState };
+          var updatedDate = {from: "", to: ""}
+          if(updatedState == nativeStateEnum.En_Cours){
+            updatedDate.to = format(new Date(), "EEE LLL dd y")
+          } else if(updatedState == nativeStateEnum.Terminee){
+            updatedDate.to = format(new Date(), "EEE LLL dd y")
+          } 
+          return { ...item, statut: updatedState, datesEffectives: updatedDate};
         } else if (found) {
           return item;
         } else if (item.children?.length > 0) {
@@ -332,6 +375,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         return item;
       });
     };
+
     return {
       project: {
         ...state.project,
@@ -349,20 +393,10 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       statut: statut,
       version: "",
       estimation: 0,
-      datesEffectives: { from: "", to: "" },
+      datesEffectives: statut == nativeStateEnum.Terminee ? { from: new Date(), to: new Date() } : { from: "", to: "" },
       children: [],
       commentaires: "",
       type: nativeItemTypeEnum.US,
-    }
-  },
-  getNewTache: (statut = "") => {
-    var nextUSNb = get().project.childNb + 1;
-    return {
-      nom: nativeItemTypeEnum.Tache + " " + nextUSNb,
-      description: "Description" + nativeItemTypeEnum.Tache + " " + nextUSNb,
-      statut: statut ? statut : nativeStateEnum.A_Faire,
-      id: "ID" + nativeItemTypeEnum.Tache + nextUSNb,
-      type: nativeItemTypeEnum.Tache
     }
   },
   getNewEnsemble: () => {
@@ -408,20 +442,19 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     });
     return chartData;
   },
-  getSprintStats: (sprint: Item): { points: number, usStates: US_States, usPriorities: US_Priorities } => {
-    var { points, usStates, usPriorities } = { points: 0, usStates: { [nativeStateEnum.Terminee]: 0, [nativeStateEnum.En_Cours]: 0, [nativeStateEnum.A_Faire]: 0 }, usPriorities: { [nativePriorityEnum.Mineure]: 0, [nativePriorityEnum.Majeure]: 0, [nativePriorityEnum.Critique]: 0 } };
-    return get().getSprintPointsAndCompletedAux(sprint.children, { points, usStates, usPriorities });
+  getSprintStats: (sprint: Item): Ensemble_Data => {
+    var { totalPoints, donePoints, stateStats, priorityStats } = { totalPoints: 0, donePoints: 0, stateStats: { [nativeStateEnum.Terminee]: 0, [nativeStateEnum.En_Cours]: 0, [nativeStateEnum.A_Faire]: 0 }, priorityStats: { [nativePriorityEnum.Mineure]: 0, [nativePriorityEnum.Majeure]: 0, [nativePriorityEnum.Critique]: 0 } };
+    return get().getSprintPointsAndCompletedAux(sprint.children, { totalPoints, donePoints, stateStats, priorityStats });
   },
-  getSprintPointsAndCompletedAux: (itemList, acc) => {
-    acc["points_realises"] = 0;
+  getSprintPointsAndCompletedAux: (itemList: Item[], acc: Ensemble_Data): Ensemble_Data => {
     itemList?.forEach(item => {
       if (item.type == nativeItemTypeEnum.US) {
-        acc.points += (item as US).estimation;
-        acc.usStates[(item as US).statut]++;
+        acc.totalPoints += (item as US).estimation;
+        acc.stateStats[(item as US).statut]++;
         if ((item as US).statut == nativeStateEnum.Terminee) {
-          acc["points_realises"] += (item as US).estimation;
+          acc.donePoints += (item as US).estimation;
         }
-        acc.usPriorities[(item as US).priorite]++;
+        acc.priorityStats[(item as US).priorite]++;
       } else if (item.type == nativeItemTypeEnum.Ensemble && item.children && item.children.length > 0) {
         acc = get().getSprintPointsAndCompletedAux(item.children, acc);
       }
@@ -430,7 +463,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   },
   getBurnUpAndDown: (data, totalPoints) => {
     var acc = 0;
-    var burn: { up: any[], down: any[] } = { up: [{}], down: [{}] }
+    var burn: { up: any[], down: any[] } = { up: [], down: [] }
     Object.keys(data).forEach(date => {
       acc += parseInt(data[date] || 0);
       burn.up.push({
@@ -448,8 +481,8 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     var sprintStats = get().getSprintStats(item as Sprint);
     var chartData = get().getTimeData(item as Sprint);
     chartData = get().getPointData(chartData, item);
-    var chart = get().getBurnUpAndDown(chartData, sprintStats.points);
-    return { burn: chart, usState: sprintStats.usStates };
+    var chart = get().getBurnUpAndDown(chartData, sprintStats.totalPoints);
+    return { burn: chart, stateStats: sprintStats.stateStats };
   }
 }));
 

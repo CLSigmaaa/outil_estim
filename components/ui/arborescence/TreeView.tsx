@@ -6,14 +6,12 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import LoopIcon from '@mui/icons-material/Loop';
-import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import AddItemButton from './AddToItemButton';
 import AddToProjectButton from './AddToProjectButton';
 import { useTreeStore } from '@/components/store/useTreeStore';
 import { unstable_useTreeItem2 as useTreeItem2, UseTreeItem2Parameters } from '@mui/x-tree-view/useTreeItem2';
 import { TreeItem2Content, TreeItem2IconContainer, TreeItem2GroupTransition, TreeItem2Label, TreeItem2Checkbox } from '@mui/x-tree-view/TreeItem2';
 import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
-import { Item } from '@/app/model/projet';
 import { nativeItemTypeEnum } from '@/app/model/projet/itemEnum';
 
 
@@ -26,7 +24,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   props: CustomTreeItemProps,
   ref: React.Ref<HTMLLIElement>,
 ) {
-  const { addItem, deleteItem, selectedItem, setSelectedItem, getNewUS, getNewEnsemble } = useTreeStore();
+  const { addItem, deleteItem, selectedItem, setSelectedItem, findItemInProject, getNewUS, getNewEnsemble, } = useTreeStore();
 
   const { id, itemId, label, disabled, children, ...other } = props;
 
@@ -75,12 +73,12 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
       setSelectedItem(null);
     }
     deleteItem(itemId);
+    setSelectedItem(findItemInProject(selectedItem?.id))
   }
   const iconDict = {
     [nativeItemTypeEnum.US]: BookmarkBorderIcon,
     [nativeItemTypeEnum.Ensemble]: BookmarksIcon,
     [nativeItemTypeEnum.Sprint]: LoopIcon,
-    [nativeItemTypeEnum.Tache]: TaskAltIcon
   }
 
   function getIconFromId(itemId: string) {
@@ -93,9 +91,6 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
     if (itemId.includes(nativeItemTypeEnum.Sprint)) {
       return iconDict[nativeItemTypeEnum.Sprint]
     }
-    if (itemId.includes(nativeItemTypeEnum.Tache)) {
-      return iconDict[nativeItemTypeEnum.Tache]
-    }
     return undefined;
   }
 
@@ -103,7 +98,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   return (
     <div className='itemContainer  '>
       <div className='flex item justify-between '>
-        <CustomTreeItemContent {...getContentProps()} style={{ padding: '4px 2px', overflow: 'hidden'}}>
+        <CustomTreeItemContent {...getContentProps()} style={{ padding: '4px 2px', overflow: 'hidden', whiteSpace: 'nowrap'}}>
           <TreeItem2IconContainer {...getIconContainerProps()}>
             <TreeItem2Icon status={status} />
           </TreeItem2IconContainer>
@@ -113,7 +108,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
           </Box>
         </CustomTreeItemContent>
        <div className='flex justify-end min-w-12'>
-        {(itemId?.includes(nativeItemTypeEnum.US) || itemId?.includes(nativeItemTypeEnum.Tache)) ? "" :
+        {(itemId?.includes(nativeItemTypeEnum.US)) ? "" :
           <AddItemButton itemId={itemId} addEnsembleToItem={() => addItem(itemId, getNewEnsemble())} addUSToItem={() => addItem(itemId, getNewUS())} />}
         <button className='deleteButton align-center max-h max-w-6' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
         </div>
@@ -126,37 +121,14 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
 
 
 export default function TreeView() {
-  const { project, addItem, selectedItem, setSelectedItem, getNewUS, getNewEnsemble, getNewSprint } = useTreeStore();
+  const { project, addItem, findItemInProject, selectedItem, setSelectedItem, getNewUS, getNewEnsemble, getNewSprint } = useTreeStore();
 
 
   function getProjectItemLabel(item: any) {
     return item ? item.nom : "";
   }
 
-  function findItemInProject(itemId: string): Item | undefined {
-    return findItemAux(project.children, itemId);
-  }
-
-  function findItemAux(children: Item[], itemId: string): Item | undefined {
-    for (const item of children) {
-      if (item == undefined) {
-        return
-      }
-      if (item.id == itemId) {
-        return item
-      }
-      if (item.children && item.children.length > 0) {
-        const found = findItemAux(item.children, itemId);
-        if (found) {
-          if (found.type == nativeItemTypeEnum.Tache){ // On n'affiche pas les tâches mais l'US les contenant
-            return item;
-          }
-          return found;
-        }
-      }
-    }
-    return undefined;
-  }
+  
 
   function selectItem(itemId: string) {
     var newSelectedItem = findItemInProject(itemId);
@@ -167,12 +139,14 @@ export default function TreeView() {
   }
 
   return (
-    <Box >
+    <div className='overflow-auto'>
+    <Box>
       <RichTreeView
         items={project.children}
         onItemFocus={(_event, itemId) => {
           selectItem(itemId);
         }}
+        expansionTrigger="iconContainer"
         getItemLabel={getProjectItemLabel}
         slots={{
           item: CustomTreeItem
@@ -181,5 +155,6 @@ export default function TreeView() {
       </RichTreeView>
       <AddToProjectButton addUS={() => addItem("", getNewUS())} addEnsemble={() => addItem("", getNewEnsemble())} addSprint={() => addItem("", getNewSprint())} />
     </Box>
+    </div>
   );
 }
