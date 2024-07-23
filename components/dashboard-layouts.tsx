@@ -48,11 +48,25 @@ export const DashboardUSLayout: React.FC = () => {
 }
 
 export const DashboardSprintLayout: React.FC = () => {
+  const { selectedItem, getSprintStats } = useTreeStore();
+  const data = getSprintStats(selectedItem);
+
   return (
     <BaseDashboardLayout>
       <DashboardRow>
         <DashboardCase title="Sprint" className="w-full">
           <BurnDown />
+        </DashboardCase>
+      </DashboardRow>
+
+      <DashboardRow>
+        <DashboardCase title="Indice de prédictibilité" className="w-full">
+          <span>{(Number(data.points_realises) / Number(data.points)).toFixed(1)}</span>
+        </DashboardCase>
+        <DashboardCase title="US restantes / US Total" className="w-full">
+          <span>
+            {data.usStates[nativeStateEnum.Terminee]} / {data.usStates[nativeStateEnum.A_Faire] + data.usStates[nativeStateEnum.En_Cours] + data.usStates[nativeStateEnum.Terminee]}
+          </span>
         </DashboardCase>
       </DashboardRow>
     </BaseDashboardLayout>
@@ -122,11 +136,25 @@ const chartDict: ChartDictType = {
 }
 
 export const DashboardEnsembleUSLayout: React.FC = () => {
+  const { selectedItem, getSprintStats } = useTreeStore();
+  const data = getSprintStats(selectedItem);
+
+  console.log(data)
   return (
     <BaseDashboardLayout>
       <DashboardRow>
         <DashboardCase title="Graphique des US" description="" className="w-full">
           <ChartSelect chartDict={chartDict} />
+        </DashboardCase>
+      </DashboardRow>
+      <DashboardRow>
+        <DashboardCase title="Indice de prédictibilité" className="w-full">
+          <span>{(Number(data.points_realises) / Number(data.points)).toFixed(1)}</span>
+        </DashboardCase>
+        <DashboardCase title="US restantes / US Total" className="w-full">
+          <span>
+            {data.usStates[nativeStateEnum.Terminee]} / {data.usStates[nativeStateEnum.A_Faire] + data.usStates[nativeStateEnum.En_Cours] + data.usStates[nativeStateEnum.Terminee]}
+          </span>
         </DashboardCase>
       </DashboardRow>
     </BaseDashboardLayout>

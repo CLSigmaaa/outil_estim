@@ -413,10 +413,14 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     return get().getSprintPointsAndCompletedAux(sprint.children, { points, usStates, usPriorities });
   },
   getSprintPointsAndCompletedAux: (itemList, acc) => {
+    acc["points_realises"] = 0;
     itemList?.forEach(item => {
       if (item.type == nativeItemTypeEnum.US) {
         acc.points += (item as US).estimation;
         acc.usStates[(item as US).statut]++;
+        if ((item as US).statut == nativeStateEnum.Terminee) {
+          acc["points_realises"] += (item as US).estimation;
+        }
         acc.usPriorities[(item as US).priorite]++;
       } else if (item.type == nativeItemTypeEnum.Ensemble && item.children && item.children.length > 0) {
         acc = get().getSprintPointsAndCompletedAux(item.children, acc);
