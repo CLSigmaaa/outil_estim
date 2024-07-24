@@ -127,6 +127,11 @@ export const DashboardEnsembleUSLayout: React.FC = () => {
         </DashboardCase>
       </DashboardRow>
       <DashboardRow>
+        <DashboardCase title="Graphique des US" description="" className="w-full">
+          <Kanban />
+        </DashboardCase>
+      </DashboardRow>
+      <DashboardRow>
         <DashboardCase title="Indice de prédictibilité" className="w-full p-5">
           <span>{(Number(data.donePoints) / Number(data.totalPoints)).toFixed(2)}</span>
         </DashboardCase>

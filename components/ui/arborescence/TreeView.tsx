@@ -24,7 +24,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   props: CustomTreeItemProps,
   ref: React.Ref<HTMLLIElement>,
 ) {
-  const { addItem, deleteItem, selectedItem, setSelectedItem, findItemInProject, getNewUS, getNewEnsemble, } = useTreeStore();
+  const { addItem, deleteItem, selectedItem, expandedItems, setExpandedItems, setSelectedItem, findItemInProject, getNewUS, getNewEnsemble, } = useTreeStore();
 
   const { id, itemId, label, disabled, children, ...other } = props;
 
@@ -53,7 +53,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
     ...other
   }: CustomLabelProps) {
     return (
-      <TreeItem2Label sx={{ display: 'flex'}}>
+      <TreeItem2Label sx={{ display: 'flex' }}>
         {Icon && (
           <Box
             component={Icon}
@@ -69,7 +69,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   }
 
   const handleDeleteItem = (itemId: any) => {
-    if (selectedItem?.id == itemId){
+    if (selectedItem?.id == itemId) {
       setSelectedItem(null);
     }
     deleteItem(itemId);
@@ -98,7 +98,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   return (
     <div className='itemContainer  '>
       <div className='flex item justify-between '>
-        <CustomTreeItemContent {...getContentProps()} style={{ padding: '4px 2px', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+        <CustomTreeItemContent {...getContentProps()} style={{ padding: '4px 2px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
           <TreeItem2IconContainer {...getIconContainerProps()}>
             <TreeItem2Icon status={status} />
           </TreeItem2IconContainer>
@@ -107,28 +107,33 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
             <CustomLabel {...getLabelProps({ icon })} />
           </Box>
         </CustomTreeItemContent>
-       <div className='flex justify-end min-w-12'>
-        {(itemId?.includes(nativeItemTypeEnum.US)) ? "" :
-          <AddItemButton itemId={itemId} addEnsembleToItem={() => addItem(itemId, getNewEnsemble())} addUSToItem={() => addItem(itemId, getNewUS())} />}
-        <button className='deleteButton align-center max-h max-w-6' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
+        <div className='flex justify-end min-w-12'>
+          {(itemId?.includes(nativeItemTypeEnum.US)) ? "" :
+            <AddItemButton itemId={itemId} addEnsembleToItem={() => {
+              addItem(itemId, getNewEnsemble())
+              setExpandedItems(expandedItems.concat(findItemInProject(itemId)?.id || ""))
+            }} addUSToItem={() => {
+              addItem(itemId, getNewUS())
+              setExpandedItems(expandedItems.concat(findItemInProject(itemId)?.id || ""))
+            }} />}
+          <button className='deleteButton align-center max-h max-w-6' onClick={() => handleDeleteItem(itemId)}> <DeleteOutlineIcon color='secondary' /></button>
         </div>
-        </div>
+      </div>
       {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
     </div>
-  )},
+  )
+},
 );
 
 
 
 export default function TreeView() {
-  const { project, addItem, findItemInProject, selectedItem, setSelectedItem, getNewUS, getNewEnsemble, getNewSprint } = useTreeStore();
-
+  const { project, addItem, findItemInProject, selectedItem, expandedItems, setExpandedItems, setSelectedItem, getNewUS, getNewEnsemble, getNewSprint } = useTreeStore();
 
   function getProjectItemLabel(item: any) {
     return item ? item.nom : "";
   }
 
-  
 
   function selectItem(itemId: string) {
     var newSelectedItem = findItemInProject(itemId);
@@ -138,23 +143,30 @@ export default function TreeView() {
     }
   }
 
+  function handleExpandedItemsChange(event: React.SyntheticEvent, itemIds: string[]) {
+    setExpandedItems(itemIds)
+  }
+
   return (
     <div className='overflow-auto'>
-    <Box>
-      <RichTreeView
-        items={project.children}
-        onItemFocus={(_event, itemId) => {
-          selectItem(itemId);
-        }}
-        expansionTrigger="iconContainer"
-        getItemLabel={getProjectItemLabel}
-        slots={{
-          item: CustomTreeItem
-        }}
-      >
-      </RichTreeView>
-      <AddToProjectButton addUS={() => addItem("", getNewUS())} addEnsemble={() => addItem("", getNewEnsemble())} addSprint={() => addItem("", getNewSprint())} />
-    </Box>
+      <Box>
+        <RichTreeView
+          items={project.children}
+          onItemFocus={(_event, itemId) => {
+            selectItem(itemId);
+          }}
+          expansionTrigger="iconContainer"
+          expandedItems={expandedItems}
+          onExpandedItemsChange={handleExpandedItemsChange}
+          getItemLabel={getProjectItemLabel}
+          slots={{
+            item: CustomTreeItem
+          }}
+        >
+        </RichTreeView>
+        <AddToProjectButton addUS={() => addItem("", getNewUS())} addEnsemble={() => addItem("", getNewEnsemble())} addSprint={() => addItem("", getNewSprint())} />
+      </Box>
+      <button onClick={() => console.log(selectedItem)}>selectedItem</button>
     </div>
   );
 }

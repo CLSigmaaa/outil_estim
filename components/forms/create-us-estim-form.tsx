@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form"
 import { useTreeStore } from "../store/useTreeStore"
 import { US } from "@/app/model/projet"
 import { createUserStoryEstimFormSchema } from "@/schemas/forms/user-story"
+import { Separator } from "@/components/ui/separator"
 
 import { useToast } from "@/components/ui/use-toast"
 
@@ -45,34 +46,35 @@ export const CreateUSEstimForm = ({ defaultValues }: { defaultValues: US }) => {
     }
 
     return (
-        <div className="bg-white p-4 border rounded border-black max-w-12">
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <p> {defaultValues.nom}</p>
-                    <p> {defaultValues.description}</p>
-                    <FormField
-                        control={form.control}
-                        name="estimation_initiale"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Estimation:</FormLabel>
-                                <FormMessage />
-                                <FormControl>
-                                    <Input
-                                        placeholder="Estimation en points"
-                                        className="resize-none"
-                                        {...field}
-                                    />
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
-
-                    <Button type="submit" className="flex justify-center">
-                        Modifier estimation
-                    </Button>
-                </form>
-            </Form>
-        </div>
+        <div className="bg-white p-4 border rounded border-black object-contain">
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                <p className="font-semibold"> {defaultValues.nom}</p>
+                <Separator />
+                <p className="italic max-h-32 overflow-auto"> {defaultValues.description}</p>
+                <FormField
+                    control={form.control}
+                    name="estimation_initiale"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Estimation:</FormLabel>
+                            <FormMessage />
+                            <FormControl>
+                            <Input
+                                    placeholder="Estimation en points"
+                                    className="resize-none"
+                                    {...field}
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+               
+                <Button type="submit" className="flex justify-center">
+                    Modifier estimation
+                </Button>
+            </form>
+        </Form>
+    </div>
     )
 }

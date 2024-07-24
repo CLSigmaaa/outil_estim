@@ -7,6 +7,7 @@ import {
 import Divider from "@mui/material/Divider";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { useTreeStore } from "../store/useTreeStore";
+import { CreateUSEstimForm } from "@/components/forms/create-us-estim-form";
 import { nativeItemTypeEnum, nativeStateEnum } from "@/app/model/projet/itemEnum";
 
 
@@ -19,7 +20,7 @@ export default function ColonneKanban({
 }) {
   const styles = {
     dragger: `px-2 py-2 my-2 transition-colors duration-150 ease-in-out bg-white rounded-lg shadow hover:bg-gray-100`,
-    dropper: "px-4 flex flex-col w-full h-96 overflow-auto",
+    dropper: "px-4 flex flex-col w-full h-full overflow-auto",
     draggerContent: `flex justify-evenly items-center space-x-3 text-base`,
     draggerIcon: `inline-flex items-center justify-center rounded-full p-1.5 text-white bg-teal-100 text-teal-700`,
     dragging: `bg-gray-300`,
@@ -48,7 +49,7 @@ export default function ColonneKanban({
   }
 
   return (
-    <div className="px-4 flex flex-col w-full">
+    <div className="px-4 flex flex-col w-full max-h-96">
     <div className="flex text-xl font-semibold justify-center">
               {statut}
             </div>
@@ -87,8 +88,8 @@ export default function ColonneKanban({
                               </div>
                             </div>
                           </PopoverTrigger>
-                          <PopoverContent>
-                            
+                          <PopoverContent className="max-w-[20rem]">
+                            <CreateUSEstimForm defaultValues={item} /> 
                           </PopoverContent>
                         </Popover>
                       );

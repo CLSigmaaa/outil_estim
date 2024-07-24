@@ -6,9 +6,11 @@ import { differenceInDays, addDays, format } from "date-fns"
 export interface TreeState {
   project: Projet;
   selectedItem: undefined | Item;
+  expandedItems: string[];
   setProject: (newProject: Projet) => void;
-  findItemInProject: (itemId: string) => Item | undefined;
   setSelectedItem: (newSelectedItem: any) => void;
+  setExpandedItems: (newExpandedItems: string[]) => void;
+  findItemInProject: (itemId: string) => Item | undefined;
   addItem: (parentId: string, newItem: Item) => void;
   deleteItem: (itemId: string) => void;
   editItem: (itemId: string, updatedProperties: Item) => void;
@@ -48,12 +50,12 @@ const mockProjet = {
           "version": "",
           "estimation": 10,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-09T12:23:21.335Z"
+            "from": "2024-06-30T22:00:00.000Z",
+            "to": "2024-07-06T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "User Story 3",
@@ -64,12 +66,12 @@ const mockProjet = {
           "version": "",
           "estimation": 15,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-12T12:23:21.335Z"
+            "from": "2024-07-02T22:00:00.000Z",
+            "to": "2024-07-05T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "User Story 4",
@@ -80,12 +82,12 @@ const mockProjet = {
           "version": "",
           "estimation": 20,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-15T12:23:21.335Z"
+            "from": "2024-07-02T22:00:00.000Z",
+            "to": "2024-07-08T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "User Story 5",
@@ -96,12 +98,12 @@ const mockProjet = {
           "version": "",
           "estimation": 25,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-21T12:23:21.335Z"
+            "from": "2024-07-04T22:00:00.000Z",
+            "to": "2024-07-07T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "User Story 6",
@@ -112,12 +114,12 @@ const mockProjet = {
           "version": "",
           "estimation": 30,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-23T12:23:21.335Z"
+            "from": "2024-07-06T22:00:00.000Z",
+            "to": "2024-07-11T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "User Story 7",
@@ -128,12 +130,12 @@ const mockProjet = {
           "version": "",
           "estimation": 35,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-25T12:23:21.335Z"
+            "from": "2024-07-09T22:00:00.000Z",
+            "to": "2024-07-13T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "User Story 8",
@@ -144,12 +146,12 @@ const mockProjet = {
           "version": "",
           "estimation": 25,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-26T12:23:21.335Z"
+            "from": "2024-07-12T22:00:00.000Z",
+            "to": "2024-07-17T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "User Story 9",
@@ -160,12 +162,12 @@ const mockProjet = {
           "version": "",
           "estimation": 35,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-28T12:23:21.335Z"
+            "from": "2024-07-10T22:00:00.000Z",
+            "to": "2024-07-14T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "User Story 10",
@@ -176,12 +178,12 @@ const mockProjet = {
           "version": "",
           "estimation": 15,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-28T12:23:21.335Z"
+            "from": "2024-07-12T22:00:00.000Z",
+            "to": "2024-07-16T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "User Story 11",
@@ -192,12 +194,12 @@ const mockProjet = {
           "version": "",
           "estimation": 30,
           "datesEffectives": {
-            "from": "",
-            "to": "2024-07-30T12:23:21.335Z"
+            "from": "2024-07-18T22:00:00.000Z",
+            "to": "2024-07-22T22:00:00.000Z"
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story",
+          "type": "User Story"
         },
         {
           "nom": "Ensemble 13",
@@ -212,8 +214,8 @@ const mockProjet = {
               "version": "",
               "estimation": 15,
               "datesEffectives": {
-                "from": "",
-                "to": "2024-07-18T09:29:19.240Z"
+                "from": "2024-07-20T22:00:00.000Z",
+                "to": "2024-07-23T22:00:00.000Z"
               },
               "children": [],
               "commentaires": "",
@@ -232,8 +234,8 @@ const mockProjet = {
                   "version": "",
                   "estimation": 30,
                   "datesEffectives": {
-                    "from": "",
-                    "to": "2024-07-24T09:29:32.603Z"
+                    "from": "2024-07-21T22:00:00.000Z",
+                    "to": "2024-07-26T22:00:00.000Z"
                   },
                   "children": [],
                   "commentaires": "",
@@ -243,6 +245,22 @@ const mockProjet = {
               "id": "ID-Ensemble15",
               "commentaires": "",
               "type": "Ensemble"
+            },
+            {
+              "nom": "User Story 17",
+              "description": "DescriptionUser Story 17",
+              "id": "ID-User Story17",
+              "priorite": "Mineure",
+              "statut": "Terminée",
+              "version": "",
+              "estimation": 15,
+              "datesEffectives": {
+                "from": "2024-07-26T22:00:00.000Z",
+                "to": "2024-07-29T22:00:00.000Z"
+              },
+              "children": [],
+              "commentaires": "",
+              "type": "User Story"
             }
           ],
           "id": "ID-Ensemble13",
@@ -250,8 +268,8 @@ const mockProjet = {
           "type": "Ensemble"
         }
       ],
-      commentaires: "",
-      type: "Sprint"
+      "commentaires": "",
+      "type": "Sprint"
     }
   ],
   "commentaires": "",
@@ -261,7 +279,16 @@ const mockProjet = {
 
 export const useTreeStore = create<TreeState>((set, get) => ({
   project: mockProjet,
+  // {
+  //   // Initialisez avec un projet par défaut ou un objet vide
+  //   nom: "",
+  //   description: "",
+  //   id: "",
+  //   children: [],
+  //   childNb: 0,
+  // } as Projet,
   selectedItem: undefined,
+  expandedItems: [],
   setProject: (newProject) => set({ project: newProject }),
   findItemInProject: (itemId: string): Item | undefined => {
     const findItemAux = (children: Item[], itemId: string): Item | undefined => {
@@ -285,6 +312,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     return findItemAux(get().project.children, itemId);
   },
   setSelectedItem: (newSelectedItem) => set({ selectedItem: newSelectedItem }),
+  setExpandedItems: (newExpandedItems) => set({ expandedItems: newExpandedItems }),
   addItem: (parentId, newItem) => set((state) => {
     const findAndAddItem = (items: Item[], parentId: string, newItem: Item): Item[] => {
       return items.map(item => {
@@ -332,10 +360,15 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         return item;
       });
     };
-
-    if (updatedProperties.statut == nativeStateEnum.En_Cours) {
-      updatedProperties.datesEffectives.from = format(new Date(), "EEE LLL dd y")
-    } else if (updatedProperties.statut == nativeStateEnum.Terminee) {
+    if (updatedProperties.statut == nativeStateEnum.A_Faire) {
+      updatedProperties.datesEffectives.from = ""
+      updatedProperties.datesEffectives.to = ""
+    } else if (updatedProperties.statut == nativeStateEnum.En_Cours) {
+      if (updatedProperties.datesEffectives.from == undefined) {
+        updatedProperties.datesEffectives.from = format(new Date(), "EEE LLL dd y")
+      }
+      updatedProperties.datesEffectives.to = ""
+    } else if (updatedProperties.statut == nativeStateEnum.Terminee && updatedProperties.datesEffectives.to == undefined) {
       updatedProperties.datesEffectives.to = format(new Date(), "EEE LLL dd y")
     }
     return {
@@ -352,10 +385,17 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       return items.map(item => {
         if (item.id === itemId) {
           found = true;
-          var updatedDate = { from: "", to: "" }
-          if (updatedState == nativeStateEnum.En_Cours) {
-            updatedDate.to = format(new Date(), "EEE LLL dd y")
+          var updatedDate = item.datesEffectives;
+          if (updatedState == nativeStateEnum.A_Faire) {
+            updatedDate.from = ""
+            updatedDate.to = ""
+          } else if (updatedState == nativeStateEnum.En_Cours) {
+            updatedDate.from = format(new Date(), "EEE LLL dd y")
+            updatedDate.to = ""
           } else if (updatedState == nativeStateEnum.Terminee) {
+            if (updatedDate.from == "") {
+              updatedDate.from = format(new Date(), "EEE LLL dd y")
+            }
             updatedDate.to = format(new Date(), "EEE LLL dd y")
           }
           return { ...item, statut: updatedState, datesEffectives: updatedDate };

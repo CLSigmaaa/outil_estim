@@ -19,6 +19,10 @@ export const createUserStoryFormSchema = z.object({
   description: z.string().min(1, { message: "Champ obligatoire." }),
   priorite: priorityEnum,
   statut: userStoryStateEnum,
+  datesEffectives: z.object({
+    from: coerceDate,
+    to: coerceDate,
+  }),
   version: z.string().optional(),
   estimation_initiale: z.coerce.number().optional(),
   commentaires: z.string().optional(),
