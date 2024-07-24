@@ -11,11 +11,11 @@ const coerceDate = z.preprocess(
 export const createSprintFormSchema = z.object({
   nom: z.string(),
   description: z.string(),
-  us_etat: userStoryStateEnum,
+  statut: userStoryStateEnum,
   estimation_initiale: z.coerce.number().optional(),
   date_range_effective: z.object({
     from: coerceDate,
     to: coerceDate,
-  }),
+  }).optional(),
   commentaires: z.string().optional(),
 })

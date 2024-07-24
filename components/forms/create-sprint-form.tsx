@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
+import { useToast } from "@/components/ui/use-toast"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Sprint } from "@/app/model/projet"
@@ -23,8 +25,8 @@ import { nativeItemTypeEnum, nativeStateEnum } from "@/app/model/projet/itemEnum
 
 export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) => {
 
-  const { selectedItem, editItem, setSelectedItem } = useTreeStore(); // Ajout de editItem
-
+  const { selectedItem, editItem, setSelectedItem } = useTreeStore();
+  const { toast } = useToast()
 
   const form = useForm({
     resolver: zodResolver(createSprintFormSchema),
@@ -39,7 +41,7 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
       commentaires: defaultValues.commentaires,
     },
   })
-  
+
   //TODO: add types
   const onSubmit = (data: any) => {
     var editedItem = {
@@ -48,10 +50,13 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
       description: data.description,
       statut: data.statut,
       commentaires: data.commentaires,
-      datesEffectives: datesEffectives,
     } as Sprint;
-    setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)
+    toast({
+      variant: "success",
+      title: "Succès !",
+      description: `Le sprint bien a été modifié.`
+    })
   }
 
   function resetform() {
@@ -59,10 +64,6 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
       nom: selectedItem.nom,
       description: selectedItem.description,
       statut: selectedItem.statut,
-      date_range_effective: {
-        from: selectedItem.datesEffectives.from,
-        to: selectedItem.datesEffectives.to,
-      },
       commentaires: selectedItem.commentaires,
     })
   }
@@ -77,92 +78,92 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
 
   return (
     <>
-    <h1 className="font-bold mb-2">Informations sur {defaultValues.nom}</h1>
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full overflow-y-auto px-1">
-        <FormField
-          control={form.control}
-          name="nom"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nom</FormLabel>
-              <FormMessage />
-              <FormControl>
-                <Input placeholder="Nom User Story" {...field} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormMessage />
-              <FormControl>
-              <Textarea
-                   placeholder="Description du Sprint"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="statut"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>État du Sprint</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+      <h1 className="font-bold mb-2">Informations sur {defaultValues.nom}</h1>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full overflow-y-auto px-1">
+          <FormField
+            control={form.control}
+            name="nom"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nom</FormLabel>
+                <FormMessage />
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un état pour le Sprint" />
-                  </SelectTrigger>
+                  <Input placeholder="Nom User Story" {...field} />
                 </FormControl>
-                <SelectContent>
-                  {Object.values(nativeStateEnum).map((item) => {
-                    return (
-                      <SelectItem
-                        key={item}
-                        value={item}>
-                        {item}
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="commentaires"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Commentaires</FormLabel>
-              <FormMessage />
-              <FormControl>
-                <Textarea
-                  placeholder="Cette US est mal estimée car ..."
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <Button
-          type="submit"
-          name="submitSprintForm"
-        >
-          Modifier Sprint
-        </Button>
-      </form>
-    </Form>
-  </>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormMessage />
+                <FormControl>
+                  <Textarea
+                    placeholder="Description du Sprint"
+                    className="resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="statut"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>État du Sprint</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un état pour le Sprint" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.values(nativeStateEnum).map((item) => {
+                      return (
+                        <SelectItem
+                          key={item}
+                          value={item}>
+                          {item}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="commentaires"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Commentaires</FormLabel>
+                <FormMessage />
+                <FormControl>
+                  <Textarea
+                    placeholder="Cette US est mal estimée car ..."
+                    className="resize-none"
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <Button
+            type="submit"
+            name="submitSprintForm"
+          >
+            Modifier Sprint
+          </Button>
+        </form>
+      </Form>
+    </>
   )
 }

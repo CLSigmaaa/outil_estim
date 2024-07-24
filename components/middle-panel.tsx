@@ -18,14 +18,14 @@ const dashboardLayouts: DashboardLayoutsType = {
 
 export const MiddlePanel = () => {
   const { selectedItem } = useTreeStore();
-  
+
   if (!selectedItem) return null;
 
   return (
     <>
       <h1 className="font-bold text-3xl mt-3 ml-3">Dashboard</h1>
       <div className="flex justify-center">
-          {dashboardLayouts[selectedItem.type]}
+        {dashboardLayouts[selectedItem.type]}
       </div>
     </>
   )

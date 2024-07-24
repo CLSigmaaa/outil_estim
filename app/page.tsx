@@ -17,6 +17,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { Grip } from "lucide-react";
 
 export default async function Home() {
   return (
@@ -29,11 +30,11 @@ export default async function Home() {
           <LeftPanel />
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel defaultSize={55} minSize={40} maxSize={65} className="h-full w-full !overflow-y-auto">
+        <ResizablePanel defaultSize={55} minSize={40} maxSize={65} className="h-full w-full !overflow-y-auto p-5">
           <MiddlePanel />
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel defaultSize={25} minSize={20} maxSize={40} className="w-full h-full">
+        <ResizablePanel defaultSize={25} minSize={20} maxSize={40} className="w-full h-full relative">
           <div className="w-full h-full overflow-y-auto p-2">
             <RightPanel />
           </div>

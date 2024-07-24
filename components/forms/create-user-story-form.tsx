@@ -14,6 +14,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
+import { useToast } from "@/components/ui/use-toast"
+
 import {
   Form,
   FormControl,
@@ -59,13 +61,14 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
     },
   })
 
+  const { toast } = useToast()
 
   const onSubmit = async (data: any) => {
     const formData = new FormData();
-    
+
     formData.append("nom", data.nom);
     formData.append("id", data.id);
-    
+
     const editedItem: US = {
       ...selectedItem,
       nom: data.nom,
@@ -76,9 +79,8 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
       estimation: data.estimation_initiale,
       commentaires: data.commentaires,
     };
-    setSelectedItem(undefined)
     editItem(editedItem.id, editedItem)
-
+    toast({ variant: "success", title: "Succès !", description: "L'US a bien été modifiée." })
   }
 
   function resetform() {
@@ -139,11 +141,11 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                 <FormMessage />
                 <FormControl>
                   <Textarea
-                      placeholder="Description de l'User Story"
-                      className="resize-none"
-                      {...field}
-                    />
-              </FormControl>
+                    placeholder="Description de l'User Story"
+                    className="resize-none"
+                    {...field}
+                  />
+                </FormControl>
               </FormItem>
             )}
           />

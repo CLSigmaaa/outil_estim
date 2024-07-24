@@ -20,9 +20,11 @@ import { useTreeStore } from "../store/useTreeStore"
 import { US } from "@/app/model/projet"
 import { createUserStoryEstimFormSchema } from "@/schemas/forms/user-story"
 
+import { useToast } from "@/components/ui/use-toast"
+
 export const CreateUSEstimForm = ({ defaultValues }: { defaultValues: US }) => {
     const { selectedItem, setSelectedItem, editItem } = useTreeStore(); // Ajout de editItem
-
+    const { toast } = useToast()
     var form = useForm({
         resolver: zodResolver(createUserStoryEstimFormSchema),
         defaultValues: {
@@ -38,38 +40,39 @@ export const CreateUSEstimForm = ({ defaultValues }: { defaultValues: US }) => {
             estimation: data.estimation_initiale
         } as US;
         editItem(editedUSEstim.id, editedUSEstim);
-        setSelectedItem({...selectedItem, children: selectedItem.children.map((us: US) => us.id == editedUSEstim.id ? editedUSEstim : us)})
+        setSelectedItem({ ...selectedItem, children: selectedItem.children.map((us: US) => us.id == editedUSEstim.id ? editedUSEstim : us) })
+        toast({ variant: "success", title: "Succès !", description: "L'US a bien été modifiée." })
     }
 
     return (
         <div className="bg-white p-4 border rounded border-black max-w-12">
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-                <p> {defaultValues.nom}</p>
-                <p> {defaultValues.description}</p>
-                <FormField
-                    control={form.control}
-                    name="estimation_initiale"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Estimation:</FormLabel>
-                            <FormMessage />
-                            <FormControl>
-                            <Input
-                                    placeholder="Estimation en points"
-                                    className="resize-none"
-                                    {...field}
-                                />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-               
-                <Button type="submit" className="flex justify-center">
-                    Modifier estimation
-                </Button>
-            </form>
-        </Form>
-    </div>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                    <p> {defaultValues.nom}</p>
+                    <p> {defaultValues.description}</p>
+                    <FormField
+                        control={form.control}
+                        name="estimation_initiale"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Estimation:</FormLabel>
+                                <FormMessage />
+                                <FormControl>
+                                    <Input
+                                        placeholder="Estimation en points"
+                                        className="resize-none"
+                                        {...field}
+                                    />
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+
+                    <Button type="submit" className="flex justify-center">
+                        Modifier estimation
+                    </Button>
+                </form>
+            </Form>
+        </div>
     )
 }

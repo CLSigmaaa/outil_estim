@@ -30,11 +30,7 @@ interface Props {
 }
 
 export const ChartSelect: React.FC<Props> = ({ chartDict }) => {
-  const [selectedChart, setSelectedChart] = React.useState<string | null>(null);
-
-  if (Object.keys(chartDict).length === 0) {
-    return null;
-  }
+  const [selectedChart, setSelectedChart] = React.useState<string | null>(chartDict ? Object.keys(chartDict)[0] : null)
 
   const chartLabels = Object.keys(chartDict);
   const chartComponents = Object.values(chartDict);
