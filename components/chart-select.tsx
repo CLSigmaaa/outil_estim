@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 
+import { nativeMasteryEnum, nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from '@/app/model/projet/itemEnum';
+
 import { Bar, BarChart } from "recharts"
 
 import {
@@ -30,7 +32,11 @@ interface Props {
 }
 
 export const ChartSelect: React.FC<Props> = ({ chartDict }) => {
-  const [selectedChart, setSelectedChart] = React.useState<string | null>(chartDict ? Object.keys(chartDict)[0] : null)
+  const [selectedChart, setSelectedChart] = React.useState<string | null>(chartDict ? Object.keys(chartDict)[0] : null);
+
+  if (Object.keys(chartDict).length === 0) {
+    return null;
+  }
 
   const chartLabels = Object.keys(chartDict);
   const chartComponents = Object.values(chartDict);
@@ -47,7 +53,7 @@ export const ChartSelect: React.FC<Props> = ({ chartDict }) => {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {data.map((item, index) => (
+            {data.length > 0 && data.map((item, index) => (
               <SelectItem key={index} value={item.name.toString()}>
                 <SelectLabel>{item.name}</SelectLabel>
               </SelectItem>

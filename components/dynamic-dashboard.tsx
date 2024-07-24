@@ -32,35 +32,16 @@ interface BaseDashboardLayoutProps {
   className?: string;
 }
 
-// interface PlaceholderChartProps {
-//   chartConfig: {
-//     desktop: { color: string };
-//     mobile: { color: string };
-//   };
-//   chartData: Array<{
-//     month: string;
-//     desktop: number;
-//     mobile: number;
-//   }>;
-// }
-
-// export const PlaceholderChart: React.FC<PlaceholderChartProps> = ({ chartConfig, chartData }) => {
-//   return (
-//     <ChartContainer config={chartConfig} className="w-full">
-//       <BarChart accessibilityLayer data={chartData}>
-//         <XAxis
-//           dataKey="month"
-//           tickLine={false}
-//           tickMargin={10}
-//           axisLine={false}
-//           tickFormatter={(value) => value.slice(0, 3)}
-//         />
-//         <Bar dataKey="desktop" fill={chartConfig.desktop.color} radius={4} />
-//         <Bar dataKey="mobile" fill={chartConfig.mobile.color} radius={4} />
-//       </BarChart>
-//     </ChartContainer>
-//   )
-// }
+export const chartConfig = {
+  desktop: {
+    label: "Desktop",
+    color: "#2563eb",
+  },
+  mobile: {
+    label: "Mobile",
+    color: "#60a5fa",
+  },
+} satisfies ChartConfig
 
 export const DashboardCase: React.FC<DashboardCaseProps> = ({ children, className, title, description, footer }) => {
   return (
