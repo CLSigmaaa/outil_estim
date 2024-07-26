@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { BurnCharts, Ensemble_Data, EnsembleUS, Item, Projet, Sprint, US, prorityStats, stateStats } from "@/app/model/projet/index";
+import { Ensemble_Data, EnsembleUS, Item, Projet, Sprint, US, Sprint_Data } from "@/app/model/projet/index";
 import { nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from '@/app/model/projet/itemEnum';
 import { differenceInDays, addDays, format } from "date-fns"
 
@@ -20,21 +20,22 @@ export interface TreeState {
   getNewSprint: (statut?: string) => Sprint;
   getTimeData: (sprint: Sprint) => any;
   getPointData: (chartData: any, item: Sprint | EnsembleUS) => any;
-  getSprintStats: (sprint: Item) => Ensemble_Data;
-  getSprintPointsAndCompletedAux: (itemList: Item[], acc: Ensemble_Data) => Ensemble_Data;
+  getItemChildrenStats: (sprint: Item) => Ensemble_Data;
+  getItemChildrenStatsAux: (itemList: Item[], acc: Ensemble_Data) => Ensemble_Data;
   getBurnUpAndDown: (data: any, totalPoints: number) => any;
-  getItemData: (item: Item) => { burn: BurnCharts, stateStats: stateStats };
+  getItemData: (item: Item) => Sprint_Data | Ensemble_Data;
+  getAllSprintsStats: (project: Projet) => {sprintName: string, sprintData: Sprint_Data}[]
 }
 
 const mockProjet = {
   nom: "Project1 Name",
   description: "description",
-  id: "id-proj1",
+  id: "proj1",
   children: [
     {
       "nom": "Sprint 1",
       "description": "DescriptionUser Sprint 1",
-      "id": "ID-Sprint1",
+      "id": "Sprint1",
       "statut": "Terminée",
       "datesEffectives": {
         "from": "2024-07-01T12:23:21.335Z",
@@ -42,9 +43,9 @@ const mockProjet = {
       },
       "children": [
         {
-          "nom": "User Story 2",
+          "nom": "US 2",
           "description": "DescriptionUser Story 2",
-          "id": "ID-User Story2",
+          "id": "US2",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -55,12 +56,12 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
-          "nom": "User Story 3",
+          "nom": "US 3",
           "description": "DescriptionUser Story 3",
-          "id": "ID-User Story3",
+          "id": "US3",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -71,12 +72,12 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
-          "nom": "User Story 4",
+          "nom": "US 4",
           "description": "DescriptionUser Story 4",
-          "id": "ID-User Story4",
+          "id": "US4",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -87,12 +88,12 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
-          "nom": "User Story 5",
+          "nom": "US 5",
           "description": "DescriptionUser Story 5",
-          "id": "ID-User Story5",
+          "id": "US5",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -103,12 +104,12 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
-          "nom": "User Story 6",
+          "nom": "US 6",
           "description": "DescriptionUser Story 6",
-          "id": "ID-User Story6",
+          "id": "US6",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -119,12 +120,12 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
-          "nom": "User Story 7",
+          "nom": "US 7",
           "description": "DescriptionUser Story 7",
-          "id": "ID-User Story7",
+          "id": "US7",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -135,12 +136,12 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
-          "nom": "User Story 8",
+          "nom": "US 8",
           "description": "DescriptionUser Story 8",
-          "id": "ID-User Story8",
+          "id": "US8",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -151,12 +152,12 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
-          "nom": "User Story 9",
+          "nom": "US 9",
           "description": "DescriptionUser Story 9",
-          "id": "ID-User Story9",
+          "id": "US9",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -167,12 +168,12 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
-          "nom": "User Story 10",
+          "nom": "US 10",
           "description": "DescriptionUser Story 10",
-          "id": "ID-User Story10",
+          "id": "US10",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -183,12 +184,12 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
-          "nom": "User Story 11",
+          "nom": "US 11",
           "description": "DescriptionUser Story 11",
-          "id": "ID-User Story11",
+          "id": "US11",
           "priorite": "Mineure",
           "statut": "Terminée",
           "version": "",
@@ -199,16 +200,16 @@ const mockProjet = {
           },
           "children": [],
           "commentaires": "",
-          "type": "User Story"
+          "type": "US"
         },
         {
           "nom": "Ensemble 13",
           "description": "DescriptionEnsemble 13",
           "children": [
             {
-              "nom": "User Story 14",
+              "nom": "US 14",
               "description": "DescriptionUser Story 14",
-              "id": "ID-User Story14",
+              "id": "US14",
               "priorite": "Majeure",
               "statut": "Terminée",
               "version": "",
@@ -219,16 +220,16 @@ const mockProjet = {
               },
               "children": [],
               "commentaires": "",
-              "type": "User Story"
+              "type": "US"
             },
             {
               "nom": "Ensemble 15",
               "description": "DescriptionEnsemble 15",
               "children": [
                 {
-                  "nom": "User Story 16",
+                  "nom": "US 16",
                   "description": "DescriptionUser Story 16",
-                  "id": "ID-User Story16",
+                  "id": "US16",
                   "priorite": "Mineure",
                   "statut": "Terminée",
                   "version": "",
@@ -239,17 +240,17 @@ const mockProjet = {
                   },
                   "children": [],
                   "commentaires": "",
-                  "type": "User Story"
+                  "type": "US"
                 }
               ],
-              "id": "ID-Ensemble15",
+              "id": "Ensemble15",
               "commentaires": "",
               "type": "Ensemble"
             },
             {
-              "nom": "User Story 17",
+              "nom": "US 17",
               "description": "DescriptionUser Story 17",
-              "id": "ID-User Story17",
+              "id": "US17",
               "priorite": "Mineure",
               "statut": "Terminée",
               "version": "",
@@ -260,10 +261,10 @@ const mockProjet = {
               },
               "children": [],
               "commentaires": "",
-              "type": "User Story"
+              "type": "US"
             }
           ],
-          "id": "ID-Ensemble13",
+          "id": "Ensemble13",
           "commentaires": "",
           "type": "Ensemble"
         }
@@ -278,15 +279,15 @@ const mockProjet = {
 } as Projet
 
 export const useTreeStore = create<TreeState>((set, get) => ({
-  project: mockProjet,
-  // {
-  //   // Initialisez avec un projet par défaut ou un objet vide
-  //   nom: "",
-  //   description: "",
-  //   id: "",
-  //   children: [],
-  //   childNb: 0,
-  // } as Projet,
+  project: //mockProjet,
+  {
+    // Initialisez avec un projet par défaut ou un objet vide
+    nom: "",
+    description: "",
+    id: "",
+    children: [],
+    childNb: 0,
+  } as Projet,
   selectedItem: undefined,
   expandedItems: [],
   setProject: (newProject) => set({ project: newProject }),
@@ -420,7 +421,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     return {
       nom: nativeItemTypeEnum.US + " " + nextUSNb,
       description: "Description" + nativeItemTypeEnum.US + " " + nextUSNb,
-      id: "ID-" + nativeItemTypeEnum.US + nextUSNb,
+      id: nativeItemTypeEnum.US + nextUSNb,
       priorite: nativePriorityEnum.Mineure,
       statut: statut,
       version: "",
@@ -437,7 +438,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       nom: nativeItemTypeEnum.Ensemble + " " + nextUSNb,
       description: "Description" + nativeItemTypeEnum.Ensemble + " " + nextUSNb,
       children: [],
-      id: "ID-" + nativeItemTypeEnum.Ensemble + nextUSNb,
+      id: nativeItemTypeEnum.Ensemble + nextUSNb,
       commentaires: "",
       type: nativeItemTypeEnum.Ensemble
     }
@@ -447,7 +448,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     return {
       nom: nativeItemTypeEnum.Sprint + " " + nextUSNb,
       description: "Description" + nativeItemTypeEnum.Sprint + " " + nextUSNb,
-      id: "ID-" + nativeItemTypeEnum.Sprint + nextUSNb,
+      id: nativeItemTypeEnum.Sprint + nextUSNb,
       statut: statut ? statut : nativeStateEnum.A_Faire,
       datesEffectives: { from: "", to: "" },
       children: [],
@@ -474,11 +475,11 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     });
     return chartData;
   },
-  getSprintStats: (sprint: Item): Ensemble_Data => {
+  getItemChildrenStats: (item: Item): Ensemble_Data => {
     var { totalPoints, donePoints, stateStats, priorityStats } = { totalPoints: 0, donePoints: 0, stateStats: { [nativeStateEnum.Terminee]: 0, [nativeStateEnum.En_Cours]: 0, [nativeStateEnum.A_Faire]: 0 }, priorityStats: { [nativePriorityEnum.Mineure]: 0, [nativePriorityEnum.Majeure]: 0, [nativePriorityEnum.Critique]: 0 } };
-    return get().getSprintPointsAndCompletedAux(sprint.children, { totalPoints, donePoints, stateStats, priorityStats });
+    return get().getItemChildrenStatsAux(item.children, { totalPoints, donePoints, stateStats, priorityStats });
   },
-  getSprintPointsAndCompletedAux: (itemList: Item[], acc: Ensemble_Data): Ensemble_Data => {
+  getItemChildrenStatsAux: (itemList: Item[], acc: Ensemble_Data): Ensemble_Data => {
     itemList?.forEach(item => {
       if (item.type == nativeItemTypeEnum.US) {
         acc.totalPoints += (item as US).estimation;
@@ -488,7 +489,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
         }
         acc.priorityStats[(item as US).priorite]++;
       } else if (item.type == nativeItemTypeEnum.Ensemble && item.children && item.children.length > 0) {
-        acc = get().getSprintPointsAndCompletedAux(item.children, acc);
+        acc = get().getItemChildrenStatsAux(item.children, acc);
       }
     });
     return acc;
@@ -510,11 +511,28 @@ export const useTreeStore = create<TreeState>((set, get) => ({
     return burn;
   },
   getItemData: (item: Item) => {
-    var sprintStats = get().getSprintStats(item as Sprint);
-    var chartData = get().getTimeData(item as Sprint);
-    chartData = get().getPointData(chartData, item);
-    var chart = get().getBurnUpAndDown(chartData, sprintStats.totalPoints);
-    return { burn: chart, stateStats: sprintStats.stateStats };
+    var childrenStats = get().getItemChildrenStats(item as Sprint);
+    if (item.type == nativeItemTypeEnum.Sprint){
+      var chartData = get().getTimeData(item as Sprint);
+      chartData = get().getPointData(chartData, item);
+      var chart = get().getBurnUpAndDown(chartData, childrenStats.totalPoints);
+      return { burn: chart, donePoints: childrenStats.donePoints, priorityStats: childrenStats.priorityStats, 
+        totalPoints: childrenStats.totalPoints, stateStats: childrenStats.stateStats };
+    }
+    return { donePoints: childrenStats.donePoints, priorityStats: childrenStats.priorityStats, 
+      totalPoints: childrenStats.totalPoints, stateStats: childrenStats.stateStats }
+  },
+  getAllSprintsStats: (project: Projet) => {
+    const sprintDataList:{sprintName: string, sprintData: Sprint_Data}[] = [];
+    var sprintData: Sprint_Data;
+    project.children.forEach(item => {
+      if (item.type != nativeItemTypeEnum.Sprint){
+        return;
+      }
+      sprintData = get().getItemData(item) as Sprint_Data;
+      sprintDataList.push({sprintName: item.nom, sprintData: sprintData})
+    });
+    return sprintDataList;
   }
 }));
 

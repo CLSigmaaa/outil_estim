@@ -26,7 +26,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
 ) {
   const { addItem, deleteItem, selectedItem, expandedItems, setExpandedItems, setSelectedItem, findItemInProject, getNewUS, getNewEnsemble, } = useTreeStore();
 
-  const { setLeftPanelVisibility, setRightPanelVisibility, setMiddlePanelVisibility } = usePanelManager();
+  const { setRightPanelVisibility, setMiddlePanelVisibility } = usePanelManager();
 
 
   const handleItemClick = () => {
@@ -137,6 +137,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
 
 export default function TreeView() {
   const { project, addItem, findItemInProject, selectedItem, expandedItems, setExpandedItems, setSelectedItem, getNewUS, getNewEnsemble, getNewSprint } = useTreeStore();
+  const { isRightPanelVisible, setRightPanelVisibility } = usePanelManager();
 
   function getProjectItemLabel(item: any) {
     return item ? item.nom : "";

@@ -21,11 +21,11 @@ import { useForm } from "react-hook-form"
 import { Sprint } from "@/app/model/projet"
 import { useTreeStore } from "@/components/store/useTreeStore"
 import { createSprintFormSchema } from "@/schemas/forms/sprint"
-import { nativeItemTypeEnum, nativeStateEnum } from "@/app/model/projet/itemEnum"
+import { nativeStateEnum } from "@/app/model/projet/itemEnum"
 
 export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) => {
 
-  const { selectedItem, editItem, setSelectedItem } = useTreeStore();
+  const { selectedItem, editItem, findItemInProject, setSelectedItem } = useTreeStore();
   const { toast } = useToast()
 
   const form = useForm({
@@ -35,8 +35,8 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
       description: defaultValues.description,
       statut: defaultValues.statut,
       date_range_effective: {
-        from: new Date(),
-        to: new Date(),
+        from: defaultValues.datesEffectives,
+        to: defaultValues.datesEffectives,
       },
       commentaires: defaultValues.commentaires,
     },
@@ -50,8 +50,10 @@ export const CreateSprintForm = ({ defaultValues }: { defaultValues: Sprint }) =
       description: data.description,
       statut: data.statut,
       commentaires: data.commentaires,
+      datesEffectives:{ from:"2024-07-01T12:23:21.335Z", to:"2024-07-30T12:23:21.335Z"}
     } as Sprint;
     editItem(editedItem.id, editedItem)
+    setSelectedItem(findItemInProject(selectedItem.id))
     toast({
       variant: "success",
       title: "Succès !",

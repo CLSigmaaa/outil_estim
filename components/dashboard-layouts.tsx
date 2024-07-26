@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from 'react';
-import { DashboardRow, DashboardCase, BaseDashboardLayout, chartData, chartConfig, PlaceholderChart } from '@/components/dynamic-dashboard';
+import { DashboardRow, DashboardCase, BaseDashboardLayout, chartConfig } from '@/components/dynamic-dashboard';
 import BurnDown from './burn-down/BurnDown';
 import { ChartSelect } from '@/components/chart-select';
 
@@ -17,6 +17,7 @@ import {
 import { useTreeStore } from "@/components/store/useTreeStore"
 import { nativeStateEnum } from '@/app/model/projet/itemEnum';
 import Kanban from './kanban/Kanban';
+import { Sprint_Data } from '@/app/model/projet';
 
 export const DashboardUSLayout: React.FC = () => {
   return (
@@ -27,22 +28,22 @@ export const DashboardUSLayout: React.FC = () => {
 }
 
 export const DashboardSprintLayout: React.FC = () => {
-  const { selectedItem, getSprintStats } = useTreeStore();
-  const data = getSprintStats(selectedItem);
+  const { selectedItem, getItemData} = useTreeStore();
+  const data = getItemData(selectedItem) as Sprint_Data;
 
   return (
     <BaseDashboardLayout>
       <DashboardRow>
-        <DashboardCase title="Kanban" className="w-full p-5">
+        <DashboardCase title="Kanban" className="w-full p-0">
           <Kanban />
         </DashboardCase>
       </DashboardRow>
       <DashboardRow>
-        <BurnDown className='w-full max-h-[500px] p-5' />
+        <BurnDown className='w-full max-h-[510px] p-5' />
       </DashboardRow>
       <DashboardRow>
         <DashboardCase title="Indice de prédictibilité" className="w-full p-5">
-          <span className="font-bold text-2xl">{(Number(data.donePoints) / Number(data.totalPoints)).toFixed(2)}</span>
+          <span className="font-bold text-2xl">{(Number(data.donePoints) / Number(data.totalPoints) || 0).toFixed(2)}</span>
         </DashboardCase>
         <DashboardCase title="US restantes / US Total" className="w-full p-5">
           <span className="font-bold text-2xl">
@@ -59,12 +60,12 @@ type ChartDictType = {
 };
 
 const BarChartByPriority: React.FC = () => {
-  const { selectedItem, getSprintStats } = useTreeStore();
+  const { selectedItem, getItemData } = useTreeStore();
 
   if (selectedItem === null || selectedItem === undefined) return null;
   if (selectedItem.type !== "Ensemble") return null;
 
-  const data = getSprintStats(selectedItem);
+  const data = getItemData(selectedItem);
 
   const newChartData = [
     { priorité: "Critique", Nombre: data.priorityStats.Critique },
@@ -86,11 +87,11 @@ const BarChartByPriority: React.FC = () => {
 }
 
 const BarChartByState: React.FC = () => {
-  const { selectedItem, getSprintStats } = useTreeStore();
+  const { selectedItem, getItemData } = useTreeStore();
 
   if (selectedItem === null || selectedItem === undefined) return null;
   if (selectedItem.type !== "Ensemble") return null;
-  const data = getSprintStats(selectedItem);
+  const data = getItemData(selectedItem);
 
   const newChartData = [
     { état: "A faire", Nombre: data.stateStats[nativeStateEnum.A_Faire] },
@@ -116,8 +117,8 @@ const chartDict: ChartDictType = {
 }
 
 export const DashboardEnsembleUSLayout: React.FC = () => {
-  const { selectedItem, getSprintStats } = useTreeStore();
-  const data = getSprintStats(selectedItem);
+  const { selectedItem, getItemData } = useTreeStore();
+  const data = getItemData(selectedItem);
 
   return (
     <BaseDashboardLayout>
@@ -133,7 +134,7 @@ export const DashboardEnsembleUSLayout: React.FC = () => {
       </DashboardRow>
       <DashboardRow>
         <DashboardCase title="Indice de prédictibilité" className="w-full p-5">
-          <span className="font-bold text-2xl">{(Number(data.donePoints) / Number(data.totalPoints)).toFixed(2)}</span>
+          <span className="font-bold text-2xl">{(Number(data.donePoints) / Number(data.totalPoints ) || 0).toFixed(2)}</span>
         </DashboardCase>
         <DashboardCase title="US restantes / US Total" className="w-full p-5">
           <span className="font-bold text-2xl">

@@ -20,27 +20,6 @@
 }
 
 
-
-.border-red {
-    border: 1px solid red;
-}
-  
-.border-blue {
-    border: 1px solid blue;
-}
-
-.border-orange {
-    border: 1px solid orange;
-}
-
-.border-green {
-    border: 1px solid green;
-}
-
-.border-yellow {
-    border: 1px solid yellow;
-}
-
 .deleteButton{
     visibility: hidden;
 }

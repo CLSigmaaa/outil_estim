@@ -6,14 +6,20 @@ import { nativeStateEnum } from "@/app/model/projet/itemEnum";
 
 export default function Kanban() {
   const { selectedItem, setSelectedItem, findItemInProject, editItemState } = useTreeStore();
+  const [selectedItemsIds, setSelectedItemsIds] = React.useState<string[]>([])
 
-  const onDragEnd = useCallback((result: any) => {
+  const onDragEnd = useCallback((result: any, itemsIds: string[]) => {
     if (result.reason === "DROP") {
       if (!result.destination || result.source.droppableId == result.destination.droppableId) {
         return;
       }
-
-      editItemState(result.draggableId, result.destination.droppableId)
+      if (itemsIds.length >= 2 && itemsIds.includes(result.draggableId)){
+        itemsIds.forEach((itemId: string) => {
+          editItemState(itemId, result.destination.droppableId)
+        })
+      } else {
+        editItemState(result.draggableId, result.destination.droppableId)
+      }
       if (selectedItem){
         setSelectedItem(findItemInProject(selectedItem.id ));
       }
@@ -22,10 +28,10 @@ export default function Kanban() {
 
   return (
     <div className="flex flex-row w-full">
-      <DragDropContext onDragEnd={onDragEnd}>
-        <ColonneKanban selectedItem={selectedItem} statut={nativeStateEnum.A_Faire} />
-        <ColonneKanban selectedItem={selectedItem} statut={nativeStateEnum.En_Cours} />
-        <ColonneKanban selectedItem={selectedItem} statut={nativeStateEnum.Terminee} />
+      <DragDropContext onDragEnd={(result) => onDragEnd(result, selectedItemsIds)}>
+        <ColonneKanban selectedItem={selectedItem} statut={nativeStateEnum.A_Faire} selectedItemsIds={selectedItemsIds} setSelectedItemsIds={setSelectedItemsIds}/>
+        <ColonneKanban selectedItem={selectedItem} statut={nativeStateEnum.En_Cours} selectedItemsIds={selectedItemsIds} setSelectedItemsIds={setSelectedItemsIds}/>
+        <ColonneKanban selectedItem={selectedItem} statut={nativeStateEnum.Terminee} selectedItemsIds={selectedItemsIds} setSelectedItemsIds={setSelectedItemsIds}/>
       </DragDropContext>
     </div>
   );

@@ -19,13 +19,14 @@ describe('Stats', () => {
     })
 
     test("Génération de l'axe Y", () => {
-        act(() => expect(expect(Object.values(
+        act(() => expect(Object.values(
             result.current.getPointData(result.current.getTimeData(sprint), sprint) as number[]
-        ).reduce((acc, pointEstim) => acc + pointEstim, 0)).toBe(consumedPoints)))
+        ).reduce((acc, pointEstim) => acc + pointEstim, 0)).toBe(consumedPoints))
     })
     
     test("Génération du burn down / burn up", () => { 
         var burnCharts: BurnCharts;
+        debugger;
         act(() => burnCharts =
             result.current.getBurnUpAndDown(
             result.current.getPointData(result.current.getTimeData(sprint), sprint), totalPoints
@@ -34,7 +35,6 @@ describe('Stats', () => {
             expect(burnCharts).not.toBeUndefined();
             return;
         }
-        debugger;
         expect(burnCharts.down[0].pointsRestants).toBe(totalPoints);
         expect(burnCharts.down[burnCharts.down.length - 1].pointsRestants).toBe(totalPoints - consumedPoints);
         expect(burnCharts.up[burnCharts.up.length - 1].pointsRestants).toBe(consumedPoints);
@@ -44,7 +44,8 @@ describe('Stats', () => {
     test("Statistique des éléments du Sprint", () => {
         
         var stats: Ensemble_Data;
-        act(() => stats = result.current.getSprintStats(sprint)); 
+        debugger;
+        act(() => stats = result.current.getItemChildrenStats(sprint)); 
         if (!stats){
             expect(stats).not.toBeUndefined();
             return;
@@ -53,9 +54,9 @@ describe('Stats', () => {
         expect(stats.stateStats[nativeStateEnum.A_Faire]).toBe(4);
         expect(stats.stateStats[nativeStateEnum.En_Cours]).toBe(5);
         expect(stats.stateStats[nativeStateEnum.Terminee]).toBe(3);
-        expect(stats.prorityStats[nativePriorityEnum.Mineure]).toBe(3);
-        expect(stats.prorityStats[nativePriorityEnum.Majeure]).toBe(5);
-        expect(stats.prorityStats[nativePriorityEnum.Critique]).toBe(4);
+        expect(stats.priorityStats[nativePriorityEnum.Mineure]).toBe(3);
+        expect(stats.priorityStats[nativePriorityEnum.Majeure]).toBe(5);
+        expect(stats.priorityStats[nativePriorityEnum.Critique]).toBe(4);
     })
     
     

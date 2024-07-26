@@ -17,7 +17,7 @@ export enum nativeMasteryEnum {
 }
 
 export enum nativeItemTypeEnum {
-    US = "User Story",
+    US = "US",
     Ensemble = "Ensemble",
     Sprint = "Sprint",
 }

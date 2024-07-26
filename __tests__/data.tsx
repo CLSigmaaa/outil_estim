@@ -7,7 +7,7 @@ export const mockProject: Projet = {
     children: [
       {"nom": "Sprint 1",
           "description": "DescriptionUser Sprint 1",
-          "id": "ID-Sprint1",
+          "id": "Sprint1",
           "statut": "Terminée",
           "datesEffectives": {
               "from": "2024-07-01T12:23:21.335Z",
@@ -15,9 +15,9 @@ export const mockProject: Projet = {
           },
           "children": [
             {
-                "nom": "User Story 2",
+                "nom": "US 2",
                 "description": "DescriptionUser Story 2",
-                "id": "ID-User Story2",
+                "id": "US2",
                 "priorite": "Mineure",
                 "statut": "En cours",
                 "version": "",
@@ -28,12 +28,12 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
-                "nom": "User Story 3",
+                "nom": "US 3",
                 "description": "DescriptionUser Story 3",
-                "id": "ID-User Story3",
+                "id": "US3",
                 "priorite": "Mineure",
                 "statut": "A faire",
                 "version": "",
@@ -44,12 +44,12 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
-                "nom": "User Story 4",
+                "nom": "US 4",
                 "description": "DescriptionUser Story 4",
-                "id": "ID-User Story4",
+                "id": "US4",
                 "priorite": "Critique",
                 "statut": "En cours",
                 "version": "",
@@ -60,12 +60,12 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
-                "nom": "User Story 5",
+                "nom": "US 5",
                 "description": "DescriptionUser Story 5",
-                "id": "ID-User Story5",
+                "id": "US5",
                 "priorite": "Critique",
                 "statut": "A faire",
                 "version": "",
@@ -76,12 +76,12 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
-                "nom": "User Story 6",
+                "nom": "US 6",
                 "description": "DescriptionUser Story 6",
-                "id": "ID-User Story6",
+                "id": "US6",
                 "priorite": "Majeure",
                 "statut": "Terminée",
                 "version": "",
@@ -92,12 +92,12 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
-                "nom": "User Story 7",
+                "nom": "US 7",
                 "description": "DescriptionUser Story 7",
-                "id": "ID-User Story7",
+                "id": "US7",
                 "priorite": "Mineure",
                 "statut": "En cours",
                 "version": "",
@@ -108,12 +108,12 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
-                "nom": "User Story 8",
+                "nom": "US 8",
                 "description": "DescriptionUser Story 8",
-                "id": "ID-User Story8",
+                "id": "US8",
                 "priorite": "Majeure",
                 "statut": "En cours",
                 "version": "",
@@ -124,12 +124,12 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
-                "nom": "User Story 9",
+                "nom": "US 9",
                 "description": "DescriptionUser Story 9",
-                "id": "ID-User Story9",
+                "id": "US9",
                 "priorite": "Majeure",
                 "statut": "Terminée",
                 "version": "",
@@ -140,12 +140,12 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
-                "nom": "User Story 10",
+                "nom": "US 10",
                 "description": "DescriptionUser Story 10",
-                "id": "ID-User Story10",
+                "id": "US10",
                 "priorite": "Critique",
                 "statut": "A faire",
                 "version": "",
@@ -156,12 +156,12 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
-                "nom": "User Story 11",
+                "nom": "US 11",
                 "description": "DescriptionUser Story 11",
-                "id": "ID-User Story11",
+                "id": "US11",
                 "priorite": "Critique",
                 "statut": "Terminée",
                 "version": "",
@@ -172,16 +172,16 @@ export const mockProject: Projet = {
                 },
                 "children": [],
                 "commentaires": "",
-                "type": "User Story"
+                "type": "US"
             },
             {
                 "nom": "Ensemble 13",
                 "description": "DescriptionEnsemble 13",
                 "children": [
                     {
-                        "nom": "User Story 14",
+                        "nom": "US 14",
                         "description": "DescriptionUser Story 14",
-                        "id": "ID-User Story14",
+                        "id": "US14",
                         "priorite": "Majeure",
                         "statut": "A faire",
                         "version": "",
@@ -192,16 +192,16 @@ export const mockProject: Projet = {
                         },
                         "children": [],
                         "commentaires": "",
-                        "type": "User Story"
+                        "type": "US"
                     },
                     {
                         "nom": "Ensemble 15",
                         "description": "DescriptionEnsemble 15",
                         "children": [
                             {
-                                "nom": "User Story 16",
+                                "nom": "US 16",
                                 "description": "DescriptionUser Story 16",
-                                "id": "ID-User Story16",
+                                "id": "US16",
                                 "priorite": "Majeure",
                                 "statut": "En cours",
                                 "version": "",
@@ -212,15 +212,15 @@ export const mockProject: Projet = {
                                 },
                                 "children": [],
                                 "commentaires": "",
-                                "type": "User Story"
+                                "type": "US"
                             }
                         ],
-                        "id": "ID-Ensemble15",
+                        "id": "Ensemble15",
                         "commentaires": "",
                         "type": "Ensemble"
                     }
                 ],
-                "id": "ID-Ensemble13",
+                "id": "Ensemble13",
                 "commentaires": "",
                 "type": "Ensemble"
             }

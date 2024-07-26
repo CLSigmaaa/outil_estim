@@ -3,6 +3,8 @@ import { nativeItemTypeEnum } from "@/app/model/projet/itemEnum";
 import { useTreeStore } from "@/components/store/useTreeStore"
 
 import { DashboardUSLayout, DashboardEnsembleUSLayout, DashboardSprintLayout } from "@/components/dashboard-layouts"
+import { usePanelManager } from "@/components/store/usePanelManager";
+import ProjectStats from "@/components/project-stats/ProjectStats";
 
 
 type DashboardLayoutsType = {
@@ -18,15 +20,18 @@ const dashboardLayouts: DashboardLayoutsType = {
 
 export const MiddlePanel = () => {
   const { selectedItem } = useTreeStore();
+  const {isRightPanelVisible} = usePanelManager();
 
-  if (!selectedItem) return null;
+  if (isRightPanelVisible && !selectedItem) return null;
 
   return (
     <>
       <h1 className="font-bold text-3xl mt-3 ml-3">Dashboard</h1>
+      {isRightPanelVisible ? 
       <div className="flex justify-center">
         {dashboardLayouts[selectedItem.type]}
-      </div>
+      </div> :
+      <ProjectStats />}
     </>
   )
 } 

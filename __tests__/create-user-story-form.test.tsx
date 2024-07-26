@@ -20,7 +20,7 @@ describe('TreeView', () => {
     test("Sélectionner une US de l'arborescence met à jour 'selectedItem' du store", () => {
         render(<TreeView/>);
         const { result } = renderHook(() => useTreeStore());
-        fireEvent.click(screen.getByText(/^User Story 1$/i))
+        fireEvent.click(screen.getByText(/^US 1$/i))
         expect(result.current.selectedItem).toBe(result.current.project.children[0]);
     })
 
@@ -29,7 +29,7 @@ describe('TreeView', () => {
         const { getByTestId } = render(<RightPanel/>);
 
         const { result } = renderHook(() => useTreeStore())
-        fireEvent.click(screen.getByText(/^User Story 1$/i))
+        fireEvent.click(screen.getByText(/^US 1$/i))
         var selectedItem = result.current.selectedItem as US
         if (!selectedItem){
             return
@@ -45,11 +45,11 @@ describe('TreeView', () => {
     })
 
     test("EditItem modifie bien les valeurs de l'US", () => {
-        var {rerender} =render(<TreeView/>);
-        var {rerender} = render(<RightPanel/>);
+        render(<TreeView/>);
+        render(<RightPanel/>);
 
         var { result } = renderHook(() => useTreeStore())
-        fireEvent.click(screen.getByText(/^User Story 1$/i))
+        fireEvent.click(screen.getByText(/^US 1$/i))
         var selectedItem = result.current.selectedItem as US;
         
         const startDate = new Date();
