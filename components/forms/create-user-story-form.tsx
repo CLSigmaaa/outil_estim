@@ -198,7 +198,8 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                 <FormMessage />
                 <Select onValueChange={(value) => {
                   setDisplayCalendar(value != nativeStateEnum.A_Faire)
-                  field.onChange(value)}} 
+                  field.onChange(value)
+                }}
                   value={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -233,59 +234,59 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
               </FormItem>
             )}
           />
-           {displayCalendar ? 
-          <FormField
-            control={form.control}
-            name="datesEffectives"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date de lancement et de fin estimée</FormLabel>
-                <FormMessage />
-                <Popover modal={true}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="date"
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !field.value.from && "text-muted-foreground"
-                      )}
-                      aria-label="dateLancementEstimee"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {field.value.from ? (
-                        field.value.to ? (
-                          <div aria-label="dateLancementEstimeeFull">
-                            {format(field.value.from, "LLL dd, y")} -{" "}
-                            {format(field.value.to, "LLL dd, y")}
-                          </div>
+          {displayCalendar ?
+            <FormField
+              control={form.control}
+              name="datesEffectives"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Date de lancement et de fin estimée</FormLabel>
+                  <FormMessage />
+                  <Popover modal={true}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="date"
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !field.value.from && "text-muted-foreground"
+                        )}
+                        aria-label="dateLancementEstimee"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {field.value.from ? (
+                          field.value.to ? (
+                            <div aria-label="dateLancementEstimeeFull">
+                              {format(field.value.from, "LLL dd, y")} -{" "}
+                              {format(field.value.to, "LLL dd, y")}
+                            </div>
+                          ) : (
+                            <div aria-label="dateLancementEstimeeStart">
+                              {format(field.value.from, "LLL dd, y")}
+                            </div>
+                          )
                         ) : (
-                          <div aria-label="dateLancementEstimeeStart">
-                            {format(field.value.from, "LLL dd, y")}
-                          </div>
-                        )
-                      ) : (
-                        <span aria-label="dateLancementEstimeeEmpty">Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="center">
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      defaultMonth={field.value.from}
-                      selected={{
-                        from: field.value.from!,
-                        to: field.value.to,
-                      }}
-                      onSelect={field.onChange}
-                      numberOfMonths={2}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </FormItem>
-            )}
-          /> : ""}
+                          <span aria-label="dateLancementEstimeeEmpty">Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="center">
+                      <Calendar
+                        initialFocus
+                        mode="range"
+                        defaultMonth={field.value.from}
+                        selected={{
+                          from: field.value.from!,
+                          to: field.value.to,
+                        }}
+                        onSelect={field.onChange}
+                        numberOfMonths={2}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            /> : ""}
           <FormField
             control={form.control}
             name="version"
@@ -325,8 +326,6 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           </Button>
         </form>
       </Form>
-          
-          <button onClick={() => console.log(defaultValues.datesEffectives)}>defaultValues</button>
     </>
   )
 }

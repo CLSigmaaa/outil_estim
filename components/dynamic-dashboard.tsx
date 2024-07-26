@@ -50,7 +50,7 @@ export const DashboardCase: React.FC<DashboardCaseProps> = ({ children, classNam
     >
       {title && (
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="font-normal text-lg">{title}</CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
       )}

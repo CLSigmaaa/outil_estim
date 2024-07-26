@@ -13,7 +13,7 @@ import { unstable_useTreeItem2 as useTreeItem2, UseTreeItem2Parameters } from '@
 import { TreeItem2Content, TreeItem2IconContainer, TreeItem2GroupTransition, TreeItem2Label, TreeItem2Checkbox } from '@mui/x-tree-view/TreeItem2';
 import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
 import { nativeItemTypeEnum } from '@/app/model/projet/itemEnum';
-
+import { usePanelManager } from '@/components/store/usePanelManager';
 
 interface CustomTreeItemProps
   extends Omit<UseTreeItem2Parameters, 'rootRef'>,
@@ -25,6 +25,14 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
   ref: React.Ref<HTMLLIElement>,
 ) {
   const { addItem, deleteItem, selectedItem, expandedItems, setExpandedItems, setSelectedItem, findItemInProject, getNewUS, getNewEnsemble, } = useTreeStore();
+
+  const { setLeftPanelVisibility, setRightPanelVisibility, setMiddlePanelVisibility } = usePanelManager();
+
+
+  const handleItemClick = () => {
+    setMiddlePanelVisibility(true);
+    setRightPanelVisibility(true);
+  }
 
   const { id, itemId, label, disabled, children, ...other } = props;
 
@@ -96,14 +104,14 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(
 
   var icon = getIconFromId(itemId)
   return (
-    <div className='itemContainer  '>
+    <div className='itemContainer' onClick={handleItemClick}>
       <div className='flex item justify-between '>
         <CustomTreeItemContent {...getContentProps()} style={{ padding: '4px 2px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
           <TreeItem2IconContainer {...getIconContainerProps()}>
             <TreeItem2Icon status={status} />
           </TreeItem2IconContainer>
-          <Box>
-            <TreeItem2Checkbox {...getCheckboxProps()} />
+          <Box className="p-1">
+            <TreeItem2Checkbox {...getCheckboxProps()}  />
             <CustomLabel {...getLabelProps({ icon })} />
           </Box>
         </CustomTreeItemContent>
@@ -166,7 +174,6 @@ export default function TreeView() {
         </RichTreeView>
         <AddToProjectButton addUS={() => addItem("", getNewUS())} addEnsemble={() => addItem("", getNewEnsemble())} addSprint={() => addItem("", getNewSprint())} />
       </Box>
-      <button onClick={() => console.log(selectedItem)}>selectedItem</button>
     </div>
   );
 }

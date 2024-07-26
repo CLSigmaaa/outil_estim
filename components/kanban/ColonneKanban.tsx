@@ -9,6 +9,7 @@ import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { useTreeStore } from "../store/useTreeStore";
 import { CreateUSEstimForm } from "@/components/forms/create-us-estim-form";
 import { nativeItemTypeEnum, nativeStateEnum } from "@/app/model/projet/itemEnum";
+import { Button } from "../ui/button";
 
 
 export default function ColonneKanban({
@@ -27,7 +28,7 @@ export default function ColonneKanban({
     dropOver: `bg-gray-100`,
   };
 
-  const { addItem, getNewUS} = useTreeStore();
+  const { addItem, getNewUS } = useTreeStore();
 
   function addItemInColum() {
     addItem(
@@ -36,12 +37,12 @@ export default function ColonneKanban({
     );
   }
 
-  function getAllChildren(item: Item): US[]{
+  function getAllChildren(item: Item): US[] {
     var acc: US[] = [];
     item?.children.forEach((child: Item) => {
-      if (child.children && child.children.length > 0){
+      if (child.children && child.children.length > 0) {
         acc = acc.concat(getAllChildren(child));
-      } else if (child.type == nativeItemTypeEnum.US){
+      } else if (child.type == nativeItemTypeEnum.US) {
         acc.push(child as US);
       }
     })
@@ -50,59 +51,58 @@ export default function ColonneKanban({
 
   return (
     <div className="px-4 flex flex-col w-full max-h-96">
-    <div className="flex text-xl font-semibold justify-center">
-              {statut}
-            </div>
-            <Divider />
-            <button onClick={addItemInColum}>
-              Ajouter une US
-            </button>
-    <Droppable droppableId={statut} type={nativeItemTypeEnum.US}>
-      {(provided, snapshot) => {
-        return (
-          <div
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            className={`${styles.dropper} ${snapshot.isDraggingOver ? styles.dropOver : ""
-              }` }
-          >
-            
-            {getAllChildren(selectedItem)
-              .filter((item: US ) => item.statut == statut)
-              .map((item: US , index: number) => {
-                return (
-                  <Draggable key={item.id} draggableId={item.id} index={index}>
-                    {(provided, snapshot) => {
-                      return (
-                        <Popover>
-                          <PopoverTrigger>
-                            <div
-                              className={`${styles.dragger} ${snapshot.isDragging ? styles.dragging : ""
-                                }`}
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                            >
-                              <div className={styles.draggerContent}>
-                                <div className="overflow-hidden text-ellipsis leading-6 max-h-12">{item.nom}</div>
+      <div className="flex text-xl font-semibold justify-center mb-2">
+        {statut}
+      </div>
+      <Divider />
+      <Button variant="outline" className="mt-2 mb-2" onClick={addItemInColum}>
+        Ajouter une US
+      </Button>
+      <Droppable droppableId={statut} type={nativeItemTypeEnum.US}>
+        {(provided, snapshot) => {
+          return (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={`${styles.dropper} ${snapshot.isDraggingOver ? styles.dropOver : ""
+                } bg-neutral-100`}
+            >
+              {getAllChildren(selectedItem)
+                .filter((item: US) => item.statut == statut)
+                .map((item: US, index: number) => {
+                  return (
+                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                      {(provided, snapshot) => {
+                        return (
+                          <Popover>
+                            <PopoverTrigger>
+                              <div
+                                className={`${styles.dragger} ${snapshot.isDragging ? styles.dragging : ""
+                                  }`}
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <div className={styles.draggerContent}>
+                                  <div className="font-medium overflow-hidden text-ellipsis leading-6 max-h-12">{item.nom}</div>
+                                </div>
                               </div>
-                            </div>
-                          </PopoverTrigger>
-                          <PopoverContent className="max-w-[20rem]">
-                            <CreateUSEstimForm defaultValues={item} /> 
-                          </PopoverContent>
-                        </Popover>
-                      );
-                    }}
-                  </Draggable>
-                );
-              })}
-            
-            {provided.placeholder}
-          </div>
-        );
-      }}
-    </Droppable>
+                            </PopoverTrigger>
+                            <PopoverContent className="max-w-[20rem]">
+                              <CreateUSEstimForm defaultValues={item} />
+                            </PopoverContent>
+                          </Popover>
+                        );
+                      }}
+                    </Draggable>
+                  );
+                })}
+
+              {provided.placeholder}
+            </div>
+          );
+        }}
+      </Droppable>
     </div>
   );
 }

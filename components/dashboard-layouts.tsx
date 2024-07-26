@@ -42,10 +42,10 @@ export const DashboardSprintLayout: React.FC = () => {
       </DashboardRow>
       <DashboardRow>
         <DashboardCase title="Indice de prédictibilité" className="w-full p-5">
-          <span>{(Number(data.donePoints) / Number(data.totalPoints)).toFixed(2)}</span>
+          <span className="font-bold text-2xl">{(Number(data.donePoints) / Number(data.totalPoints)).toFixed(2)}</span>
         </DashboardCase>
         <DashboardCase title="US restantes / US Total" className="w-full p-5">
-          <span>
+          <span className="font-bold text-2xl">
             {data.stateStats[nativeStateEnum.Terminee]} / {data.stateStats[nativeStateEnum.A_Faire] + data.stateStats[nativeStateEnum.En_Cours] + data.stateStats[nativeStateEnum.Terminee]}
           </span>
         </DashboardCase>
@@ -133,10 +133,10 @@ export const DashboardEnsembleUSLayout: React.FC = () => {
       </DashboardRow>
       <DashboardRow>
         <DashboardCase title="Indice de prédictibilité" className="w-full p-5">
-          <span>{(Number(data.donePoints) / Number(data.totalPoints)).toFixed(2)}</span>
+          <span className="font-bold text-2xl">{(Number(data.donePoints) / Number(data.totalPoints)).toFixed(2)}</span>
         </DashboardCase>
-        <DashboardCase title="US restantes / US Total" className="w-full">
-          <span>
+        <DashboardCase title="US restantes / US Total" className="w-full p-5">
+          <span className="font-bold text-2xl">
             {data.stateStats[nativeStateEnum.Terminee]} / {data.stateStats[nativeStateEnum.A_Faire] + data.stateStats[nativeStateEnum.En_Cours] + data.stateStats[nativeStateEnum.Terminee]}
           </span>
         </DashboardCase>

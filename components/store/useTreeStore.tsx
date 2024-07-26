@@ -274,7 +274,7 @@ const mockProjet = {
   ],
   "commentaires": "",
   "type": "Sprint",
-  childNb: 16,
+  childNb: 18,
 } as Projet
 
 export const useTreeStore = create<TreeState>((set, get) => ({

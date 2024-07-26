@@ -48,13 +48,13 @@ export default function BurnDown({ className }: { className: string }) {
     return (
         <Card className={className}>
             <CardHeader className="flex flex-row justify-between ">
-                <CardTitle>{isBurnUpDisplayed ? "Burn Up" : "Burn Down"}</CardTitle>
+                <CardTitle className="text-lg font-normal">{isBurnUpDisplayed ? "Burn Up" : "Burn Down"}</CardTitle>
                 <div className="flex items-center gap-2">
                     <Switch onClick={switchBurnGraph} />
                     <Label> Burn Down / Burn Up </Label>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="font-bold text-2xl">
                 <ChartContainer config={chartConfig} className="max-h-[400px]">
                     <LineChart
                         accessibilityLayer
