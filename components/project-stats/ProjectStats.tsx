@@ -4,20 +4,20 @@ import { Projet } from "@/app/model/projet";
 import { useTreeStore } from "@/components/store/useTreeStore";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartLegend, ChartTooltip } from "@/components/ui/chart";
-import { Activity  } from "lucide-react";
+import { Activity } from "lucide-react";
 import { XAxis, YAxis, CartesianGrid, Bar, BarChart } from "recharts";
 
-export default function ProjectStats(){
+export default function ProjectStats() {
 
     const { project, getAllSprintsStats } = useTreeStore();
 
-    function getProjectVelocity(project: Projet): {sprintName: string, sprintPoints: number}[]{
+    function getProjectVelocity(project: Projet): { sprintName: string, sprintPoints: number }[] {
         const sprintsData = getAllSprintsStats(project);
-        const res = sprintsData.map(data => ({sprintName: data.sprintName, sprintPoints: data.sprintData.donePoints})) 
+        const res = sprintsData.map(data => ({ sprintName: data.sprintName, sprintPoints: data.sprintData.donePoints }))
         return res;
     }
     const chartData = getProjectVelocity(project);
-    
+
 
     const chartConfig = {
         desktop: {
@@ -27,8 +27,8 @@ export default function ProjectStats(){
         },
     } satisfies ChartConfig
 
-    return(
-         <Card >
+    return (
+        <Card >
             <CardHeader className="flex flex-row justify-between ">
                 <CardTitle>TITRE</CardTitle>
             </CardHeader>
@@ -38,7 +38,7 @@ export default function ProjectStats(){
                         accessibilityLayer
                         data={chartData}
                         dataKey={"sprintName"}
-                        
+
                     >
                         <XAxis dataKey="sprintName" />
                         <YAxis domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1 / 10) * 10]} //   10% de marge 
@@ -51,7 +51,6 @@ export default function ProjectStats(){
                             maxBarSize={5}
                             name="Vélocité"
                             fill="green"
-                            
                         />
                     </BarChart>
                 </ChartContainer>

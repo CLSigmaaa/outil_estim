@@ -11,10 +11,10 @@ import { Button } from "../button";
 import { usePanelManager } from "@/components/store/usePanelManager";
 
 export default function Arborescence() {
-  const { isRightPanelVisible, isMiddlePanelVisible, isLeftPanelVisible, toggleLeftPanel, toggleRightPanel, toggleMiddlePanel } = usePanelManager();
+  const { isRightPanelVisible, isMiddlePanelVisible, isLeftPanelVisible, toggleLeftPanel, toggleRightPanel, toggleMiddlePanel, setRightPanelVisibility } = usePanelManager();
 
   const handleClick = () => {
-    toggleRightPanel();
+    setRightPanelVisibility(false);
   }
 
   const [selectedProject, setSelectedProject] = useState<Projet>({

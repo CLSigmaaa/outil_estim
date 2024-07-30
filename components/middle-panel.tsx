@@ -20,18 +20,18 @@ const dashboardLayouts: DashboardLayoutsType = {
 
 export const MiddlePanel = () => {
   const { selectedItem } = useTreeStore();
-  const {isRightPanelVisible} = usePanelManager();
+  const { isRightPanelVisible } = usePanelManager();
 
   if (isRightPanelVisible && !selectedItem) return null;
 
   return (
     <>
       <h1 className="font-bold text-3xl mt-3 ml-3">Dashboard</h1>
-      {isRightPanelVisible ? 
-      <div className="flex justify-center">
-        {dashboardLayouts[selectedItem.type]}
-      </div> :
-      <ProjectStats />}
+      {isRightPanelVisible ?
+        <div className="flex justify-center">
+          {dashboardLayouts[selectedItem.type]}
+        </div> :
+        <ProjectStats />}
     </>
   )
 } 

@@ -7,7 +7,9 @@ export interface TreeState {
   project: Projet;
   selectedItem: undefined | Item;
   expandedItems: string[];
+  currentRoute: string;
   setProject: (newProject: Projet) => void;
+  setCurrentRoute: (newRoute: string) => void;
   setSelectedItem: (newSelectedItem: any) => void;
   setExpandedItems: (newExpandedItems: string[]) => void;
   findItemInProject: (itemId: string) => Item | undefined;
@@ -24,7 +26,7 @@ export interface TreeState {
   getItemChildrenStatsAux: (itemList: Item[], acc: Ensemble_Data) => Ensemble_Data;
   getBurnUpAndDown: (data: any, totalPoints: number) => any;
   getItemData: (item: Item) => Sprint_Data | Ensemble_Data;
-  getAllSprintsStats: (project: Projet) => {sprintName: string, sprintData: Sprint_Data}[]
+  getAllSprintsStats: (project: Projet) => { sprintName: string, sprintData: Sprint_Data }[]
 }
 
 const mockProjet = {
@@ -279,18 +281,12 @@ const mockProjet = {
 } as Projet
 
 export const useTreeStore = create<TreeState>((set, get) => ({
-  project: //mockProjet,
-  {
-    // Initialisez avec un projet par défaut ou un objet vide
-    nom: "",
-    description: "",
-    id: "",
-    children: [],
-    childNb: 0,
-  } as Projet,
+  project: mockProjet,
   selectedItem: undefined,
   expandedItems: [],
+  currentRoute: "",
   setProject: (newProject) => set({ project: newProject }),
+  setCurrentRoute: (newRoute: string) => set({ currentRoute: newRoute }),
   findItemInProject: (itemId: string): Item | undefined => {
     const findItemAux = (children: Item[], itemId: string): Item | undefined => {
       for (const item of children) {
@@ -512,25 +508,29 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   },
   getItemData: (item: Item) => {
     var childrenStats = get().getItemChildrenStats(item as Sprint);
-    if (item.type == nativeItemTypeEnum.Sprint){
+    if (item.type == nativeItemTypeEnum.Sprint) {
       var chartData = get().getTimeData(item as Sprint);
       chartData = get().getPointData(chartData, item);
       var chart = get().getBurnUpAndDown(chartData, childrenStats.totalPoints);
-      return { burn: chart, donePoints: childrenStats.donePoints, priorityStats: childrenStats.priorityStats, 
-        totalPoints: childrenStats.totalPoints, stateStats: childrenStats.stateStats };
+      return {
+        burn: chart, donePoints: childrenStats.donePoints, priorityStats: childrenStats.priorityStats,
+        totalPoints: childrenStats.totalPoints, stateStats: childrenStats.stateStats
+      };
     }
-    return { donePoints: childrenStats.donePoints, priorityStats: childrenStats.priorityStats, 
-      totalPoints: childrenStats.totalPoints, stateStats: childrenStats.stateStats }
+    return {
+      donePoints: childrenStats.donePoints, priorityStats: childrenStats.priorityStats,
+      totalPoints: childrenStats.totalPoints, stateStats: childrenStats.stateStats
+    }
   },
   getAllSprintsStats: (project: Projet) => {
-    const sprintDataList:{sprintName: string, sprintData: Sprint_Data}[] = [];
+    const sprintDataList: { sprintName: string, sprintData: Sprint_Data }[] = [];
     var sprintData: Sprint_Data;
     project.children.forEach(item => {
-      if (item.type != nativeItemTypeEnum.Sprint){
+      if (item.type != nativeItemTypeEnum.Sprint) {
         return;
       }
       sprintData = get().getItemData(item) as Sprint_Data;
-      sprintDataList.push({sprintName: item.nom, sprintData: sprintData})
+      sprintDataList.push({ sprintName: item.nom, sprintData: sprintData })
     });
     return sprintDataList;
   }
