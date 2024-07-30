@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils";
 
 import { Plus } from 'lucide-react';
 import { Trash2 } from 'lucide-react';
+import { Repeat } from 'lucide-react';
+import { UserRound } from 'lucide-react';
+import { UsersRound } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
 
 import {
@@ -18,113 +21,177 @@ import {
 
 import { motion } from 'framer-motion';
 import { usePanelManager } from "./store/usePanelManager";
+import { Icon } from "next/dist/lib/metadata/types/metadata-types";
+import { Button } from "./ui/button";
+
+// css imports
+import "@/app/assets/styles/outilEstim.css";
 
 type node = any
 
+const treeIcons: Record<string, React.ReactElement<Icon>> = {
+  US: <UserRound size={20} />,
+  Ensemble: <UsersRound size={20} />,
+  Sprint: <Repeat size={20} />,
+};
 
-export const NewFileTree = ({ node }: { node: node }) => {
+export const DeleteItemButton = ({ node }: { node: node }) => {
+  const { selectedItem, setSelectedItem, deleteItem } = useTreeStore();
+  const [isPopOverOpen, setIsPopOverOpen] = React.useState(false);
+
+  const handleClick = () => {
+    deleteItem(node.id)
+    if (selectedItem?.id === node.id) {
+      setSelectedItem(null)
+    }
+  }
+
+  return (
+    <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
+      <PopoverTrigger className={cn(
+        "cursor-pointer flex items-center",
+        node.type === "US" ? "justify-end" : "justify-between"
+      )}>
+        <Trash2 className={cn(
+          "font-light text-red-700",
+        )} />
+      </PopoverTrigger>
+      <PopoverContent className="flex flex-col gap-y-2">
+        <span className="font-medium">Êtes-vous sûr de vouloir supprimer cet élément ?</span>
+        <div className="flex gap-x-2">
+          <Button
+            onClick={handleClick}
+            variant="destructive"
+          >
+            Oui
+          </Button>
+          <Button
+            onClick={() => setIsPopOverOpen(false)}
+            variant="secondary"
+          >
+            Non, ne pas supprimer
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover >
+  )
+}
+
+export const AddItemButton = ({ node }: { node: node }) => {
+  const { setSelectedItem, addItem, getNewUS, getNewSprint, getNewEnsemble } = useTreeStore();
+
+  const [isPopOverOpen, setIsPopOverOpen] = React.useState(false);
+
+  const handleAddChildToNode = (childType: string) => {
+    const typeToFunctionMap: { [key: string]: () => any } = {
+      "US": getNewUS,
+      "Ensemble": getNewEnsemble,
+      "Sprint": getNewSprint
+    };
+
+    const newItemFunction = typeToFunctionMap[childType];
+
+    if (newItemFunction) {
+      const newItem = newItemFunction();
+      addItem(node.id, newItem);
+      setSelectedItem(newItem);
+    }
+
+    setIsPopOverOpen(false);
+  }
+
+  return (
+    <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
+      <PopoverTrigger>
+        <Plus className="font-light text-blue-700" />
+      </PopoverTrigger>
+      <PopoverContent>
+        <ul>
+          <li
+            onClick={() => handleAddChildToNode("US")}
+            className="cursor-pointer p-2 hover:bg-slate-100 flex gap-x-4"
+          >
+            <UserRound size={20} />
+            Ajouter une US
+          </li>
+          <li
+            onClick={() => handleAddChildToNode("Ensemble")}
+            className="cursor-pointer p-2 hover:bg-slate-100 flex gap-x-4"
+          >
+            <UsersRound size={20} />
+            Ajouter un Ensemble
+          </li>
+        </ul>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+
+export const NewFileTree = ({ node }: any) => {
   const { selectedItem, setCurrentRoute, setSelectedItem, addItem, deleteItem, getNewUS, getNewSprint, getNewEnsemble, findItemInProject } = useTreeStore();
 
   const { setRightPanelVisibility } = usePanelManager();
 
   const [areChildrenDisplayed, setAreChildrenDisplayed] = React.useState(false);
-  const [isPopOverOpen, setIsPopOverOpen] = React.useState(false);
 
   const handleClick = ((_event: any) => {
     setRightPanelVisibility(true);
     setAreChildrenDisplayed((prev) => !prev);
     setSelectedItem(node);
     setCurrentRoute("")
-
   })
 
-  const handleAddChildToNode = (_childType: string) => {
-    if (_childType === "US") {
-      const newUS = getNewUS()
-      addItem(node.id, newUS)
-      setSelectedItem(newUS)
-    } else if (_childType === "Ensemble") {
-      const newEnsemble = getNewEnsemble()
-      addItem(node.id, newEnsemble)
-      setSelectedItem(newEnsemble)
-    } else if (_childType === "Sprint") {
-      const newSprint = getNewSprint()
-      addItem(node.id, newSprint)
-      setSelectedItem(newSprint)
-    }
-    setIsPopOverOpen(false);
-  }
-
   return (
-    <div className="w-full">
-      <ul className="w-full">
-        <li className={cn(
-          "flex w-full p-2 hover:bg-slate-100",
-          selectedItem?.id === node.id && "bg-blue-100",
-        )}>
-          <div onClick={handleClick} className="flex w-full font-medium">
+    <ul className="w-full">
+      <li >
+        <div
+          className="flex justify-between w-full"
+        >
+          <div
+            onClick={handleClick}
+            className={cn(
+              "flex w-full p-2 hover:bg-slate-100 overflow-hidden max-w-full",
+              selectedItem?.id === node.id && "bg-blue-100",
+            )}
+          >
             <motion.span
               animate={{ rotate: areChildrenDisplayed ? 90 : 0 }}
               transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
-              className="flex items-center justify-center"
+              className="flex items-center justify-center cursor-pointer max-w-full overflow-hidden"
             >
               <ChevronRight className={cn(
-                node.type == "US" ? "invisible" : "visible"
+                node.type == "US" ? "invisible" : "visible",
               )}
               />
             </motion.span>
+
+            <span className="flex items-center ml-2">
+              {treeIcons[node?.type]}
+            </span>
+
             <span
-              className="cursor-pointer select-none w-3/4 ml-2"
+              className="cursor-pointer select-none w-3/4 ml-2 text-ellipsis truncate"
             >
               {node.nom}
             </span>
           </div>
-          <div className="absolute flex justify-around w-1/4 right-0">
+          <div className="flex w-1/4 justify-end">
             {node.type !== "US" && (
-              <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
-                <PopoverTrigger>
-                  <Plus className="font-light text-blue-700" />
-                </PopoverTrigger>
-                <PopoverContent>
-                  <ul>
-                    <li
-                      onClick={() => handleAddChildToNode("US")}
-                      className="cursor-pointer p-2 hover:bg-slate-100"
-                    >
-                      Ajouter une US
-                    </li>
-                    <li
-                      onClick={() => handleAddChildToNode("Ensemble")}
-                      className="cursor-pointer p-2 hover:bg-slate-100"
-                    >
-                      Ajouter un Ensemble
-                    </li>
-                  </ul>
-                </PopoverContent>
-              </Popover>
+              <AddItemButton node={node} />
             )}
-            <button onClick={() => {
-              deleteItem(node.id)
-              if (selectedItem?.id === node.id) {
-                setSelectedItem(null)
-              }
-            }}
-            >
-              <Trash2 className={cn(
-                "font-light text-red-700",
-                node.type == "US" && "right-2 absolute"
-              )} />
-            </button>
+            <DeleteItemButton node={node} />
           </div>
-        </li>
-      </ul>
-      {areChildrenDisplayed && (
-        <ul className="ml-5 w-full">
-          {node.children?.map((child: node) => (
-            <NewFileTree node={child} key={child.id} />
-          ))}
-        </ul>
-      )}
-    </div>
+        </div>
+
+        {areChildrenDisplayed && (
+          <ul className="pl-5 w-full">
+            {node.children?.map((child: node) => (
+              <NewFileTree node={child} key={child.id} />
+            ))}
+          </ul>
+        )}
+      </li>
+    </ul>
   )
 }

@@ -5,18 +5,22 @@ import * as React from "react";
 import { NewFileTree } from "@/components/new-arborescence";
 
 import { useTreeStore } from "@/components/store/useTreeStore";
+import { usePanelManager } from "@/components/store/usePanelManager";
 
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 import { Separator } from "@/components/ui/separator";
 
-import { LineChart } from 'lucide-react'
+import { Repeat } from 'lucide-react';
+import { UserRound } from 'lucide-react';
+import { UsersRound } from 'lucide-react';
+import { LineChart } from "lucide-react";
+
 import { cn } from "@/lib/utils";
-import { usePanelManager } from "./store/usePanelManager";
 
 export const LeftPanel = () => {
   const { project, currentRoute, setCurrentRoute, addItem, selectedItem, setSelectedItem, getNewSprint, getNewUS, getNewEnsemble } = useTreeStore();
@@ -43,7 +47,7 @@ export const LeftPanel = () => {
   }
 
   return (
-    <div className="flex flex-col w-full h-full relative">
+    <div className="flex flex-col w-full h-full">
       <span className="font-semibold text-lg my-4 text-center">{project.nom}</span>
       <Separator />
 
@@ -52,27 +56,30 @@ export const LeftPanel = () => {
       ))}
 
       <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
-        <PopoverTrigger className="mt-4 border-slate-200 border p-3 rounded-md hover:bg-slate-100">
+        <PopoverTrigger className="mt-4 border-slate-200 border p-3 rounded-md hover:bg-slate-100 select-none">
           Ajouter un élément au projet
         </PopoverTrigger>
         <PopoverContent>
           <ul>
             <li
               onClick={() => addChildToRoot("US")}
-              className="cursor-pointer p-2 hover:bg-slate-100"
+              className="cursor-pointer p-2 hover:bg-slate-100 flex gap-x-4"
             >
+              <UserRound size={20} />
               Ajouter une US
             </li>
             <li
               onClick={() => addChildToRoot("Ensemble")}
-              className="cursor-pointer p-2 hover:bg-slate-100"
+              className="cursor-pointer p-2 hover:bg-slate-100 flex gap-x-4"
             >
+              <UsersRound size={20} />
               Ajouter un Ensemble
             </li>
             <li
               onClick={() => addChildToRoot("Sprint")}
-              className="cursor-pointer p-2 hover:bg-slate-100"
+              className="cursor-pointer p-2 hover:bg-slate-100 flex gap-x-4"
             >
+              <Repeat size={20} />
               Ajouter un Sprint
             </li>
           </ul>
