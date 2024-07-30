@@ -52,9 +52,11 @@ export const DeleteItemButton = ({ node }: { node: node }) => {
         "cursor-pointer flex items-center",
         node.type === "US" ? "justify-end" : "justify-between"
       )}>
-        <Trash2 className={cn(
-          "font-light text-red-700",
-        )} />
+        <Trash2
+          size={24}
+          className={cn(
+            "font-light text-red-700",
+          )} />
       </PopoverTrigger>
       <PopoverContent className="flex flex-col gap-y-2">
         <span className="font-medium">Êtes-vous sûr de vouloir supprimer cet élément ?</span>
@@ -103,7 +105,7 @@ export const AddItemButton = ({ node }: { node: node }) => {
   return (
     <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
       <PopoverTrigger>
-        <Plus className="font-light text-blue-700" />
+        <Plus size={24} className="font-light text-blue-700" />
       </PopoverTrigger>
       <PopoverContent>
         <ul>
@@ -176,7 +178,7 @@ export const NewFileTree = ({ node }: any) => {
               {node.nom}
             </span>
           </div>
-          <div className="flex w-1/4 justify-end">
+          <div className="flex w-1/4 justify-end gap-x-1">
             {node.type !== "US" && (
               <AddItemButton node={node} />
             )}
