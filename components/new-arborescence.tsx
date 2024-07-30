@@ -131,25 +131,22 @@ export const AddItemButton = ({ node }: { node: node }) => {
 
 
 export const NewFileTree = ({ node }: any) => {
-  const { selectedItem, setCurrentRoute, setSelectedItem, addItem, deleteItem, getNewUS, getNewSprint, getNewEnsemble, findItemInProject } = useTreeStore();
-
+  const { selectedItem, setSelectedItem, setCurrentRoute, expandedItems, toggleExpandedItem } = useTreeStore();
   const { setRightPanelVisibility } = usePanelManager();
 
-  const [areChildrenDisplayed, setAreChildrenDisplayed] = React.useState(false);
+  const isExpanded = expandedItems.includes(node.id);
 
-  const handleClick = ((_event: any) => {
+  const handleClick = () => {
     setRightPanelVisibility(true);
-    setAreChildrenDisplayed((prev) => !prev);
+    toggleExpandedItem(node.id);
     setSelectedItem(node);
-    setCurrentRoute("")
-  })
+    setCurrentRoute("");
+  }
 
   return (
     <ul className="w-full">
-      <li >
-        <div
-          className="flex justify-between w-full"
-        >
+      <li>
+        <div className="flex justify-between w-full">
           <div
             onClick={handleClick}
             className={cn(
@@ -158,7 +155,7 @@ export const NewFileTree = ({ node }: any) => {
             )}
           >
             <motion.span
-              animate={{ rotate: areChildrenDisplayed ? 90 : 0 }}
+              animate={{ rotate: isExpanded ? 90 : 0 }}
               transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
               className="flex items-center justify-center cursor-pointer max-w-full overflow-hidden"
             >
@@ -172,21 +169,17 @@ export const NewFileTree = ({ node }: any) => {
               {treeIcons[node?.type]}
             </span>
 
-            <span
-              className="cursor-pointer select-none w-3/4 ml-2 text-ellipsis truncate"
-            >
+            <span className="cursor-pointer select-none w-3/4 ml-2 text-ellipsis truncate">
               {node.nom}
             </span>
           </div>
           <div className="flex w-1/4 justify-end gap-x-1">
-            {node.type !== "US" && (
-              <AddItemButton node={node} />
-            )}
+            {node.type !== "US" && <AddItemButton node={node} />}
             <DeleteItemButton node={node} />
           </div>
         </div>
 
-        {areChildrenDisplayed && (
+        {isExpanded && (
           <ul className="pl-5 w-full">
             {node.children?.map((child: node) => (
               <NewFileTree node={child} key={child.id} />
@@ -195,5 +188,5 @@ export const NewFileTree = ({ node }: any) => {
         )}
       </li>
     </ul>
-  )
+  );
 }

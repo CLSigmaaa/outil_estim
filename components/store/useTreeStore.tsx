@@ -12,6 +12,7 @@ export interface TreeState {
   setCurrentRoute: (newRoute: string) => void;
   setSelectedItem: (newSelectedItem: any) => void;
   setExpandedItems: (newExpandedItems: string[]) => void;
+  toggleExpandedItem: (itemId: any) => void;
   findItemInProject: (itemId: string) => Item | undefined;
   addItem: (parentId: string, newItem: Item) => void;
   deleteItem: (itemId: string) => void;
@@ -310,6 +311,14 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   },
   setSelectedItem: (newSelectedItem) => set({ selectedItem: newSelectedItem }),
   setExpandedItems: (newExpandedItems) => set({ expandedItems: newExpandedItems }),
+  toggleExpandedItem: (itemId: any) => set((state) => {
+    const isExpanded = state.expandedItems.includes(itemId);
+    return {
+      expandedItems: isExpanded
+        ? state.expandedItems.filter(id => id !== itemId)
+        : [...state.expandedItems, itemId],
+    };
+  }),
   addItem: (parentId, newItem) => set((state) => {
     const findAndAddItem = (items: Item[], parentId: string, newItem: Item): Item[] => {
       return items.map(item => {
