@@ -32,12 +32,3 @@
     border-left: 1px solid grey;
     
 }
-
-.indent-line::before {
-  content: "";
-  position: absolute;
-  border-left: 1px solid #ddd;
-  height: 100%;
-  left: 15px;
-  top: 0;
-}

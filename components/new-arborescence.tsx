@@ -35,6 +35,16 @@ const treeIcons: Record<string, React.ReactElement<Icon>> = {
   Sprint: <Repeat size={20} />,
 };
 
+const calculateNodeDepth = (node, findItemInProject) => {
+  let depth = 0;
+  let currentNode = node;
+  while (currentNode.parentId) {
+    currentNode = findItemInProject(currentNode.parentId);
+    depth++;
+  }
+  return depth;
+};
+
 export const DeleteItemButton = ({ node }: { node: node }) => {
   const { selectedItem, setSelectedItem, deleteItem } = useTreeStore();
   const [isPopOverOpen, setIsPopOverOpen] = React.useState(false);
@@ -131,26 +141,32 @@ export const AddItemButton = ({ node }: { node: node }) => {
 
 
 export const NewFileTree = ({ node }: any) => {
-  const { selectedItem, setSelectedItem, setCurrentRoute, expandedItems, toggleExpandedItem } = useTreeStore();
+  const { selectedItem, setSelectedItem, setCurrentRoute, expandedItems, toggleExpandedItem, findItemInProject } = useTreeStore();
+
   const { setRightPanelVisibility } = usePanelManager();
 
   const isExpanded = expandedItems.includes(node.id);
 
   const handleClick = () => {
     setRightPanelVisibility(true);
-    toggleExpandedItem(node.id);
     setSelectedItem(node);
     setCurrentRoute("");
-  }
+    if (selectedItem?.id !== node.id || !isExpanded) {
+      toggleExpandedItem(node.id);
+    }
+  };
 
   return (
-    <ul className="w-full">
+    <ul className={cn(
+      "w-full",
+
+    )}>
       <li>
-        <div className="flex justify-between w-full">
+        <div className="flex justify-between items-center w-full select-none" style={{ paddingLeft: `0px` }}>
           <div
             onClick={handleClick}
             className={cn(
-              "flex w-full p-2 hover:bg-slate-100 overflow-hidden max-w-full",
+              "flex w-full p-2 hover:bg-slate-100 overflow-hidden max-w-full cursor-pointer",
               selectedItem?.id === node.id && "bg-blue-100",
             )}
           >
@@ -159,7 +175,7 @@ export const NewFileTree = ({ node }: any) => {
               transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
               className="flex items-center justify-center cursor-pointer max-w-full overflow-hidden"
             >
-              <ChevronRight className={cn(
+              <ChevronRight size={20} className={cn(
                 node.type == "US" ? "invisible" : "visible",
               )}
               />
@@ -169,11 +185,11 @@ export const NewFileTree = ({ node }: any) => {
               {treeIcons[node?.type]}
             </span>
 
-            <span className="cursor-pointer select-none w-3/4 ml-2 text-ellipsis truncate">
+            <span className="ml-2 flex-grow truncate">
               {node.nom}
             </span>
           </div>
-          <div className="flex w-1/4 justify-end gap-x-1">
+          <div className="flex items-center gap-x-2 flex-shrink-0">
             {node.type !== "US" && <AddItemButton node={node} />}
             <DeleteItemButton node={node} />
           </div>

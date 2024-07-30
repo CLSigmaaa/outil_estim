@@ -314,9 +314,9 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   toggleExpandedItem: (itemId: any) => set((state) => {
     const isExpanded = state.expandedItems.includes(itemId);
 
-    if (isExpanded && state.selectedItem?.id !== itemId) {
-      return { expandedItems: state.expandedItems };
-    }
+    // if (isExpanded && state.selectedItem.id === itemId) {
+    //   return { expandedItems: state.expandedItems };
+    // }
 
     return {
       expandedItems: isExpanded

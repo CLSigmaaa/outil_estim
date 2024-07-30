@@ -28,7 +28,7 @@ export const DashboardUSLayout: React.FC = () => {
 }
 
 export const DashboardSprintLayout: React.FC = () => {
-  const { selectedItem, getItemData} = useTreeStore();
+  const { selectedItem, getItemData } = useTreeStore();
   const data = getItemData(selectedItem) as Sprint_Data;
 
   return (
@@ -43,10 +43,12 @@ export const DashboardSprintLayout: React.FC = () => {
       </DashboardRow>
       <DashboardRow>
         <DashboardCase title="Indice de prédictibilité" className="w-full p-5">
-          <span className="font-bold text-2xl">{(Number(data.donePoints) / Number(data.totalPoints) || 0).toFixed(2)}</span>
+          <span className="font-bold text-2xl p-6">
+            {(Number(data.donePoints) / Number(data.totalPoints) || 0).toFixed(2)}
+          </span>
         </DashboardCase>
         <DashboardCase title="US restantes / US Total" className="w-full p-5">
-          <span className="font-bold text-2xl">
+          <span className="font-bold text-2xl p-6">
             {data.stateStats[nativeStateEnum.Terminee]} / {data.stateStats[nativeStateEnum.A_Faire] + data.stateStats[nativeStateEnum.En_Cours] + data.stateStats[nativeStateEnum.Terminee]}
           </span>
         </DashboardCase>
@@ -134,7 +136,7 @@ export const DashboardEnsembleUSLayout: React.FC = () => {
       </DashboardRow>
       <DashboardRow>
         <DashboardCase title="Indice de prédictibilité" className="w-full p-5">
-          <span className="font-bold text-2xl">{(Number(data.donePoints) / Number(data.totalPoints ) || 0).toFixed(2)}</span>
+          <span className="font-bold text-2xl">{(Number(data.donePoints) / Number(data.totalPoints) || 0).toFixed(2)}</span>
         </DashboardCase>
         <DashboardCase title="US restantes / US Total" className="w-full p-5">
           <span className="font-bold text-2xl">

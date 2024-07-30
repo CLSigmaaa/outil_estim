@@ -97,6 +97,7 @@ export const LeftPanel = () => {
         )}
         onClick={() => {
           setCurrentRoute("stats");
+          setSelectedItem(undefined);
           setRightPanelVisibility(false);
         }}
       >
