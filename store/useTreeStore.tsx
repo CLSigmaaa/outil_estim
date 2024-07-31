@@ -283,6 +283,14 @@ const mockProjet = {
 
 export const useTreeStore = create<TreeState>((set, get) => ({
   project: mockProjet,
+  // {
+  //   // Initialisez avec un projet par défaut ou un objet vide
+  //   nom: "",
+  //   description: "",
+  //   id: "",
+  //   children: [],
+  //   childNb: 0,
+  // } as Projet,
   selectedItem: undefined,
   expandedItems: [],
   currentRoute: "",
@@ -436,7 +444,7 @@ export const useTreeStore = create<TreeState>((set, get) => ({
       statut: statut,
       version: "",
       estimation: 0,
-      datesEffectives: statut == nativeStateEnum.Terminee ? { from: new Date(), to: new Date() } : { from: "", to: "" },
+      datesEffectives: statut == nativeStateEnum.Terminee ? { from: new Date(), to: new Date() } : nativeStateEnum.En_Cours ? { from: new Date(), to: "" } :{ from: "", to: "" },
       children: [],
       commentaires: "",
       type: nativeItemTypeEnum.US,
@@ -455,12 +463,13 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   },
   getNewSprint: (statut = "") => {
     var nextUSNb = get().project.childNb + 1;
+    var startDate = new Date();
     return {
       nom: nativeItemTypeEnum.Sprint + " " + nextUSNb,
       description: "Description" + nativeItemTypeEnum.Sprint + " " + nextUSNb,
       id: nativeItemTypeEnum.Sprint + nextUSNb,
       statut: statut ? statut : nativeStateEnum.A_Faire,
-      datesEffectives: { from: "", to: "" },
+      datesEffectives: { from: startDate, to: addDays(startDate, 30) },
       children: [],
       commentaires: "",
       type: nativeItemTypeEnum.Sprint,

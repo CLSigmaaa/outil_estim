@@ -26,7 +26,6 @@ describe('Stats', () => {
     
     test("Génération du burn down / burn up", () => { 
         var burnCharts: BurnCharts;
-        debugger;
         act(() => burnCharts =
             result.current.getBurnUpAndDown(
             result.current.getPointData(result.current.getTimeData(sprint), sprint), totalPoints
@@ -44,7 +43,6 @@ describe('Stats', () => {
     test("Statistique des éléments du Sprint", () => {
         
         var stats: Ensemble_Data;
-        debugger;
         act(() => stats = result.current.getItemChildrenStats(sprint)); 
         if (!stats){
             expect(stats).not.toBeUndefined();

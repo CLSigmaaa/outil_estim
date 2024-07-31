@@ -33,6 +33,7 @@ export const DashboardSprintLayout: React.FC = () => {
 
   return (
     <BaseDashboardLayout>
+    <button onClick={() => console.log(selectedItem)}> fff </button>
       <DashboardRow>
         <DashboardCase title="Kanban" className="w-full p-0">
           <Kanban />

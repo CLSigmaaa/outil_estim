@@ -69,7 +69,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
 
   const onSubmit = async (data: any) => {
     const formData = new FormData();
-
+    console.log({...data, type: selectedItem?.type})
     formData.append("nom", data.nom);
     formData.append("id", data.id);
 
@@ -108,7 +108,10 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
 
   const [displayCalendar, setDisplayCalendar] = React.useState(defaultValues.statut != nativeStateEnum.A_Faire);
 
-  React.useEffect(resetform, [defaultValues])
+  React.useEffect(() => {
+    resetform(); 
+    setDisplayCalendar(defaultValues.statut != nativeStateEnum.A_Faire);
+  }, [defaultValues])
 
   return (
     <>
