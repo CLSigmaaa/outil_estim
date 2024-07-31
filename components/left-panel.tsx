@@ -88,11 +88,11 @@ export const LeftPanel = () => {
 
       <Separator className="my-4" />
 
-      <span className="text-lg font-medium">Statistiques générales</span>
+      <span className="text-lg font-medium mb-2">Statistiques générales</span>
 
       <div
         className={cn(
-          "p-4 hover:bg-slate-200 cursor-pointer flex w-full gap-x-4",
+          "p-4 hover:bg-slate-200 cursor-pointer flex w-full gap-x-4 select-none",
           currentRoute === "stats" ? "bg-blue-200" : ""
         )}
         onClick={() => {

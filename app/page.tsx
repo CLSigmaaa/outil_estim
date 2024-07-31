@@ -24,7 +24,7 @@ export default function PanelsWrapper() {
   const refA = useRef<ImperativePanelHandle>(null);
   const refB = useRef<ImperativePanelHandle>(null);
   const refC = useRef<ImperativePanelHandle>(null);
-  
+
   if (!isLeftPanelVisible && !isRightPanelVisible && !isMiddlePanelVisible) return null;
 
   return (
@@ -54,14 +54,14 @@ export default function PanelsWrapper() {
             id="middle-panel"
             order={2}
             ref={refB}
-            defaultSize={isRightPanelVisible ? 
-              100 - (refA.current?.getSize() || defaultLeftPanelSize) - defaultRightPanelSize : 
+            defaultSize={isRightPanelVisible ?
+              100 - (refA.current?.getSize() || defaultLeftPanelSize) - defaultRightPanelSize :
               100 - (refA.current?.getSize() || defaultLeftPanelSize)}
             className={`h-full w-full !overflow-y-auto ${isRightPanelVisible ? "p-3" : "p-7"} bg-neutral-50`} // Passage de p-3 à p-7 pour compenser le padding p-3 du right pannel et la marge ml-2 du handle
           >
             <MiddlePanel />
           </ResizablePanel>
-          
+
           {isRightPanelVisible ? <ResizableHandle withHandle className="ml-2" /> : null}
         </>
         {isRightPanelVisible && (
@@ -70,7 +70,9 @@ export default function PanelsWrapper() {
               id="right-panel"
               order={3}
               ref={refC}
-              defaultSize={defaultRightPanelSize }
+              defaultSize={defaultRightPanelSize}
+              minSize={20}
+              maxSize={30}
               className="h-full w-full !overflow-y-auto p-3"
             >
               <RightPanel />
@@ -81,4 +83,4 @@ export default function PanelsWrapper() {
     </>
   )
 }
- 
+
