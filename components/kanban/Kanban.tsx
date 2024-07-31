@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 import { DragDropContext } from "@hello-pangea/dnd";
-import { useTreeStore } from "@/components/store/useTreeStore";
-import ColonneKanban from "@/components/kanban/ColonneKanban";
+import { useTreeStore } from "@/store/useTreeStore";
 import { nativeStateEnum } from "@/app/model/projet/itemEnum";
+import ColonneKanban from "./kanban-column";
 
 export default function Kanban() {
   const { selectedItem, setSelectedItem, findItemInProject, editItemState } = useTreeStore();

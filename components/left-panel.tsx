@@ -4,8 +4,8 @@ import * as React from "react";
 
 import { NewFileTree } from "@/components/new-arborescence";
 
-import { useTreeStore } from "@/components/store/useTreeStore";
-import { usePanelManager } from "@/components/store/usePanelManager";
+import { useTreeStore } from "@/store/useTreeStore";
+import { usePanelManager } from "@/store/usePanelManager";
 
 import {
   Popover,

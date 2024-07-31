@@ -19,7 +19,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Sprint } from "@/app/model/projet"
-import { useTreeStore } from "@/components/store/useTreeStore"
+import { useTreeStore } from "@/store/useTreeStore"
 import { createSprintFormSchema } from "@/schemas/forms/sprint"
 import { nativeStateEnum } from "@/app/model/projet/itemEnum"
 

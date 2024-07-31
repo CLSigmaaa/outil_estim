@@ -35,7 +35,7 @@ import { createUserStoryFormSchema } from "@/schemas/forms/user-story"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useFieldArray, useForm } from "react-hook-form"
 import { US } from "@/app/model/projet"
-import { useTreeStore } from "@/components/store/useTreeStore"
+import { useTreeStore } from "@/store/useTreeStore"
 
 import { nativePriorityEnum, nativeStateEnum, nativeMasteryEnum } from "@/app/model/projet/itemEnum"
 

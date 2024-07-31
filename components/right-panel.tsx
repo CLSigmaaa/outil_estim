@@ -3,7 +3,7 @@ import { nativeItemTypeEnum } from "@/app/model/projet/itemEnum"
 import { CreateEnsembleForm } from "./forms/create-ensemble-form"
 import { CreateSprintForm } from "./forms/create-sprint-form"
 import { CreateUserStoryForm } from "./forms/create-user-story-form"
-import { useTreeStore } from "./store/useTreeStore"
+import { useTreeStore } from "../store/useTreeStore"
 
 
 import { Grip } from 'lucide-react';

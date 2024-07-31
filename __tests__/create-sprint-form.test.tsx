@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, renderHook, act } from '@testing-library/react';
 import { jest, describe, expect, test } from '@jest/globals';
-import { TreeState, useTreeStore } from '@/components/store/useTreeStore';
+import { TreeState, useTreeStore } from '@/store/useTreeStore';
 import TreeView from '@/components/ui/arborescence/TreeView';
 import { RightPanel } from '@/components/right-panel';
 import { Sprint, US } from '@/app/model/projet';

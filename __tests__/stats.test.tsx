@@ -4,7 +4,7 @@ import { BurnCharts, Ensemble_Data, Projet, Sprint, prorityStats, stateStats } f
 import { mockProject } from './data';
 import { differenceInDays } from "date-fns"
 import { nativeStateEnum, nativePriorityEnum } from '@/app/model/projet/itemEnum';
-import { useTreeStore } from '@/components/store/useTreeStore';
+import { useTreeStore } from '@/store/useTreeStore';
 import { act, renderHook } from '@testing-library/react';
 
 

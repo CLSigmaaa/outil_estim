@@ -1,7 +1,7 @@
 "use client"
 
 import { Projet } from "@/app/model/projet";
-import { useTreeStore } from "@/components/store/useTreeStore";
+import { useTreeStore } from "@/store/useTreeStore";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartLegend, ChartTooltip } from "@/components/ui/chart";
 import { Activity } from "lucide-react";

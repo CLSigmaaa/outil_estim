@@ -5,7 +5,7 @@ import { MiddlePanel } from "@/components/middle-panel";
 import { RightPanel } from "@/components/right-panel";
 import React, { useRef } from "react";
 
-import { usePanelManager } from "@/components/store/usePanelManager"
+import { usePanelManager } from "@/store/usePanelManager"
 
 import {
   ResizableHandle,

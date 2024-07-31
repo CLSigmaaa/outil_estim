@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { useTreeStore } from "@/components/store/useTreeStore";
+import { useTreeStore } from "@/store/useTreeStore";
 
 import { useToast } from "@/components/ui/use-toast";
 
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/popover"
 
 import { motion } from 'framer-motion';
-import { usePanelManager } from "./store/usePanelManager";
+import { usePanelManager } from "../store/usePanelManager";
 import { Icon } from "next/dist/lib/metadata/types/metadata-types";
 import { Button } from "./ui/button";
 

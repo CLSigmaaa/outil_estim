@@ -19,7 +19,7 @@ import { useToast } from "@/components/ui/use-toast"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useTreeStore } from "../store/useTreeStore"
+import { useTreeStore } from "../../store/useTreeStore"
 import { EnsembleUS } from "@/app/model/projet"
 import { createEnsembleFormSchema } from "@/schemas/forms/ensemble-us"
 

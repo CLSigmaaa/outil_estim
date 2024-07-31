@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/chart"
 
 import { Sprint } from "@/app/model/projet"
-import { useTreeStore } from "../store/useTreeStore"
+import { useTreeStore } from "../../store/useTreeStore"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 

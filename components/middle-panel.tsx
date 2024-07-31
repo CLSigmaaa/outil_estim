@@ -1,10 +1,10 @@
 "use client"
 import { nativeItemTypeEnum } from "@/app/model/projet/itemEnum";
-import { useTreeStore } from "@/components/store/useTreeStore"
+import { useTreeStore } from "@/store/useTreeStore"
 
 import { DashboardUSLayout, DashboardEnsembleUSLayout, DashboardSprintLayout } from "@/components/dashboard-layouts"
-import { usePanelManager } from "@/components/store/usePanelManager";
-import ProjectStats from "@/components/project-stats/ProjectStats";
+import { usePanelManager } from "@/store/usePanelManager";
+import ProjectStats from "@/components/project-stats/project-stats"
 
 
 type DashboardLayoutsType = {

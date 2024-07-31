@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { DashboardRow, DashboardCase, BaseDashboardLayout, chartConfig } from '@/components/dynamic-dashboard';
-import BurnDown from './burn-down/BurnDown';
+import BurnDown from './burn-down/burn-down';
 import { ChartSelect } from '@/components/chart-select';
 
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
@@ -14,9 +14,9 @@ import {
   ChartTooltipContent
 } from "@/components/ui/chart"
 
-import { useTreeStore } from "@/components/store/useTreeStore"
+import { useTreeStore } from "@/store/useTreeStore"
 import { nativeStateEnum } from '@/app/model/projet/itemEnum';
-import Kanban from './kanban/Kanban';
+import Kanban from './kanban/kanban';
 import { Sprint_Data } from '@/app/model/projet';
 
 export const DashboardUSLayout: React.FC = () => {
