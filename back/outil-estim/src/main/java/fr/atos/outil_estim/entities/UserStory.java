@@ -18,16 +18,22 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize
 public class UserStory extends EstimItem{
 	@Column
+	@JsonProperty("priorite")
 	private Priority priority;
 	@Column
+	@JsonProperty("statut")
 	private State state;
 	@Column
+	@JsonProperty("version")
 	private String version;
 	@Column
+	@JsonProperty("estimation_initiale")
 	private Integer estimation;
 	@Column
+	@JsonProperty("datesEffectives.from")
 	private Date effectiveDateFrom;
 	@Column
+	@JsonProperty("datesEffectives.to")
 	private Date effectiveDateTo;
 
 	public UserStory() {

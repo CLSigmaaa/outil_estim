@@ -24,7 +24,7 @@ public class Project {
 	private String description;
 	@Column
 	@OneToMany
-	@JsonManagedReference
+	@JsonManagedReference(value = "project")
 	private Set<EstimItem> children;
 	@Column
 	private Integer childNumber;

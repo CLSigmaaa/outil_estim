@@ -15,12 +15,23 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 
 @Entity
+@JsonTypeInfo(
+		use = JsonTypeInfo.Id.NAME,
+		include = JsonTypeInfo.As.PROPERTY,
+		property = "type"
+)
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@JsonSubTypes({
+		@JsonSubTypes.Type(value = Sprint.class, name = "Sprint"),
+		@JsonSubTypes.Type(value = UserStory.class, name = "US"),
+		@JsonSubTypes.Type(value = Ensemble.class, name = "Ensemble")
+})
 public abstract class EstimItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
 	private Long id;
 	@Column
+	@JsonProperty("nom")
 	private String name;
 	@ManyToOne
 	@JsonBackReference(value = "parentItem")
@@ -29,8 +40,10 @@ public abstract class EstimItem {
 	@JsonBackReference(value = "project")
 	private Project project;
 	@Column
+	@JsonProperty("description")
 	private String description;
 	@Column
+	@JsonProperty("commentaires")
 	private String commentaires;
 	@Column
 	private ItemType type;

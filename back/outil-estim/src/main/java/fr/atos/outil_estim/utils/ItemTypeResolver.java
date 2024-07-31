@@ -37,7 +37,7 @@ public class ItemTypeResolver extends TypeIdResolverBase {
 		return null;
 	}
 	@Override
-	public JavaType typeFromId(DatabindContext context, String type) throws IOException {
+	public JavaType typeFromId(DatabindContext context, String type) {
 		ItemType itemType = ItemType.fromString(type);
 
 		return switch (itemType) {

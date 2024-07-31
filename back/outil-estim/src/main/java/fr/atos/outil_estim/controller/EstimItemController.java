@@ -24,10 +24,8 @@ public class EstimItemController {
 
 
 	@GetMapping("/items/{itemId}")
-	public String getItem(@PathVariable Long itemId) throws JsonProcessingException {
-		var test = estimItemService.getItem(itemId);
-		ObjectMapper objectMapper = new ObjectMapper();
-		return objectMapper.writeValueAsString(test);
+	public EstimItem getItem(@PathVariable Long itemId) {
+		return estimItemService.getItem(itemId);
 	}
 	@PostMapping(value = "/items")
 	public void addItem(Long parentId, String itemType) {

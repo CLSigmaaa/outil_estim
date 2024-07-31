@@ -11,6 +11,8 @@ public class EstimItemUpdateVisitorImpl implements EstimItemUpdateVisitor {
 		userStoryToEdit.setPriority(newUserStory.getPriority());
 		userStoryToEdit.setState(newUserStory.getState());
 		userStoryToEdit.setVersion(newUserStory.getVersion());
+		userStoryToEdit.setEffectiveDateFrom(newUserStory.getEffectiveDateFrom());
+		userStoryToEdit.setEffectiveDateTo(newUserStory.getEffectiveDateTo());
 	}
 
 	@Override
