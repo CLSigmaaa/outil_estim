@@ -4,6 +4,8 @@ import * as React from "react";
 
 import { useTreeStore } from "@/components/store/useTreeStore";
 
+import { useToast } from "@/components/ui/use-toast";
+
 import { cn } from "@/lib/utils";
 
 import { Plus } from 'lucide-react';
@@ -35,25 +37,22 @@ const treeIcons: Record<string, React.ReactElement<Icon>> = {
   Sprint: <Repeat size={20} />,
 };
 
-const calculateNodeDepth = (node, findItemInProject) => {
-  let depth = 0;
-  let currentNode = node;
-  while (currentNode.parentId) {
-    currentNode = findItemInProject(currentNode.parentId);
-    depth++;
-  }
-  return depth;
-};
-
 export const DeleteItemButton = ({ node }: { node: node }) => {
   const { selectedItem, setSelectedItem, deleteItem } = useTreeStore();
   const [isPopOverOpen, setIsPopOverOpen] = React.useState(false);
+
+  const { toast } = useToast();
 
   const handleClick = () => {
     deleteItem(node.id)
     if (selectedItem?.id === node.id) {
       setSelectedItem(null)
     }
+    toast({
+      title: "Succès !",
+      description: "L'item a bien été supprimé.",
+      variant: "success"
+    })
   }
 
   return (
