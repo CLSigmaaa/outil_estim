@@ -151,9 +151,7 @@ export const NewFileTree = ({ node }: any) => {
     setRightPanelVisibility(true);
     setSelectedItem(node);
     setCurrentRoute("");
-    if (selectedItem?.id !== node.id || !isExpanded) {
-      toggleExpandedItem(node.id);
-    }
+    toggleExpandedItem(node.id);
   };
 
   return (
@@ -162,12 +160,14 @@ export const NewFileTree = ({ node }: any) => {
 
     )}>
       <li>
-        <div className="flex justify-between items-center w-full select-none" style={{ paddingLeft: `0px` }}>
+        <div className={cn(
+          "flex justify-between items-center w-full select-none hover:bg-slate-100",
+          selectedItem?.id === node.id && "bg-blue-100",
+        )} style={{ paddingLeft: `0px` }}>
           <div
             onClick={handleClick}
             className={cn(
-              "flex w-full p-2 hover:bg-slate-100 overflow-hidden max-w-full cursor-pointer",
-              selectedItem?.id === node.id && "bg-blue-100",
+              "flex w-full p-2  overflow-hidden max-w-full cursor-pointer",
             )}
           >
             <motion.span
