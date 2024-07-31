@@ -34,8 +34,8 @@ export default function ColonneKanban({
     dropOver: `bg-gray-100`,
     selected: `border border-black`,
   };
-  
-  const { addItem, getNewUS} = useTreeStore();
+
+  const { addItem, getNewUS } = useTreeStore();
   const primaryButton = 0;
 
   function addItemInColumn() {
@@ -57,25 +57,25 @@ export default function ColonneKanban({
     return acc
   }
   // Inspired by https://github.com/hello-pangea/dnd/blob/main/docs/patterns/multi-drag.md
-  function selectUS (event: MouseEvent, item: Item) {
+  function selectUS(event: MouseEvent, item: Item) {
     if (event.defaultPrevented || event.button !== primaryButton) {
       return;
     }
     performAction(event, item);
   };
-  
-  function wasPressingMultiSelectKey (event: MouseEvent | KeyboardEvent) {
+
+  function wasPressingMultiSelectKey(event: MouseEvent | KeyboardEvent) {
     const isUsingWindows = navigator.platform.indexOf('Win') >= 0;
     return isUsingWindows ? event.ctrlKey : event.metaKey;
   };
-  
+
   function toggleSelectionInGroup(ItemId: string): void {
     const itemIds: string[] = selectedItemsIds;
     const index: number = itemIds.indexOf(ItemId);
 
     // Ajoute l'item s'il n'est pas déjà sélectionné
     if (index === -1) {
-     setSelectedItemsIds([...itemIds, ItemId]);
+      setSelectedItemsIds([...itemIds, ItemId]);
       return;
     }
 
@@ -85,7 +85,7 @@ export default function ColonneKanban({
     setSelectedItemsIds(shallow);
   };
 
-  function performAction (event: MouseEvent | KeyboardEvent, item: Item) {
+  function performAction(event: MouseEvent | KeyboardEvent, item: Item) {
     if (wasPressingMultiSelectKey(event)) {
       event.preventDefault(); // Empêche le délenchement du PopOver
       toggleSelectionInGroup(item.id);
@@ -93,7 +93,7 @@ export default function ColonneKanban({
     }
     setSelectedItemsIds([]);
   };
-// Inspired by https://github.com/hello-pangea/dnd/blob/main/docs/patterns/multi-drag.md
+  // Inspired by https://github.com/hello-pangea/dnd/blob/main/docs/patterns/multi-drag.md
 
   return (
     <div className="px-4 flex flex-col w-full max-h-96">

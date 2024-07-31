@@ -13,6 +13,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -46,35 +55,38 @@ export const CreateUSEstimForm = ({ defaultValues }: { defaultValues: US }) => {
     }
 
     return (
-        <div className="bg-white p-4 border rounded border-black object-contain">
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-                <p className="font-semibold"> {defaultValues.nom}</p>
-                <Separator />
-                <p className="italic max-h-32 overflow-auto"> {defaultValues.description}</p>
-                <FormField
-                    control={form.control}
-                    name="estimation_initiale"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Estimation:</FormLabel>
-                            <FormMessage />
-                            <FormControl>
-                            <Input
-                                    placeholder="Estimation en points"
-                                    className="resize-none"
-                                    {...field}
-                                />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-               
-                <Button type="submit" className="flex justify-center">
-                    Modifier estimation
-                </Button>
-            </form>
-        </Form>
-    </div>
+        <Card className="w-[350px] shadow-2xl">
+            <CardHeader>
+                <CardTitle>{defaultValues.nom}</CardTitle>
+                <CardDescription>{defaultValues.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid w-full items-center gap-4 p-6">
+                        <FormField
+                            control={form.control}
+                            name="estimation_initiale"
+                            render={({ field }) => (
+                                <FormItem className="flex gap-y-2 flex-col">
+                                    <FormLabel>Estimation:</FormLabel>
+                                    <FormMessage />
+                                    <FormControl>
+                                        <Input
+                                            placeholder="Estimation en points"
+                                            className="resize-none"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                        <Button type="submit" className="flex justify-center">
+                            Modifier estimation
+                        </Button>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
     )
 }
