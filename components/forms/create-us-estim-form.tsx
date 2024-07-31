@@ -32,7 +32,7 @@ import { Separator } from "@/components/ui/separator"
 
 import { useToast } from "@/components/ui/use-toast"
 
-export const CreateUSEstimForm = ({ defaultValues }: { defaultValues: US }) => {
+export const CreateUSEstimForm = ({ defaultValues, popoverClose }: { defaultValues: US, popoverClose: any }) => {
     const { selectedItem, setSelectedItem, editItem } = useTreeStore(); // Ajout de editItem
     const { toast } = useToast()
     var form = useForm({
@@ -52,6 +52,7 @@ export const CreateUSEstimForm = ({ defaultValues }: { defaultValues: US }) => {
         editItem(editedUSEstim.id, editedUSEstim);
         setSelectedItem({ ...selectedItem, children: selectedItem.children.map((us: US) => us.id == editedUSEstim.id ? editedUSEstim : us) })
         toast({ variant: "success", title: "Succès !", description: "L'US a bien été modifiée." })
+        popoverClose(false);
     }
 
     return (

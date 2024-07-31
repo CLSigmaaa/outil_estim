@@ -36,6 +36,9 @@ export default function ColonneKanban({
   };
 
   const { addItem, getNewUS } = useTreeStore();
+
+  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+
   const primaryButton = 0;
 
   function addItemInColumn() {
@@ -120,7 +123,7 @@ export default function ColonneKanban({
                     <Draggable key={item.id} draggableId={item.id} index={index}>
                       {(provided, snapshot) => {
                         return (
-                          <Popover>
+                          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
                             <PopoverTrigger>
                               <div
                                 className={`${styles.dragger} ${snapshot.isDragging ? styles.dragging : ""
@@ -136,7 +139,7 @@ export default function ColonneKanban({
                               </div>
                             </PopoverTrigger>
                             <PopoverContent className="max-w-[20rem] z-10">
-                              <CreateUSEstimForm defaultValues={item} />
+                              <CreateUSEstimForm defaultValues={item} popoverClose={setIsPopoverOpen} />
                             </PopoverContent>
                           </Popover>
                         );
