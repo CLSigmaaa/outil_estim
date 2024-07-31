@@ -33,8 +33,8 @@ public class ProjectController {
 		projectService.addProject();
 	}
 
-	@PostMapping("/projects/items")
-	public void addProjectItem(@RequestParam(name = "projectId") String projectId, @RequestParam(name = "itemType") String itemType) {
+	@PostMapping("/projects/{projectId}/items")
+	public void addProjectItem(@PathVariable String projectId, @RequestParam(name = "itemType") String itemType) {
 		projectService.addEmptyEstimItemToProject(projectId, ItemType.fromString(itemType));
 	}
 }

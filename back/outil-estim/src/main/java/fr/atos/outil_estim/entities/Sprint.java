@@ -6,6 +6,9 @@ import fr.atos.outil_estim.utils.EstimItemUpdateVisitor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.Set;
@@ -14,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
+@Getter @Setter @NoArgsConstructor
 public class Sprint extends EstimItem{
 	@Column
 	@JsonAlias({ "state" })
@@ -28,8 +32,6 @@ public class Sprint extends EstimItem{
 	@JsonAlias({ "children" })
 	private Set<EstimItem> children;
 
-	public Sprint() {
-	}
 	@Override
 	public void accept(EstimItemUpdateVisitor visitor, EstimItem newEstimItem) {
 		if (!(newEstimItem instanceof Sprint newSprint)) {
@@ -43,35 +45,4 @@ public class Sprint extends EstimItem{
 		visitor.visit(this, estimItemToAdd);
 	}
 
-	public State getState() {
-		return state;
-	}
-
-	public void setState(State state) {
-		this.state = state;
-	}
-
-	public Date getEffectiveDateFrom() {
-		return effectiveDateFrom;
-	}
-
-	public void setEffectiveDateFrom(Date effectiveDateFrom) {
-		this.effectiveDateFrom = effectiveDateFrom;
-	}
-
-	public Date getEffectiveDateTo() {
-		return effectiveDateTo;
-	}
-
-	public void setEffectiveDateTo(Date effectiveDateTo) {
-		this.effectiveDateTo = effectiveDateTo;
-	}
-
-	public Set<EstimItem> getChildren() {
-		return children;
-	}
-
-	public void setChildren(Set<EstimItem> children) {
-		this.children = children;
-	}
 }

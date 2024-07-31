@@ -36,8 +36,8 @@ public class EstimItemController {
 		estimItemService.editItem(itemId, newEstimItem);
 	}
 	@PutMapping("/items/state")
-	public void editItemState(Long parentId, String state){
-		estimItemService.editItemState(parentId, State.fromString(state));
+	public void editItemState(Long itemId, String state){
+		estimItemService.editItemState(itemId, State.fromString(state));
 	}
 
 	@DeleteMapping("/items")

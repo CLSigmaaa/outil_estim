@@ -6,6 +6,9 @@ import fr.atos.outil_estim.utils.EstimItemAddItemVisitor;
 import fr.atos.outil_estim.utils.EstimItemUpdateVisitor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
@@ -16,6 +19,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Entity
 @JsonSerialize
+@Getter @Setter @NoArgsConstructor
 public class UserStory extends EstimItem{
 	@Column
 	@JsonProperty("priorite")
@@ -36,8 +40,6 @@ public class UserStory extends EstimItem{
 	@JsonProperty("datesEffectives.to")
 	private Date effectiveDateTo;
 
-	public UserStory() {
-	}
 	@Override
 	public void accept(EstimItemUpdateVisitor visitor, EstimItem newEstimItem) {
 		if (!(newEstimItem instanceof UserStory newUserStory)) {
@@ -49,53 +51,6 @@ public class UserStory extends EstimItem{
 	@Override
 	public void accept(EstimItemAddItemVisitor visitor, EstimItem estimItemToAdd) {
 		visitor.visit(this, estimItemToAdd);
-	}
-	public Priority getPriority() {
-		return priority;
-	}
-
-	public void setPriority(Priority priority) {
-		this.priority = priority;
-	}
-
-	public State getState() {
-		return state;
-	}
-
-	public void setState(State state) {
-		this.state = state;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	public Integer getEstimation() {
-		return estimation;
-	}
-
-	public void setEstimation(Integer estimation) {
-		this.estimation = estimation;
-	}
-
-	public Date getEffectiveDateFrom() {
-		return effectiveDateFrom;
-	}
-
-	public void setEffectiveDateFrom(Date effectiveDateFrom) {
-		this.effectiveDateFrom = effectiveDateFrom;
-	}
-
-	public Date getEffectiveDateTo() {
-		return effectiveDateTo;
-	}
-
-	public void setEffectiveDateTo(Date effectiveDateTo) {
-		this.effectiveDateTo = effectiveDateTo;
 	}
 
 }
