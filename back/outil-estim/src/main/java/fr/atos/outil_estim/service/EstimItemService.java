@@ -8,9 +8,10 @@ import fr.atos.outil_estim.entities.UserStory;
 import fr.atos.outil_estim.enums.ItemType;
 import fr.atos.outil_estim.enums.State;
 import fr.atos.outil_estim.repository.EstimItemRepo;
-import fr.atos.outil_estim.utils.EstimItemAddItemVisitorImpl;
-import fr.atos.outil_estim.utils.EstimItemUpdateVisitorImpl;
-import fr.atos.outil_estim.utils.EstimItemUpdateVisitor;
+import fr.atos.outil_estim.stats.Stats;
+import fr.atos.outil_estim.visitors.EstimItemAddItemVisitorImpl;
+import fr.atos.outil_estim.visitors.EstimItemUpdateVisitorImpl;
+import fr.atos.outil_estim.visitors.EstimItemUpdateVisitor;
 
 import java.util.Optional;
 
@@ -29,7 +30,6 @@ public class EstimItemService {
 			case SPRINT -> new Sprint();
 			case ENSEMBLE -> new Ensemble();
 		};
-		newItem.setType(itemType);
 		newItem.setProject(project);
 		estimItemRepository.saveAndFlush(newItem);
 		return newItem;
@@ -55,7 +55,6 @@ public class EstimItemService {
 			case SPRINT -> throw new IllegalArgumentException("Sprint may only be added at the root of the project");
 			case ENSEMBLE -> new Ensemble();
 		};
-		newItem.setType(itemType);
 		newItem.setParentItem(parentItem);
 		estimItemRepository.save(newItem);
 		EstimItemAddItemVisitorImpl addItemVisitor = new EstimItemAddItemVisitorImpl();
@@ -101,4 +100,20 @@ public class EstimItemService {
 		estimItemRepository.save(itemToEdit);
 	}
 
+	public Stats getStats(Long itemId) {
+		Optional<EstimItem> item = estimItemRepository.findById(itemId);
+		if (item.isEmpty()) {
+			throw new IllegalArgumentException("Item not found");
+		}
+		if (item.get() instanceof UserStory) {
+			throw new IllegalArgumentException("Can't compute stats for UserStory");
+		}
+		var stats = new Stats();
+		if (item.get() instanceof Sprint sprint) {
+			stats.computeStats(sprint);
+		} else if (item.get() instanceof Ensemble ensemble) {
+			stats.computeStats(ensemble);
+		}
+		return stats;
+	}
 }

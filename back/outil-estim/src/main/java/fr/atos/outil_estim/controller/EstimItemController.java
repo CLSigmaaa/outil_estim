@@ -4,6 +4,7 @@ import fr.atos.outil_estim.entities.EstimItem;
 import fr.atos.outil_estim.enums.ItemType;
 import fr.atos.outil_estim.enums.State;
 import fr.atos.outil_estim.service.EstimItemService;
+import fr.atos.outil_estim.stats.Stats;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -14,9 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @RestController
 public class EstimItemController {
 	@Autowired
@@ -43,5 +41,11 @@ public class EstimItemController {
 	@DeleteMapping("/items")
 	public void deleteItem(Long itemId) {
 		estimItemService.deleteItem(itemId);
+	}
+
+	@GetMapping("items/{itemId}/stats")
+	public Stats getStats(@PathVariable Long itemId) {
+
+		return estimItemService.getStats(itemId);
 	}
 }

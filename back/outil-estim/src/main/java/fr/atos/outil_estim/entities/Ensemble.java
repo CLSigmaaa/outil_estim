@@ -1,7 +1,7 @@
 package fr.atos.outil_estim.entities;
 
-import fr.atos.outil_estim.utils.EstimItemAddItemVisitor;
-import fr.atos.outil_estim.utils.EstimItemUpdateVisitor;
+import fr.atos.outil_estim.visitors.EstimItemAddItemVisitor;
+import fr.atos.outil_estim.visitors.EstimItemUpdateVisitor;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
@@ -11,7 +11,6 @@ import lombok.Setter;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Entity

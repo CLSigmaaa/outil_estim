@@ -1,21 +1,15 @@
 package fr.atos.outil_estim.entities;
 
-import fr.atos.outil_estim.enums.ItemType;
-import fr.atos.outil_estim.utils.EstimItemAddItemVisitor;
-import fr.atos.outil_estim.utils.EstimItemUpdateVisitor;
-import fr.atos.outil_estim.utils.ItemTypeResolver;
+import fr.atos.outil_estim.visitors.EstimItemAddItemVisitor;
+import fr.atos.outil_estim.visitors.EstimItemUpdateVisitor;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 
 @Entity
 @JsonTypeInfo(
@@ -49,10 +43,9 @@ public abstract class EstimItem {
 	@Column
 	@JsonProperty("commentaires")
 	private String commentaires;
-	@Column
-	private ItemType type;
 
 	public abstract void accept(EstimItemUpdateVisitor visitor, EstimItem newEstimItem);
+
 	public abstract void accept(EstimItemAddItemVisitor visitor, EstimItem newEstimItem);
 
 }

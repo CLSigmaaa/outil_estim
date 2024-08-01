@@ -2,18 +2,16 @@ package fr.atos.outil_estim.entities;
 
 import fr.atos.outil_estim.enums.Priority;
 import fr.atos.outil_estim.enums.State;
-import fr.atos.outil_estim.utils.EstimItemAddItemVisitor;
-import fr.atos.outil_estim.utils.EstimItemUpdateVisitor;
+import fr.atos.outil_estim.visitors.EstimItemAddItemVisitor;
+import fr.atos.outil_estim.visitors.EstimItemUpdateVisitor;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
-import org.hibernate.annotations.Type;
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -32,13 +30,13 @@ public class UserStory extends EstimItem{
 	private String version;
 	@Column
 	@JsonProperty("estimation_initiale")
-	private Integer estimation;
+	private int estimation;
 	@Column
 	@JsonProperty("datesEffectives.from")
-	private Date effectiveDateFrom;
+	private LocalDate effectiveDateFrom;
 	@Column
 	@JsonProperty("datesEffectives.to")
-	private Date effectiveDateTo;
+	private LocalDate effectiveDateTo;
 
 	@Override
 	public void accept(EstimItemUpdateVisitor visitor, EstimItem newEstimItem) {

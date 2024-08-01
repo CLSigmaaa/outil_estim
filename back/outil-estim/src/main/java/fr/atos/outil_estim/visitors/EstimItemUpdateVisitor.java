@@ -1,4 +1,4 @@
-package fr.atos.outil_estim.utils;
+package fr.atos.outil_estim.visitors;
 
 import fr.atos.outil_estim.entities.Ensemble;
 import fr.atos.outil_estim.entities.Sprint;
