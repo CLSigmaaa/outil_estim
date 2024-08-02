@@ -66,11 +66,11 @@ public class Stats {
 
 	private Map<LocalDate, Integer> computeBurnXAxis(Sprint sprint) {
 		HashMap<LocalDate, Integer> burnData = new HashMap<>();
-		if (sprint.getEffectiveDateFrom() == null || sprint.getEffectiveDateTo() == null) {
+		if (sprint.getEffectiveDates().getFrom() == null || sprint.getEffectiveDates().getTo() == null) {
 			throw new IllegalArgumentException("Sprint dates are not set");
 		}
-		var startDate = sprint.getEffectiveDateFrom();
-		var sprintDuration = Period.between(startDate, sprint.getEffectiveDateTo()).getDays();
+		var startDate = sprint.getEffectiveDates().getFrom();
+		var sprintDuration = Period.between(startDate, sprint.getEffectiveDates().getTo()).getDays();
 		for (int dayNb = 0; dayNb <= sprintDuration + 1; dayNb++) {
 			burnData.put(startDate.plusDays(dayNb), 0);
 		}
@@ -80,7 +80,7 @@ public class Stats {
 	private Map<LocalDate, Integer> computeBurnYAxis(Map<LocalDate, Integer> burnData, Set<EstimItem> children){
 		children.forEach(child -> {
 			if (child instanceof UserStory userStory && userStory.getState() == State.TERMINEE) {
-				var endDate = userStory.getEffectiveDateTo();
+				var endDate = userStory.getEffectiveDates().getTo();
 				burnData.put(endDate, burnData.get(endDate) + userStory.getEstimation());
 			} else if (child instanceof Ensemble childEnsemble) {
 				computeBurnYAxis(burnData, childEnsemble.getChildren());

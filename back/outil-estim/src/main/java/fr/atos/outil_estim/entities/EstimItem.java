@@ -1,5 +1,6 @@
 package fr.atos.outil_estim.entities;
 
+import fr.atos.outil_estim.enums.ItemType;
 import fr.atos.outil_estim.visitors.EstimItemAddItemVisitor;
 import fr.atos.outil_estim.visitors.EstimItemUpdateVisitor;
 import jakarta.persistence.*;
@@ -19,8 +20,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 )
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @JsonSubTypes({
-		@JsonSubTypes.Type(value = Sprint.class, name = "Sprint"),
-		@JsonSubTypes.Type(value = UserStory.class, name = "US"),
+		@JsonSubTypes.Type(value = DatedEstimItem.class, name = "DatedEstimItem"),
 		@JsonSubTypes.Type(value = Ensemble.class, name = "Ensemble")
 })
 @Getter @Setter
@@ -43,6 +43,9 @@ public abstract class EstimItem {
 	@Column
 	@JsonProperty("commentaires")
 	private String commentaires;
+	@Column
+	@JsonProperty(value = "type", access = JsonProperty.Access.WRITE_ONLY)
+	private ItemType type;
 
 	public abstract void accept(EstimItemUpdateVisitor visitor, EstimItem newEstimItem);
 

@@ -7,7 +7,7 @@ public enum State {
 		return switch (state) {
 			case "A faire" -> A_FAIRE;
 			case "En cours" -> EN_COURS;
-			case "Terminée" -> TERMINEE;
+			case "Terminee" -> TERMINEE;
 			default -> throw new IllegalArgumentException("Unknown state: " + state);
 		};
 	}

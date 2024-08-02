@@ -16,21 +16,20 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 @Entity
-@Getter @Setter @NoArgsConstructor
-public class Sprint extends EstimItem{
+@Getter @Setter
+public class Sprint extends DatedEstimItem{
 	@Column
 	@JsonAlias({ "state" })
 	private State state;
-	@Column
-	@JsonAlias({ "effectiveDateFrom" })
-	private LocalDate effectiveDateFrom;
-	@Column
-	@JsonAlias({ "effectiveDateTo" })
-	private LocalDate effectiveDateTo;
 	@OneToMany
 	@JsonAlias({ "children" })
 	private Set<EstimItem> children;
 
+	public void setDefaultValue(Long id) {
+		setName(String.format("Sprint %d", id));
+		setDescription(String.format("Description Sprint %d", id));
+		setState(State.A_FAIRE);
+	}
 	@Override
 	public void accept(EstimItemUpdateVisitor visitor, EstimItem newEstimItem) {
 		if (!(newEstimItem instanceof Sprint newSprint)) {
@@ -43,5 +42,6 @@ public class Sprint extends EstimItem{
 	public void accept(EstimItemAddItemVisitor visitor, EstimItem estimItemToAdd) {
 		visitor.visit(this, estimItemToAdd);
 	}
+
 
 }

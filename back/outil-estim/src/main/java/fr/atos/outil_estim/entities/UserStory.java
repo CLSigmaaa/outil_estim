@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Entity
 @JsonSerialize
 @Getter @Setter @NoArgsConstructor
-public class UserStory extends EstimItem{
+public class UserStory extends DatedEstimItem{
 	@Column
 	@JsonProperty("priorite")
 	private Priority priority;
@@ -31,12 +31,7 @@ public class UserStory extends EstimItem{
 	@Column
 	@JsonProperty("estimation_initiale")
 	private int estimation;
-	@Column
-	@JsonProperty("datesEffectives.from")
-	private LocalDate effectiveDateFrom;
-	@Column
-	@JsonProperty("datesEffectives.to")
-	private LocalDate effectiveDateTo;
+
 
 	@Override
 	public void accept(EstimItemUpdateVisitor visitor, EstimItem newEstimItem) {

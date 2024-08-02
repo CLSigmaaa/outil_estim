@@ -6,6 +6,8 @@ import fr.atos.outil_estim.enums.State;
 import fr.atos.outil_estim.service.EstimItemService;
 import fr.atos.outil_estim.stats.Stats;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +22,9 @@ public class EstimItemController {
 	@Autowired
 	private EstimItemService estimItemService;
 
-
+	public List<EstimItem> getItems() {
+		return estimItemService.getItems();
+	}
 	@GetMapping("/items/{itemId}")
 	public EstimItem getItem(@PathVariable Long itemId) {
 		return estimItemService.getItem(itemId);
@@ -31,7 +35,7 @@ public class EstimItemController {
 	}
 	@PutMapping(value = "/items", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void editItem(Long itemId, @RequestBody EstimItem newEstimItem){
-		estimItemService.editItem(itemId, newEstimItem);
+		estimItemService.updateItem(itemId, newEstimItem);
 	}
 	@PutMapping("/items/state")
 	public void editItemState(Long itemId, String state){
