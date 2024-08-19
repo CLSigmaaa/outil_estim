@@ -26,50 +26,44 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useTreeStore } from "../../store/useTreeStore"
-import { US } from "@/app/model/projet"
-import { createUserStoryEstimFormSchema } from "@/schemas/forms/user-story"
+import { estimation, Task } from "@/app/model/projet"
 import { Separator } from "@/components/ui/separator"
 
 import { useToast } from "@/components/ui/use-toast"
+import { createTaskEstimFormSchema } from "@/schemas/forms/task-estim"
 
-export const CreateUSEstimForm = ({ defaultValues, popoverClose }: { defaultValues: US, popoverClose: any }) => {
+export const TaskEstimForm = (/*{ defaultValues, popoverClose }: { defaultValues: estimation, popoverClose: any }*/) => {
     const { selectedItem, setSelectedItem, editItem } = useTreeStore(); // Ajout de editItem
     const { toast } = useToast()
     var form = useForm({
-        resolver: zodResolver(createUserStoryEstimFormSchema),
+        resolver: zodResolver(createTaskEstimFormSchema),
         defaultValues: {
-            estimation_initiale: defaultValues.estimation || 0,
-            id: defaultValues.id,
+            consommée: "defaultValues.consommee",
+            reste_a_faire: "defaultValues.reste_a_faire",
+            cause_ecart: "defaultValues.cause"
         }
     })
 
     //TODO: add types
     const onSubmit = (data: any) => {
-        var editedUSEstim = {
-            ...defaultValues,
-            estimation: data.estimation_initiale
-        } as US;
-        editItem(editedUSEstim.id, editedUSEstim);
-        setSelectedItem({ ...selectedItem, children: selectedItem.children.map((us: US) => us.id == editedUSEstim.id ? editedUSEstim : us) })
+        var newEstim = {
+            date: new Date().toISOString(),
+            consommee: data.consommée,
+            reste_a_faire: data.reste_a_faire,
+            cause: data.cause_ecart
+        }
         toast({ variant: "success", title: "Succès !", description: "L'US a bien été modifiée." })
-        popoverClose(false);
     }
 
     return (
-        <Card className="w-[350px] shadow-2xl">
-            <CardHeader>
-                <CardTitle>{defaultValues.nom}</CardTitle>
-                <CardDescription>{defaultValues.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
+        <div className="flex w-full gap-4">
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid w-full items-center gap-4 p-6">
-                        <FormField
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="flex justify-between items-center flex-grow">
+                    <FormField
                             control={form.control}
-                            name="estimation_initiale"
+                            name="consommée"
                             render={({ field }) => (
-                                <FormItem className="flex gap-y-2 flex-col">
-                                    <FormLabel>Estimation:</FormLabel>
+                                <FormItem className="flex mb-0">
                                     <FormMessage />
                                     <FormControl>
                                         <Input
@@ -81,13 +75,44 @@ export const CreateUSEstimForm = ({ defaultValues, popoverClose }: { defaultValu
                                 </FormItem>
                             )}
                         />
-
+                        <FormField
+                            control={form.control}
+                            name="reste_a_faire"
+                            render={({ field }) => (
+                                <FormItem className="flex mb-0">
+                                    <FormMessage />
+                                    <FormControl>
+                                        <Input
+                                            placeholder="Estimation en jours"
+                                            className="resize-none"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="cause_ecart"
+                            render={({ field }) => (
+                                <FormItem className="flex mb-0">
+                                    <FormMessage />
+                                    <FormControl>
+                                        <Input
+                                            placeholder="Estimation en points"
+                                            className="resize-none"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
                         <Button type="submit" className="flex justify-center">
-                            Modifier estimation
+                            Modifier
                         </Button>
                     </form>
                 </Form>
-            </CardContent>
-        </Card>
+                <Button onClick={() => {console.log("apercu")}}>Aperçu</Button>
+            </div>  
     )
 }

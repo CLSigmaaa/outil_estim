@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,24 +23,24 @@ public class ProjectController {
 	private ProjectService projectService;
 
 	@GetMapping("/projects/{projectId}")
-	public Project getProject(@PathVariable String projectId) {
+	public ResponseEntity<Project> getProject(@PathVariable Long projectId) {
 		return projectService.getProject(projectId);
 	}
 
 	@GetMapping("/projects")
-	public List<Project> getProjects() {
+	public ResponseEntity<List<Project>> getProjects() {
 		return projectService.getProjects();
 	}
 
 	@PostMapping("/projects")
-	public void addProject() {
-		projectService.addProject();
+	public ResponseEntity<Project> addProject(@RequestBody Project project) {
+		return projectService.addProject(project);
 	}
 
-	@PostMapping("/projects/{projectId}/items")
-	public void addProjectItem(@PathVariable String projectId, @RequestParam(name = "itemType") String itemType) {
-		projectService.addEmptyEstimItemToProject(projectId, ItemType.fromString(itemType));
-	}
+//	@PostMapping("/projects/{projectId}/items")
+//	public void addProjectItem(@PathVariable String projectId, @RequestParam(name = "itemType") String itemType) {
+//		projectService.(projectId, ItemType.fromString(itemType));
+//	}
 
 	@PutMapping(value = "/projects", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void updateProject(@RequestBody Project project) {

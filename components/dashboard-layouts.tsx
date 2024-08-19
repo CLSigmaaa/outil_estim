@@ -16,7 +16,7 @@ import {
 
 import { useTreeStore } from "@/store/useTreeStore"
 import { nativeStateEnum } from '@/app/model/projet/itemEnum';
-import Kanban from './kanban/kanban';
+import Kanban from './kanban/Kanban';
 import { Sprint_Data } from '@/app/model/projet';
 
 export const DashboardUSLayout: React.FC = () => {
@@ -33,7 +33,6 @@ export const DashboardSprintLayout: React.FC = () => {
 
   return (
     <BaseDashboardLayout>
-    <button onClick={() => console.log(selectedItem)}> fff </button>
       <DashboardRow>
         <DashboardCase title="Kanban" className="w-full p-0">
           <Kanban />

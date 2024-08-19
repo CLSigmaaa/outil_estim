@@ -1,23 +1,16 @@
 export enum nativePriorityEnum {
-    Mineure = "Mineure",
-    Majeure = "Majeure",
-    Critique = "Critique",
+    MINEURE = "MINEURE",
+    MAJEURE = "MAJEURE",
+    CRITIQUE = "CRITIQUE",
 }
 
 export enum nativeStateEnum {
-    A_Faire = "A faire",
-    En_Cours = "En cours",
-    Terminee = "Terminée",
-}
-
-export enum nativeMasteryEnum {
-    Faible = "Faible",
-    Moyen = "Moyenne",
-    Eleve = "Élevée",
+    A_FAIRE = "A_FAIRE",
+    EN_COURS = "EN_COURS",
+    TERMINEE = "TERMINEE",
 }
 
 export enum nativeItemTypeEnum {
-    US = "US",
-    Ensemble = "Ensemble",
-    Sprint = "Sprint",
+    TASK = "TASK",
+    SPRINT = "SPRINT",
 }

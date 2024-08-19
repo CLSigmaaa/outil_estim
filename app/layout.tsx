@@ -10,14 +10,15 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
+  children, breadcrumbs
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode, breadcrumbs: React.ReactNode
 }>) {
   return (
     <html lang="fr">
       <body className={`h-screen flex flex-col ${inter.className}`}>
-        {children}
+        <div className="p-2 px-10 border-b-2">{breadcrumbs }</div>
+        <div className="p-2 px-10">{children}</div>
         <Toaster />
       </body>
     </html>

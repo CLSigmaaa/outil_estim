@@ -1,4 +1,4 @@
-import { US, Item } from "@/app/model/projet";
+import { Task, Item } from "@/app/model/projet";
 import {
   Popover,
   PopoverTrigger,
@@ -7,7 +7,7 @@ import {
 import Divider from "@mui/material/Divider";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { useTreeStore } from "../../store/useTreeStore";
-import { CreateUSEstimForm } from "@/components/forms/create-us-estim-form";
+import { TaskEstimForm } from "@/components/forms/create-us-estim-form";
 import { nativeItemTypeEnum, nativeStateEnum } from "@/app/model/projet/itemEnum";
 import React from "react";
 import { Button } from "@/components/ui/button";
@@ -48,13 +48,13 @@ export default function ColonneKanban({
     );
   }
 
-  function getAllChildren(item: Item): US[] {
-    var acc: US[] = [];
+  function getAllChildren(item: Item): Task[] {
+    var acc: Task[] = [];
     item?.children.forEach((child: Item) => {
       if (child.children && child.children.length > 0) {
         acc = acc.concat(getAllChildren(child));
-      } else if (child.type == nativeItemTypeEnum.US) {
-        acc.push(child as US);
+      } else if (child.type == nativeItemTypeEnum.Task) {
+        acc.push(child as Task);
       }
     })
     return acc
@@ -107,7 +107,7 @@ export default function ColonneKanban({
       <Button variant="outline" className="mt-2 mb-2" onClick={addItemInColumn}>
         Ajouter une US
       </Button>
-      <Droppable droppableId={statut} type={nativeItemTypeEnum.US}>
+      <Droppable droppableId={statut} type={nativeItemTypeEnum.Task}>
         {(provided, snapshot) => {
           return (
             <div
@@ -117,13 +117,13 @@ export default function ColonneKanban({
                 } bg-neutral-100`}
             >
               {getAllChildren(selectedItem)
-                .filter((item: US) => item.statut == statut)
-                .map((item: US, index: number) => {
+                .filter((item: Task) => item.statut == statut)
+                .map((item: Task, index: number) => {
                   return (
                     <Draggable key={item.id} draggableId={item.id} index={index}>
                       {(provided, snapshot) => {
                         return (
-                          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                          <Popover >
                             <PopoverTrigger>
                               <div
                                 className={`${styles.dragger} ${snapshot.isDragging ? styles.dragging : ""
@@ -139,7 +139,7 @@ export default function ColonneKanban({
                               </div>
                             </PopoverTrigger>
                             <PopoverContent className="max-w-[20rem] z-10">
-                              <CreateUSEstimForm defaultValues={item} popoverClose={setIsPopoverOpen} />
+                              <TaskEstimForm defaultValues={item} popoverClose={setIsPopoverOpen} />
                             </PopoverContent>
                           </Popover>
                         );

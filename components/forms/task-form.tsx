@@ -1,20 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
 
-import upload from "@/actions/upload"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "@/components/ui/use-toast"
 
 import {
   Form,
@@ -30,96 +20,107 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-import { createUserStoryFormSchema } from "@/schemas/forms/user-story"
+import { createTaskFormSchema } from "@/schemas/forms/task"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useFieldArray, useForm } from "react-hook-form"
-import { US } from "@/app/model/projet"
-import { useTreeStore } from "@/store/useTreeStore"
+import { useForm } from "react-hook-form"
 
-import { nativePriorityEnum, nativeStateEnum, nativeMasteryEnum } from "@/app/model/projet/itemEnum"
+import { nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from "@/app/model/projet/itemEnum"
+import { Task, TaskData } from "@/app/model/projet"
+import { getSprint, getTask, postTask, updateTask } from "@/components/utils/api"
+import { getSprintToast, getTaskToast, postTaskToast, updateTaskToast } from "@/components/utils/toasts"
 
-const testHandle = (event: any, onChange: any) => {
-  console.log(event.target.files && event.target.files[0])
-  onChange(event.target.files && event.target.files[0])
-}
 
-export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) => {
-
-  const { selectedItem, editItem, setSelectedItem, findItemInProject } = useTreeStore(); // Ajout de editItem
+export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintId }:{taskToEdit: Task | undefined, setTaskList: any, closeForm: any, projectId: string, sprintId: string}) => {
   const form = useForm({
-    resolver: zodResolver(createUserStoryFormSchema),
-    defaultValues: {
-      nom: defaultValues.nom,
-      id: defaultValues.id,
-      description: defaultValues.description,
-      priorite: defaultValues.priorite,
-      statut: defaultValues.statut,
-      datesEffectives: {
-        from: defaultValues.datesEffectives.from,
-        to: defaultValues.datesEffectives.to,
-      },
-      version: defaultValues.version,
-      estimation_initiale: defaultValues.estimation || 0,
-      commentaires: defaultValues.commentaires,
+    resolver: zodResolver(createTaskFormSchema),
+    defaultValues: taskToEdit ? taskToEdit : {
+      name: "",
+      description: "",
+      priority: undefined,
+      state: undefined,
     },
   })
 
-  const { toast } = useToast()
+    
+    
 
   const onSubmit = async (data: any) => {
-    const formData = new FormData();
-    console.log({...data, type: selectedItem?.type})
-    formData.append("nom", data.nom);
-    formData.append("id", data.id);
-
-    const editedItem: US = {
-      ...selectedItem,
-      nom: data.nom,
+    var taskData: TaskData = {
+      name: data.name,
       description: data.description,
-      priorite: data.priorite,
-      statut: data.statut,
-      datesEffectives: data.datesEffectives,
-      version: data.version,
-      estimation: data.estimation_initiale,
-      commentaires: data.commentaires,
-    };
-    editItem(editedItem.id, editedItem)
-    toast({ variant: "success", title: "Succès !", description: "L'US a bien été modifiée." })
-    setSelectedItem(findItemInProject(selectedItem?.id))
+      priority: data.priority,
+      state: data.state,
+      estimationList: [],
+      effectiveDates: { from: new Date(), to: new Date() },
+      type: nativeItemTypeEnum.TASK,
+    }
+    var response = taskToEdit ? await updateTask(projectId, sprintId, taskToEdit.id, taskData) : await postTask(projectId, sprintId, taskData);
+    if (response == undefined) {
+      return;
+    }
+    if (!response.ok) {
+      taskToEdit ? updateTaskToast(false) : postTaskToast(false);
+      return;
+    }
+    response.json().then(async (newTask) => { // UpdateTask return the updated task and postTask return the sprint
+      
+      if (newTask == null) {
+        taskToEdit ? updateTaskToast(false) : postTaskToast(false);
+        return;
+      }
+      response = await getSprint(projectId, sprintId);
+      if (response == undefined) {
+        return;
+      }
+      if (!response.ok) {
+        getTaskToast(false);
+        return;
+      }
+      response.json().then((updatedSprint) => {
+        setTaskList(updatedSprint.tasks);
+        taskToEdit ? updateTaskToast(true) : postTaskToast(true);
+      });
+
+      
+      closeForm();
+    });
+    
+    updateTaskToast(true);
   }
 
-  function resetform() {
-    form.reset({
-      nom: selectedItem.nom,
-      id: selectedItem.id,
-      description: selectedItem.description,
-      priorite: selectedItem.priorite,
-      statut: selectedItem.statut,
-      datesEffectives: {
-        from: selectedItem.datesEffectives.from,
-        to: selectedItem.datesEffectives.to,
-      },
-      version: selectedItem.version,
-      estimation_initiale: selectedItem.estimation || 0,
-      commentaires: selectedItem.commentaires,
-    })
-  }
+  // function resetform() {
+  //   form.reset({
+  //     name: selectedItem.nom,
+  //     id: selectedItem.id,
+  //     description: selectedItem.description,
+  //     priorite: selectedItem.priorite,
+  //     statut: selectedItem.statut,
+  //     datesEffectives: {
+  //       from: selectedItem.datesEffectives.from,
+  //       to: selectedItem.datesEffectives.to,
+  //     },
+  //     version: selectedItem.version,
+  //     estimation_initiale: selectedItem.estimation || 0,
+  //     commentaires: selectedItem.commentaires,
+  //   })
+  // }
 
-  const [displayCalendar, setDisplayCalendar] = React.useState(defaultValues.statut != nativeStateEnum.A_Faire);
+  const [displayCalendar, setDisplayCalendar] = React.useState(taskToEdit?.state != nativeStateEnum.A_FAIRE);
 
   React.useEffect(() => {
-    resetform(); 
-    setDisplayCalendar(defaultValues.statut != nativeStateEnum.A_Faire);
-  }, [defaultValues])
+    // resetform(); 
+    setDisplayCalendar(taskToEdit?.state != nativeStateEnum.A_FAIRE);
+  }, [taskToEdit])
+
 
   return (
     <>
-      <h1 className="font-bold mb-2 p-1">Informations sur {defaultValues.nom}</h1>
+      <h1 className="font-bold mb-2 p-1">{taskToEdit ? `Informations sur ${taskToEdit.name}` : "Ajouter une tâche" }</h1>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          aria-label="submitUSForm"
+          aria-label="submitTaskForm"
           className="w-full overflow-y-auto px-1"
         >
           <FormField
@@ -136,13 +137,13 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           />
           <FormField
             control={form.control}
-            name="nom"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nom {createUserStoryFormSchema.shape['nom'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>Nom {createTaskFormSchema.shape['name'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <FormControl>
-                  <Input placeholder="Nom User Story" {...field} />
+                  <Input placeholder="Nom tâche" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -152,11 +153,11 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description {createUserStoryFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>Description {createTaskFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <FormControl>
                   <Textarea
-                    placeholder="Description de l'User Story"
+                    placeholder="Description de la tâche"
                     className="resize-none"
                     {...field}
                   />
@@ -166,10 +167,10 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           />
           <FormField
             control={form.control}
-            name="priorite"
+            name="priority"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Priorité {createUserStoryFormSchema.shape['priorite'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>Priorité {createTaskFormSchema.shape['priority'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -177,7 +178,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {Object.keys(nativePriorityEnum).map((item) => {
+                    {Object.values(nativePriorityEnum).map((item) => {
                       return (
                         <SelectItem
                           key={item}
@@ -194,19 +195,19 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
           />
           <FormField
             control={form.control}
-            name="statut"
+            name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>État des US {createUserStoryFormSchema.shape['statut'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>État des US {createTaskFormSchema.shape['state'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <Select onValueChange={(value) => {
-                  setDisplayCalendar(value != nativeStateEnum.A_Faire)
+                  setDisplayCalendar(value != nativeStateEnum.A_FAIRE)
                   field.onChange(value)
                 }}
                   value={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un état pour l'US" />
+                      <SelectValue placeholder="Sélectionner un état pour la tâche" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -224,20 +225,7 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="estimation_initiale"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Estimation Initiale {createUserStoryFormSchema.shape['estimation_initiale'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-                <FormMessage />
-                <FormControl>
-                  <Input placeholder="20 Points" type="number" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          {displayCalendar ?
+          {/* {displayCalendar ?
             <FormField
               control={form.control}
               name="datesEffectives"
@@ -289,43 +277,16 @@ export const CreateUserStoryForm = ({ defaultValues }: { defaultValues: US }) =>
                   </Popover>
                 </FormItem>
               )}
-            /> : ""}
-          <FormField
-            control={form.control}
-            name="version"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Version {createUserStoryFormSchema.shape['version'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
-                <FormMessage />
-                <FormControl>
-                  <Input placeholder="Version cible" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="commentaires"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Commentaires</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Cette US est mal estimée car ..."
-                    className="resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            /> : ""} */}
+         
+         <Button className="mt-2" onClick={closeForm}>Annuler</Button>
           <Button
             className="mt-2"
             type="submit"
-            data-testid="USFormSubmitBtn"
+            data-testid="TaskFormSubmitBtn"
+            disabled={!form.formState.isValid}
           >
-            Modifier US
+            {taskToEdit ? "Modifier" : "Ajouter"}
           </Button>
         </form>
       </Form>

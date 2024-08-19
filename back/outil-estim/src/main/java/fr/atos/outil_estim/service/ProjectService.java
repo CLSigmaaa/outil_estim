@@ -1,17 +1,21 @@
 package fr.atos.outil_estim.service;
 
-import fr.atos.outil_estim.entities.Ensemble;
-import fr.atos.outil_estim.entities.EstimItem;
 import fr.atos.outil_estim.entities.Project;
 import fr.atos.outil_estim.entities.Sprint;
-import fr.atos.outil_estim.entities.UserStory;
+import fr.atos.outil_estim.entities.Task;
 import fr.atos.outil_estim.enums.ItemType;
 import fr.atos.outil_estim.repository.ProjectRepo;
+import fr.atos.outil_estim.repository.SprintRepo;
+import fr.atos.outil_estim.util.Error;
 
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,73 +24,93 @@ public class ProjectService {
 	@Autowired
 	private ProjectRepo projectRepository;
 
-	@Autowired
-	private EstimItemService estimItemService;
-	public Project getProject(String projectId) {
-		return projectRepository.findById(Long.parseLong(projectId))
-				.orElseThrow(() -> new IllegalArgumentException("Project with id " + projectId + " not found"));
+	public ResponseEntity<Project> getProject(Long projectId) {
+		try {
+			Project project = projectRepository.findByIdWithSprints(projectId).
+					orElseThrow(() -> new IllegalArgumentException("Project with id " + projectId + " not found"));
+			return ResponseEntity.ok(project);
+		} catch (IllegalArgumentException e) {
+			return Error.errorFromException(e);
+		}
 	}
 
 	@Transactional
-	public void addEmptyEstimItemToProject(String projectId, ItemType estimItemType) {
-		Project project = projectRepository.findById(Long.parseLong(projectId))
-				.orElseThrow(() -> new IllegalArgumentException("Project with id " + projectId + " not found"));
-		EstimItem newItem = estimItemService.createProjectChild(project, estimItemType);
-		project.getChildren().add(newItem);
+	public ResponseEntity<Project> addProject(Project project) {
+		try {
+			return ResponseEntity.ok(projectRepository.save(project));
+		} catch (IllegalArgumentException e) {
+			return Error.errorFromException(e);
+		}
 
-		projectRepository.save(project);
-	}
-	@Transactional
-	public void addProject() {
-		Project project = new Project();
-		projectRepository.save(project);
 	}
 
-	public List<Project> getProjects() {
-		return projectRepository.findAll();
+	public ResponseEntity<List<Project>> getProjects() {
+		try {
+			return ResponseEntity.ok(projectRepository.findAll());
+		} catch (IllegalArgumentException e) {
+			return Error.errorFromException(e);
+		}
 	}
 
-	public void updateProject(Project project) {
-		Project projectToUpdate = projectRepository.findById(project.getId())
-				.orElseThrow(() -> new IllegalArgumentException("Project with id " +project.getId() + " not found"));
-		projectToUpdate.setName(project.getName());
-		projectToUpdate.setDescription(project.getDescription());
-		projectToUpdate.setChildNumber(project.getChildNumber());
-		updateProjectChildren(project, projectToUpdate);
-		projectRepository.save(projectToUpdate);
+	public ResponseEntity<Project> updateProject(Project project) {
+
+		try {
+			Project projectToUpdate = projectRepository.findById(project.getId())
+					.orElseThrow(() -> new IllegalArgumentException("Project with id " + project.getId() + " not found"));
+			projectToUpdate.setName(project.getName());
+			projectToUpdate.setDescription(project.getDescription());
+			projectToUpdate.setChildNumber(project.getChildNumber());
+			updateProjectChildren(project, projectToUpdate);
+			return ResponseEntity.ok(projectRepository.save(projectToUpdate));
+		} catch (IllegalArgumentException e) {
+			return Error.errorFromException(e);
+		}
+	}
+
+	public ResponseEntity<Void> deleteProject(Long projectId) {
+		try {
+			Project project = projectRepository.findById(projectId)
+					.orElseThrow(() -> new IllegalArgumentException("Project with id " + projectId + " not found"));
+			projectRepository.delete(project);
+			return ResponseEntity.noContent().build();
+		} catch (IllegalArgumentException e) {
+			return Error.errorFromException(e);
+		}
 	}
 
 	private void updateProjectChildren(Project newProject, Project projectToUpdate) {
-		// Ajoute les nouveaux items a l'ancien projet
-		updateItemChildren(newProject.getChildren());
-
-		// Enlève à l'ancien projet les items non présent dans le nouveau
-		projectToUpdate.getChildren().forEach(child -> {
-			try {
-				estimItemService.getItem(child.getId());
-			} catch (IllegalArgumentException e) {
-				estimItemService.deleteItem(child.getId());
-			}
-		});
+		//		// Ajoute les nouveaux items a l'ancien projet
+		//		newProject.getChildren().forEach(sprint -> {
+		//			try {
+		//				sprintService.updateItem(sprint.getId(), sprint);
+		//			} catch (IllegalArgumentException e) {
+		//				taskService.addSprintT(sprint.getProject(), sprint.getType());
+		//				taskService.updateItem(sprint.getId(), sprint);
+		//			}
+		//			if (sprint instanceof Sprint sprint) {
+		//				updateSprintChildren(sprint.getId(), sprint.getChildren());
+		//			} else {
+		//				throw new IllegalArgumentException("Unknown child type "+sprint.getClass());
+		//			}
+		//		});
+		//
+		//		// Enlève à l'ancien projet les items non présent dans le nouveau
+		//		projectToUpdate.getChildren().forEach(child -> {
+		//			try {
+		//				taskService.getItem(child.getId());
+		//			} catch (IllegalArgumentException e) {
+		//				taskService.deleteItem(child.getId());
+		//			}
+		//		});
 	}
 
-	private void updateItemChildren(Set<EstimItem> children){
-		children.forEach(child -> {
-			try {
-				estimItemService.updateItem(child.getId(), child);
-			} catch (IllegalArgumentException e) {
-				estimItemService.createProjectChild(child.getProject(), child.getType());
-				estimItemService.updateItem(child.getId(), child);
-			}
-			if (child instanceof UserStory) {
-				return;
-			} else if (child instanceof Ensemble ensemble) {
-				updateItemChildren(ensemble.getChildren());
-			} else if (child instanceof Sprint sprint) {
-				updateItemChildren(sprint.getChildren());
-			} else {
-				throw new IllegalArgumentException("Unknown child type "+child.getClass());
-			}
-		});
+	private void updateSprintChildren(Long parentId, Set<Task> children) {
+		//		children.forEach(child -> {
+		//			try {
+		//				taskService.updateItem(parentId, child);
+		//			} catch (IllegalArgumentException e) {
+		//				taskService.addTaskToSprint(child.getId(), child);
+		//			}
+		//		});
 	}
 }

@@ -93,3 +93,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+.deleteButton{
+  visibility: hidden;
+}
+
+.item:hover * .deleteButton, .deleteButton:hover {
+  visibility: visible;
+}
+
+.MuiCollapse-wrapper{
+  border-left: 1px solid grey;
+  
+}

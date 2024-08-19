@@ -12,7 +12,7 @@ type DashboardLayoutsType = {
 };
 
 const dashboardLayouts: DashboardLayoutsType = {
-  [nativeItemTypeEnum.US]: <DashboardUSLayout />,
+  [nativeItemTypeEnum.Task]: <DashboardUSLayout />,
   [nativeItemTypeEnum.Sprint]: <DashboardSprintLayout />,
   [nativeItemTypeEnum.Ensemble]: <DashboardEnsembleUSLayout />,
 }

@@ -51,7 +51,7 @@ export const LeftPanel = () => {
       <span className="font-semibold text-lg my-4 text-center">{project.nom}</span>
       <Separator />
 
-      {project.children.map((child) => (
+      {project.sprints.map((child) => (
         <NewFileTree node={child} key={child.id} />
       ))}
 
