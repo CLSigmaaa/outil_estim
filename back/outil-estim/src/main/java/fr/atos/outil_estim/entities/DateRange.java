@@ -13,10 +13,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Getter @Setter @NoArgsConstructor
 public class DateRange {
 	@Column(name = "effective_date_from")
-	@JsonProperty("from")
 	private LocalDate from;
 	@Column(name = "effective_date_to")
-	@JsonProperty("to")
 	private LocalDate to;
 
 

@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,13 +38,13 @@ public class ProjectController {
 		return projectService.addProject(project);
 	}
 
-//	@PostMapping("/projects/{projectId}/items")
-//	public void addProjectItem(@PathVariable String projectId, @RequestParam(name = "itemType") String itemType) {
-//		projectService.(projectId, ItemType.fromString(itemType));
-//	}
+	@PutMapping(value = "/projects/{projectId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Project> updateProject(@PathVariable Long projectId, @RequestBody Project project) {
+		return projectService.updateProject(projectId, project);
+	}
 
-	@PutMapping(value = "/projects", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void updateProject(@RequestBody Project project) {
-		projectService.updateProject(project);
+	@DeleteMapping("/projects/{projectId}")
+	public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
+		return projectService.deleteProject(projectId);
 	}
 }

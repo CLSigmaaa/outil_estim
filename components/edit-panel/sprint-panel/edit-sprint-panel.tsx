@@ -3,17 +3,20 @@ import { Sprint } from "@/app/model/projet";
 import { DataTable } from "@/components/ui/data-table";
 
 import React from "react";
-import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   nativeStateEnum,
 } from "@/app/model/projet/itemEnum";
 import { deleteSprint, getProject } from "@/components/utils/api";
 import { SprintForm } from "@/components/forms/sprint-form";
-import { editSprintColumns } from "@/components/edit-panel/sprint-panel/edit-sprint-columns";
-import { deleteTaskToast, getProjectToast, getSprintToast } from "@/components/utils/toasts";
+import { EditSprintColumns } from "@/components/edit-panel/sprint-panel/edit-sprint-columns";
+import { deleteSprintToast, deleteTaskToast, getProjectToast, getSprintToast } from "@/components/utils/toasts";
+import { useProjectStore } from "@/store/useProjectStore";
+import { useTranslation } from "react-i18next";
 
-export default function EditSprintList({projectId}: {projectId: string}) {
+export default function EditSprintPanel({projectId}: {projectId: string}) {
+  const { t } = useTranslation();
+  const {selectedProject, setSelectedProject} = useProjectStore();
   const [sprintList, setSprintList] = React.useState<Sprint[]>([]);
 
   const [displayForm, setDisplayForm] = React.useState<boolean>(false);
@@ -25,32 +28,35 @@ export default function EditSprintList({projectId}: {projectId: string}) {
   function setSortedSprintList(SprintList: Sprint[]) {
     setSprintList(SprintList?.sort((a, b) => parseFloat(a.id) - parseFloat(b.id)) || []);
   }
-  // create a sample for SprintList
   React.useEffect(() => {
-    fetchSprintList();
-  }, []);
+    if (selectedProject == undefined) {
+      return;
+    }
+    setSortedSprintList(selectedProject.sprints);
+  }, [selectedProject]);
 
-  const fetchSprintList = async () => {
+  async function fetchProject() {
     var response = await getProject(projectId);
     if (response == undefined) {
       return;
     }
     if (!response.ok) {
-      getSprintToast(false);
+      getProjectToast(false);
       return;
     }
-    response.json().then((updatedProject) => {
-      setSortedSprintList(updatedProject.sprints);
+    response.json().then((project) => {
+      setSelectedProject(project);
     });
-  };
+  }
+  
 
-  function formatData(SprintList: Sprint[]) {
-    return SprintList.map((Sprint) => {
+  function formatData(sprintList: Sprint[]) {
+    return sprintList.map((sprint) => {
       return {
-        ...Sprint,
-        name: Sprint.name,
-        description: Sprint.description,
-        state: nativeStateEnum[Sprint.state],
+        ...sprint,
+        name: sprint.name,
+        description: sprint.description,
+        state: sprint.state,
       };
     });
   }
@@ -66,11 +72,11 @@ export default function EditSprintList({projectId}: {projectId: string}) {
       return;
     }
     if (!response.ok) {
-      deleteTaskToast(false);
+      deleteSprintToast(false);
       return;
     }
-    fetchSprintList();
-    deleteTaskToast(true);
+    fetchProject();
+    deleteSprintToast(true);
   }
 
   function closeForm() {
@@ -80,7 +86,9 @@ export default function EditSprintList({projectId}: {projectId: string}) {
 
   return (
     <div className="py-10">
-      {displayForm ? (
+       <p className="text-xl font-semibold">{selectedProject ? selectedProject.name : t("global.chargement")} </p>
+      <div className="py-5">
+        {displayForm ? (
         <SprintForm
           projectId={projectId}
           sprintToEdit={sprintToEdit}
@@ -89,15 +97,16 @@ export default function EditSprintList({projectId}: {projectId: string}) {
         />
       ) : (
         <div>
-          <Button onClick={() => setDisplayForm(true)}>
-            Ajouter un sprint
+          <Button className="mb-5" onClick={() => setDisplayForm(true)}>
+          {t("sprint.ajouterSprint")}
           </Button>
           <DataTable
             data={formatData(sprintList)}
-            columns={editSprintColumns(editSprint, handleDelete)}
+            columns={EditSprintColumns(editSprint, handleDelete, t)}
           />
         </div>
       )}
-    </div>
+      </div>
+      </div>
   );
 }

@@ -9,7 +9,6 @@ import { toast } from "@/components/ui/use-toast"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,26 +25,36 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
 import { nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from "@/app/model/projet/itemEnum"
-import { Task, TaskData } from "@/app/model/projet"
+import { Sprint, Task, TaskData } from "@/app/model/projet"
 import { getSprint, getTask, postTask, updateTask } from "@/components/utils/api"
 import { getSprintToast, getTaskToast, postTaskToast, updateTaskToast } from "@/components/utils/toasts"
+import { Checkbox } from "@/components/ui/checkbox"
+import { assignTaskUtil } from "@/components/utils/taskListUtil"
+import { useProjectStore } from "@/store/useProjectStore"
+import { Separator } from "@/components/ui/separator"
+import { useTranslation } from "react-i18next"
 
 
-export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintId }:{taskToEdit: Task | undefined, setTaskList: any, closeForm: any, projectId: string, sprintId: string}) => {
+export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, updateSprintInfos }:{taskToEdit: Task | undefined, closeForm: Function, projectId: string, userId: string, sprint: Sprint | undefined, updateSprintInfos: Function}) => {
+  const { t } = useTranslation();
+  const { setSelectedSprint } = useProjectStore();
+  
   const form = useForm({
     resolver: zodResolver(createTaskFormSchema),
-    defaultValues: taskToEdit ? taskToEdit : {
+    defaultValues: taskToEdit ? {...taskToEdit, assignTask: false} : {
       name: "",
       description: "",
       priority: undefined,
       state: undefined,
+      assignTask: false,
     },
   })
 
-    
-    
-
   const onSubmit = async (data: any) => {
+    if (sprint == undefined) {
+      getSprintToast(false);
+      return;
+    }
     var taskData: TaskData = {
       name: data.name,
       description: data.description,
@@ -55,7 +64,7 @@ export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintI
       effectiveDates: { from: new Date(), to: new Date() },
       type: nativeItemTypeEnum.TASK,
     }
-    var response = taskToEdit ? await updateTask(projectId, sprintId, taskToEdit.id, taskData) : await postTask(projectId, sprintId, taskData);
+    var response = taskToEdit ? await updateTask(projectId, sprint.id, taskToEdit.id, taskData) : await postTask(projectId, sprint.id, taskData);
     if (response == undefined) {
       return;
     }
@@ -63,60 +72,34 @@ export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintI
       taskToEdit ? updateTaskToast(false) : postTaskToast(false);
       return;
     }
-    response.json().then(async (newTask) => { // UpdateTask return the updated task and postTask return the sprint
+    response.json().then(async (newTask) => { 
       
       if (newTask == null) {
         taskToEdit ? updateTaskToast(false) : postTaskToast(false);
         return;
       }
-      response = await getSprint(projectId, sprintId);
-      if (response == undefined) {
-        return;
+      if (data.assignTask) {
+        assignTaskUtil(projectId, sprint.id, newTask.id, userId, setSelectedSprint);
       }
-      if (!response.ok) {
-        getTaskToast(false);
-        return;
-      }
-      response.json().then((updatedSprint) => {
-        setTaskList(updatedSprint.tasks);
-        taskToEdit ? updateTaskToast(true) : postTaskToast(true);
-      });
 
-      
+      updateSprintInfos();
+      taskToEdit ? updateTaskToast(true) : postTaskToast(true);
       closeForm();
     });
     
     updateTaskToast(true);
   }
 
-  // function resetform() {
-  //   form.reset({
-  //     name: selectedItem.nom,
-  //     id: selectedItem.id,
-  //     description: selectedItem.description,
-  //     priorite: selectedItem.priorite,
-  //     statut: selectedItem.statut,
-  //     datesEffectives: {
-  //       from: selectedItem.datesEffectives.from,
-  //       to: selectedItem.datesEffectives.to,
-  //     },
-  //     version: selectedItem.version,
-  //     estimation_initiale: selectedItem.estimation || 0,
-  //     commentaires: selectedItem.commentaires,
-  //   })
-  // }
-
   const [displayCalendar, setDisplayCalendar] = React.useState(taskToEdit?.state != nativeStateEnum.A_FAIRE);
 
   React.useEffect(() => {
-    // resetform(); 
     setDisplayCalendar(taskToEdit?.state != nativeStateEnum.A_FAIRE);
   }, [taskToEdit])
 
 
   return (
     <>
-      <h1 className="font-bold mb-2 p-1">{taskToEdit ? `Informations sur ${taskToEdit.name}` : "Ajouter une tâche" }</h1>
+      <h1 className="font-bold mb-2 p-1">{taskToEdit ? `${t("actions.modifier")} ${taskToEdit.name}` : t("tache.ajouterTache") }</h1>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -140,10 +123,10 @@ export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintI
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nom {createTaskFormSchema.shape['name'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>{t("global.nom")} {createTaskFormSchema.shape['name'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <FormControl>
-                  <Input placeholder="Nom tâche" {...field} />
+                  <Input placeholder={t("tache.nom")} {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -153,11 +136,11 @@ export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintI
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description {createTaskFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>{t("global.description")} {createTaskFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <FormControl>
                   <Textarea
-                    placeholder="Description de la tâche"
+                    placeholder={t("tache.description")}
                     className="resize-none"
                     {...field}
                   />
@@ -170,11 +153,11 @@ export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintI
             name="priority"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Priorité {createTaskFormSchema.shape['priority'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>{t("global.priorite")} {createTaskFormSchema.shape['priority'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner une priorité" />
+                      <SelectValue placeholder={t("actions.selectionnerPriorite")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -198,7 +181,7 @@ export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintI
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>État des US {createTaskFormSchema.shape['state'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>{t("tache.etat")} {createTaskFormSchema.shape['state'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <Select onValueChange={(value) => {
                   setDisplayCalendar(value != nativeStateEnum.A_FAIRE)
@@ -207,7 +190,7 @@ export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintI
                   value={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un état pour la tâche" />
+                      <SelectValue placeholder={t("tache.selectionnerEtat")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -216,7 +199,7 @@ export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintI
                         <SelectItem
                           key={item}
                           value={item}>
-                          {item}
+                          <div className={item == nativeStateEnum.EN_COURS ? "text-red-600" : (item == nativeStateEnum.TERMINEE ? "text-green-600" : "")}>{item}</div>
                         </SelectItem>
                       )
                     })}
@@ -225,69 +208,36 @@ export const TaskForm = ({taskToEdit, setTaskList, closeForm, projectId, sprintI
               </FormItem>
             )}
           />
-          {/* {displayCalendar ?
-            <FormField
-              control={form.control}
-              name="datesEffectives"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Date de lancement et de fin estimée</FormLabel>
-                  <FormMessage />
-                  <Popover modal={true}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        id="date"
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !field.value.from && "text-muted-foreground"
-                        )}
-                        aria-label="dateLancementEstimee"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value.from ? (
-                          field.value.to ? (
-                            <div aria-label="dateLancementEstimeeFull">
-                              {format(field.value.from, "LLL dd, y")} -{" "}
-                              {format(field.value.to, "LLL dd, y")}
-                            </div>
-                          ) : (
-                            <div aria-label="dateLancementEstimeeStart">
-                              {format(field.value.from, "LLL dd, y")}
-                            </div>
-                          )
-                        ) : (
-                          <span aria-label="dateLancementEstimeeEmpty">Pick a date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="center">
-                      <Calendar
-                        initialFocus
-                        mode="range"
-                        defaultMonth={field.value.from}
-                        selected={{
-                          from: field.value.from!,
-                          to: field.value.to,
-                        }}
-                        onSelect={field.onChange}
-                        numberOfMonths={2}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </FormItem>
-              )}
-            /> : ""} */}
-         
-         <Button className="mt-2" onClick={closeForm}>Annuler</Button>
+          {taskToEdit ? "" :<FormField
+          control={form.control}
+          name="assignTask"
+          render={({ field }) => (
+            <FormItem className="flex gap-2 ml-1 mt-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                {t("tache.sAssignerTache")}
+                </FormLabel>
+              </div>
+            </FormItem>
+          )}
+        /> }
+        <Separator className="my-5"/>
+        <div className="flex gap-2 mt-2">
+        <Button variant={"outline"} onClick={closeForm as React.MouseEventHandler<HTMLButtonElement>}>Annuler</Button>
           <Button
-            className="mt-2"
             type="submit"
             data-testid="TaskFormSubmitBtn"
             disabled={!form.formState.isValid}
           >
-            {taskToEdit ? "Modifier" : "Ajouter"}
+            {taskToEdit ? t("actions.modifier") : t("actions.ajouter")}
           </Button>
+          </div>
         </form>
       </Form>
     </>

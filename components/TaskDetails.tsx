@@ -1,19 +1,21 @@
 import { Task } from "@/app/model/projet";
+import { nativePriorityEnum, nativeStateEnum } from "@/app/model/projet/itemEnum";
 import BurnUp from "@/components/burn-down/burn-up";
 import { Button } from "@/components/ui/button";
 import { DeleteItemButton } from "@/components/ui/delete-button";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import { deleteEstimation, getTask } from "@/components/utils/api";
-import { deleteEstimationToast, getTaskToast } from "@/components/utils/toasts";
+import { deleteEstimationToast, getEstimationToast, getTaskToast } from "@/components/utils/toasts";
+import { useProjectStore } from "@/store/useProjectStore";
+import { format } from "date-fns";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function TaskDetails({projectId, sprintId, taskId}: {projectId: string, sprintId: string, taskId: string}) {
-  const [displayedTask, setDisplayedTask] = React.useState<Task | undefined>(undefined);
-  React.useEffect( () => {
-    fetchTask(taskId);
-  }, []);
-
+  const { t } = useTranslation();
+  const {selectedTask, setSelectedTask} = useProjectStore();
   const fetchTask = async (taskId: string) => {
     var response = await getTask(projectId, sprintId, taskId);
     if (response == undefined) {
@@ -30,8 +32,7 @@ export default function TaskDetails({projectId, sprintId, taskId}: {projectId: s
           date: new Date(estim.date),
         };
       });
-      setDisplayedTask(task);
-      deleteEstimationToast(true);
+      setSelectedTask(task);
     });
   };
 
@@ -41,44 +42,49 @@ export default function TaskDetails({projectId, sprintId, taskId}: {projectId: s
     });
   }
 
-  if (displayedTask === undefined || displayedTask === {} as Task) {
-    return <div>Chargement...</div>;
+  if (selectedTask === undefined || selectedTask === {} as Task) {
+    return <div>{t("global.chargement")}</div>;
   }
 
   return (
     <div className="flex w-full">
-    <div className="flex flex-col justify-center w-1/2 items-center">
-      <p className="text-2xl font-semibold">TaskDetails</p>
-      <p>Nom: {displayedTask?.name}</p>
-      <p>Description: {displayedTask?.description}</p>
-      <p>Priorité: {displayedTask?.priority}</p>
-      <p>Statut: {displayedTask?.state}</p>
-      {displayedTask.estimationList.length != 0 ? (
+    <div className="flex flex-col w-1/2 p-4 gap-2 border rounded">
+      <p className="text-2xl font-semibold self-center">{t("actions.details")}</p>
+      <div className="flex gap-1"><p className="font-semibold">{t("global.nom")}:</p> {selectedTask.name}</div>
+      <div className="flex gap-1">
+        <p className="font-semibold">{t("global.description")}:</p> 
+        <p className="overflow-auto max-h-40">{selectedTask.description}</p>
+      </div>
+      <div className="flex gap-1"><p className="font-semibold">{t("global.priorite")}:</p> {selectedTask.priority}</div>
+      <div className="flex gap-1"><p className="font-semibold">{t("global.statut")}:</p> {selectedTask.state}</div>
+      <div className="flex gap-1"><p className="font-semibold">{t("global.responsable")}:</p> {selectedTask.estimUser?.firstName +" "+ selectedTask.estimUser?.lastName  || t("global.aucunReponsable")}</div>
+      {selectedTask.estimationList.length != 0 ? (
         <Tabs
-          defaultValue={displayedTask?.estimationList[displayedTask.estimationList.length - 1].id}
-          className="w-[400px]"
+          defaultValue={""}
         >
-          <TabsList className="flex w-full justify-between">
-            {displayedTask?.estimationList.map((estim, index) => (
-              <TabsTrigger key={estim.id} value={estim.id}>{index}</TabsTrigger>
+          <TabsList className="flex flex-grow mb-2">
+            {selectedTask.estimationList.map((estim, index) => (
+              <TabsTrigger className="flex flex-grow" key={estim.id} value={estim.id}>{index}</TabsTrigger>
             ))}
           </TabsList>
-          {displayedTask?.estimationList.map((estim) => (
-            <TabsContent key={estim.id} value={estim.id}>
-              <p>Date: {estim.date.toString()}</p>
-              <p>Consommée: {estim.consommee}</p>
-              <p>Reste à faire: {estim.resteAFaire}</p>
-              <p>Cause écart: {estim.causeEcart}</p>
-            <DeleteItemButton handleClick={() => handleDelete(sprintId, taskId, estim.id)}/>
+          {selectedTask.estimationList.map((estim) => (
+            <TabsContent key={estim.id} value={estim.id} className="flex flex-col gap-2 mt-0">
+              <div className="flex gap-1"><p className="font-semibold">{t("estimation.date")}:</p> {format(estim.date, 'dd-MM-yyyy')}</div>
+              <div className="flex gap-1"><p className="font-semibold">{t("estimation.consommee")}:</p> {estim.consommee}</div>
+              <div className="flex gap-1"><p className="font-semibold">{t("estimation.resteAFaire")}:</p> {estim.resteAFaire}</div>
+              <div className="flex gap-1"><p className="font-semibold">{t("estimation.causeEcart")}:</p> {estim.causeEcart}</div>
+              <Separator className="my-4"/>
+            <DeleteItemButton text={"Supprimer estimation"} handleClick={() => handleDelete(sprintId, taskId, estim.id)}/>
             </TabsContent>
             
           ))}
         </Tabs>
       ) : (
-        <p>Pas d'estimation</p>
+        <p>{t("estimation.aucune")}</p>
       )}
     </div>
-    {displayedTask.estimationList.length != 0 ? <BurnUp task={displayedTask}/> : "Pas d'estimations saisies"}
+    {selectedTask.estimationList.length != 0 ? <BurnUp task={selectedTask}/> 
+    : <div className="flex flex-grow justify-center items-center">{t("estimation.aucune")}</div>}
     </div>
   );
 }

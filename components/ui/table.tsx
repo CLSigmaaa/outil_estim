@@ -1,12 +1,13 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { nativeStateEnum } from "@/app/model/projet/itemEnum"
 
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto px-2">
+  <div className="relative w-full overflow-auto px-2 bg-white rounded-md">
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm", className)}
@@ -73,8 +74,8 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-12 px-2 max-w-[50px] pe-0 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
-      className, props.children.props.column.id === "actions" ? "w-[60px]" : "" // Impose la width pour la colonne actions
+      "h-12 px-2  pe-0 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      className,  (props.children as any)?.props?.column.id === "causeEcart" ? "w-[360px]" : ""// Impose la width pour la colonne actions
     )}
     {...props}
   />
@@ -84,17 +85,24 @@ TableHead.displayName = "TableHead"
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) =>  (<td
+>(({ className, ...props }, ref) =>{
+  var textClass = "";
+  if ((props.children as any)?.props?.column?.id === "state") {
+    textClass = "font-semibold ";
+    textClass += (props.children as any)?.props?.row?.original?.state === nativeStateEnum.TERMINEE ? "text-green-600" 
+    : (props.children as any)?.props?.row?.original?.state === nativeStateEnum.EN_COURS ? "text-red-600" : "";
+
+  }
+  return (<td
     ref={ref}
-    className={cn("p-2  align-middle [&:has([role=checkbox])]:pr-0",
-        className,
-        
+    className={cn("p-2 align-middle [&:has([role=checkbox])]:pr-0",
+        className, textClass // Change la couleur du texte si la tâche est terminée
         
       )}
     {...props}
   />
   
-))
+)})
 TableCell.displayName = "TableCell"
 
 const TableCaption = React.forwardRef<

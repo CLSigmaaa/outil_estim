@@ -12,10 +12,12 @@ import { useForm, UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { createTaskEstimFormSchema } from "@/schemas/forms/task-estim";
 import React from "react";
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronUp, EyeIcon } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import i18next from "@/app/i18n";
+import { useTranslation } from "react-i18next";
 
 export type EstimInfo = {
   nomTache: string;
@@ -43,9 +45,8 @@ const header = ({column, title}:{column: Column<EstimInfo, unknown>, title: stri
   )
 }
 
-export function estimTableColumns(submitEstimation: any): ColumnDef<EstimInfo>[] {
-  const path = usePathname(); 
-
+export function EstimAssignedColumns(submitEstimation: Function, t: Function): ColumnDef<EstimInfo>[] {
+  const path = usePathname();
   var formDict: {
     [key: string]: UseFormReturn<
       { consommee: number; resteAFaire: number; causeEcart: string },
@@ -54,54 +55,61 @@ export function estimTableColumns(submitEstimation: any): ColumnDef<EstimInfo>[]
     >;
   } = {};
 
-  function defineForm(rowId: string) {
-    if (formDict[rowId] === undefined) {
-      formDict[rowId] = useForm({
-        resolver: zodResolver(createTaskEstimFormSchema),
-        defaultValues: {
-          consommee: "",
-          resteAFaire: "",
-          causeEcart: "",
-        },
-      });
+  function DefineForm(taskId: string) {
+    var newForm = useForm({
+      // On ne peut appeler de Hook dans un bloc conditionnel
+      resolver: zodResolver(createTaskEstimFormSchema),
+      defaultValues: {
+        consommee: "",
+        resteAFaire: "",
+        causeEcart: "",
+      },
+    });
+    if (formDict[taskId] == undefined) {
+      formDict[taskId] = newForm as any;
     }
   }
 
   return [
     {
       accessorKey: "nomTache",
-      header: ({column}) => header({column, title: "Nom"}),
+      header: ({column}) => header({column, title: t("global.nom")}),
+      cell: ({ row }) => (
+        <div className="whitespace-pre-line overflow-auto max-h-16">
+          {row.original.nomTache}
+        </div>
+      ),
     },
     {
       accessorKey: "estimationInitiale",
-      header: ({column}) => header({column, title: "Estimation initiale"}),
+      header: ({column}) => header({column, title: t("estimation.estimationInitiale")}),
     },
     {
       accessorKey: "consommee",
-      header: ({column}) => header({column, title: "Consommée"}),
+      header: ({column}) => header({column, title: t("estimation.consommee")}),
     },
     {
       accessorKey: "resteAFaire",
-      header: ({column}) => header({column, title: "Dernier reste à faire"}),
+      header: ({column}) => header({column, title: t("estimation.dernierResteAFaire")}),
     },
     {
       accessorKey: "newConsommee",
-      header: () => "Nouveau consommée",
+      header: () => t("estimation.nouveauConsommee"),
       cell: ({ row }) => {
-        defineForm(row.id);
+        DefineForm(row.original.id);
 
         return (
-          <div className="flex flex-grow">
-          <Form {...formDict[row.id]}>
+          <div className="flex flex-grow min-w-32">
+          <Form {...formDict[row.original.id]}>
             <FormField
-              control={formDict[row.id].control}
+              control={formDict[row.original.id].control}
               name="consommee"
               render={({ field }) => (
                 <FormItem className="flex flex-grow mb-0 w-min ">
                   <FormMessage />
                   <FormControl>
                     <Input
-                      placeholder="Nouveau consommée"
+                      placeholder={t("estimation.nouveauConsommee")}
                       className="resize-none"
                       {...field}
                     />
@@ -116,22 +124,22 @@ export function estimTableColumns(submitEstimation: any): ColumnDef<EstimInfo>[]
     },
     {
       accessorKey: "newResteAFaire",
-      header: () => "Nouveau reste à faire",
+      header: () => t("estimation.nouveauResteAFaire"),
       cell: ({ row }) => {
-        defineForm(row.id);
+        DefineForm(row.original.id);
 
         return (
-          <div className="flex flex-grow">
-          <Form {...formDict[row.id]}>
+          <div className="flex flex-grow min-w-32">
+          <Form {...formDict[row.original.id]}>
             <FormField
-              control={formDict[row.id].control}
+              control={formDict[row.original.id].control}
               name="resteAFaire"
               render={({ field }) => (
                 <FormItem className="flex flex-grow mb-0 w-min">
                   <FormMessage />
                   <FormControl>
                     <Input
-                      placeholder="Nouveau reste à faire"
+                      placeholder={t("estimation.nouveauResteAFaire")}
                       className="resize-none"
                       {...field}
                     />
@@ -146,22 +154,22 @@ export function estimTableColumns(submitEstimation: any): ColumnDef<EstimInfo>[]
     },
     {
       accessorKey: "causeEcart",
-      header: () => <div className="">Cause de l'écart</div>,
+      header: () => <div>{t("estimation.causeEcart")}</div>,
       cell: ({ row }) => {
-        defineForm(row.id);
+        DefineForm(row.original.id);
 
         return (
           
-          <Form {...formDict[row.id]}>
+          <Form {...formDict[row.original.id]}>
             <FormField
-              control={formDict[row.id].control}
+              control={formDict[row.original.id].control}
               name="causeEcart"
               render={({ field }) => (
                 <FormItem className="mb-0">
                   <FormMessage />
                   <FormControl>
                     <Textarea
-                      placeholder="Cause de l'écart"
+                      placeholder={t("estimation.causeEcart")}
                       className="resize-none min-h-min px-0"
                       {...field}
                     />
@@ -175,20 +183,20 @@ export function estimTableColumns(submitEstimation: any): ColumnDef<EstimInfo>[]
     },
     {
       accessorKey: "actions",
-      header: () => <div className=" pe-2 flex justify-center ">Actions</div>,
+      header: () => <div className=" pe-2 flex justify-center ">{t("global.actions")}</div>,
       cell: ({ row }) => (
         <div className="flex justify-center items-center gap-4 ">
-          <Form {...formDict[row.id]}>
+          <Form {...formDict[row.original.id]}>
           <Button
             type="submit"
-            onClick={() => formDict[row.id].handleSubmit(submitEstimation(formDict[row.id], row.id))}
-            disabled={!formDict[row.id] == undefined}
+            onClick={() => formDict[row.original.id].handleSubmit(submitEstimation(formDict[row.original.id], row.original.id))}
+            disabled={!formDict[row.original.id] == undefined}
           >
-            Sauvegarder
+            {t("actions.confirmer")}
           </Button>
           </Form>
           <Link href={`${path}/${row.original.id}`}>
-          <Button > Aperçu </Button>
+          <Button  className="flex items-center gap-2"> <EyeIcon /> {t("actions.details")} </Button>
           </Link>
         </div>
       ),

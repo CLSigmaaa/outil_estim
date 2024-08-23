@@ -1,13 +1,13 @@
 export enum nativePriorityEnum {
-    MINEURE = "MINEURE",
-    MAJEURE = "MAJEURE",
-    CRITIQUE = "CRITIQUE",
+    MINEURE = "Mineure",
+    MAJEURE = "Majeure",
+    CRITIQUE = "Critique",
 }
 
 export enum nativeStateEnum {
-    A_FAIRE = "A_FAIRE",
-    EN_COURS = "EN_COURS",
-    TERMINEE = "TERMINEE",
+    EN_COURS = "En cours",
+    A_FAIRE = "A faire",
+    TERMINEE = "Terminee",
 }
 
 export enum nativeItemTypeEnum {

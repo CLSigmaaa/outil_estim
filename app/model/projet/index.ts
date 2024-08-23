@@ -5,21 +5,25 @@ export type Estimation = {id: string, date: Date, consommee: number, resteAFaire
 
 export type TaskData = {name: string, description: string, priority: nativePriorityEnum, state: nativeStateEnum, estimationList: Estimation[], effectiveDates: {from: Date, to: Date}, type: nativeItemTypeEnum};
 
+export type EstimUser = {id: string, firstName: string, lastName: string, email: string};
+
 export class Task {
     name: string;
     description: string;
     id: string;
+    estimUser: EstimUser;
     priority: nativePriorityEnum;
     state: nativeStateEnum;
     estimationList: Estimation[];
     effectiveDates: { from: Date, to: Date };
     type: nativeItemTypeEnum;
 
-    constructor(name: string, description: string, id: string, priority: nativePriorityEnum, state: nativeStateEnum, 
-        estimationList: Estimation[], effectivesDates: { from: Date, to: Date }, type: nativeItemTypeEnum) {
+    constructor(name: string, description: string, id: string, priority: nativePriorityEnum, estimUser: EstimUser,
+        state: nativeStateEnum, estimationList: Estimation[], effectivesDates: { from: Date, to: Date }, type: nativeItemTypeEnum) {
         this.name = name;
         this.description = description;
         this.id = id;
+        this.estimUser = estimUser;
         this.priority = priority;
         this.state = state;
         this.estimationList = estimationList;
@@ -51,14 +55,14 @@ export class Sprint {
     }
 }
 
-export class Projet {
-    nom: string;
+export class Project {
+    name: string;
     description: string;
     id: string;
     sprints: Sprint[];
     childNb: number;
-    constructor(nom: string, description: string, sprints: Sprint[], id: string, childNb: number) {
-        this.nom = nom;
+    constructor(name: string, description: string, sprints: Sprint[], id: string, childNb: number) {
+        this.name = name;
         this.description = description;
         this.sprints = sprints;
         this.id = id;
@@ -69,8 +73,8 @@ export type Sprint_Data = {
     burn: BurnCharts,
     totalPoints: number,
     donePoints: number,
-    stateStats: stateStats,
-    priorityStats: prorityStats
+    // stateStats: stateStats,
+    // priorityStats: prorityStats
 }
 
 export type BurnCharts = {
@@ -84,14 +88,3 @@ export type BurnCharts = {
     }];
 }
 
-export type stateStats = {
-    [nativeStateEnum.Terminee]: number;
-    [nativeStateEnum.En_Cours]: number;
-    [nativeStateEnum.A_Faire]: number;
-};
-
-export type prorityStats = {
-    [nativePriorityEnum.Mineure]: number;
-    [nativePriorityEnum.Majeure]: number;
-    [nativePriorityEnum.Critique]: number;
-};

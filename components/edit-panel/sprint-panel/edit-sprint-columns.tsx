@@ -1,11 +1,12 @@
 import { Column, ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronUp, EditIcon } from "lucide-react"
 import { Sprint } from "@/app/model/projet";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DeleteItemButton } from "@/components/ui/delete-button";
+import { useTranslation } from "react-i18next";
 
 
 const header = ({column, title}:{column: Column<Sprint, unknown>, title: string}) => {
@@ -23,39 +24,40 @@ const header = ({column, title}:{column: Column<Sprint, unknown>, title: string}
   )
 }
 
-export function editSprintColumns(editSprint: any, handleDelete: any): ColumnDef<Sprint>[] {
+export function EditSprintColumns(editSprint: Function, handleDelete: Function, t: Function): ColumnDef<Sprint>[] {
   const path = usePathname();
 
   return [
     {
       accessorKey: "name",
-      header: ({column}) => header({column, title: "Nom"}),
+      header: ({column}) => header({column, title: t("global.nom")}),
     },
     {
       accessorKey: "description",
-      header: ({column}) => header({column, title: "Description"}),
+      header: ({column}) => header({column, title: t("global.description")}),
     },
     {
       accessorKey: "state",
-      header: ({column}) => header({column, title: "Statut"}),
+      header: ({column}) => header({column, title: t("global.statut")}),
     },
     {
       accessorKey: "actions",
-      header: () => <div className=" pe-2 flex justify-center ">Actions</div>,
+      header: () => <div className=" pe-2 flex justify-center ">{t("global.actions")}</div>,
       cell: ({ row }) => (
         <div className="flex justify-center items-center gap-4 ">
+          <Link href={`${path}/${row.original.id}/tasks`}>
+            <Button> {t("actions.estimer")}  </Button>
+          </Link>
           <Button
+          className="flex items-center gap-2"
             type="submit"
             onClick={() => {
               editSprint(row.original)}}
           >
-            Modifier
+            <EditIcon />
+            {t("actions.modifier")}
           </Button>
-          
-          <Link href={`${path}/${row.original.id}/tasks`}>
-            <Button> Estimation </Button>
-          </Link>
-           <DeleteItemButton handleClick={() => handleDelete(row.original.id)}/>
+           <DeleteItemButton text={t("actions.supprimer.titre")} handleClick={() => handleDelete(row.original.id)}/>
         </div>
       ),
     },

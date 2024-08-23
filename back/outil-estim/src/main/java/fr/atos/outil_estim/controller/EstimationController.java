@@ -39,8 +39,8 @@ public class EstimationController {
 	}
 
 	@DeleteMapping(value = "/estimations/{estimationId}")
-	public ResponseEntity<Void> deleteEstimation(@PathVariable Long estimationId) {
-		return estimationService.deleteEstimation(estimationId);
+	public ResponseEntity<Void> deleteEstimation(@PathVariable Long taskId, @PathVariable Long estimationId) {
+		return estimationService.deleteEstimation(taskId, estimationId);
 	}
 
 

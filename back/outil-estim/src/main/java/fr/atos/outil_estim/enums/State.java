@@ -11,4 +11,12 @@ public enum State {
 			default -> throw new IllegalArgumentException("Unknown state: " + state);
 		};
 	}
+
+	public static String toString(State state) {
+		return switch (state) {
+			case A_FAIRE -> "A faire";
+			case EN_COURS -> "En cours";
+			case TERMINEE -> "Terminee";
+		};
+	}
 }

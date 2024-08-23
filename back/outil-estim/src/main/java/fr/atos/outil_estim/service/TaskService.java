@@ -77,13 +77,12 @@ public class TaskService {
 	}
 
 	@Transactional
-	public ResponseEntity<Void> editTaskState(Long taskId, State state) {
+	public ResponseEntity<Task> editTaskState(Long taskId, State state) {
 		try {
 			Task task = taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException(TASK_NOT_FOUND + taskId));
 			updateDate(task, state);
 			task.setState(state);
-			taskRepository.save(task);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.ok(taskRepository.save(task));
 		} catch (IllegalArgumentException e) {
 			return Error.errorFromException(e);
 		}

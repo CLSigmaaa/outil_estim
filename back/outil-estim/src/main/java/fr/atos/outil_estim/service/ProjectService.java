@@ -41,7 +41,6 @@ public class ProjectService {
 		} catch (IllegalArgumentException e) {
 			return Error.errorFromException(e);
 		}
-
 	}
 
 	public ResponseEntity<List<Project>> getProjects() {
@@ -52,21 +51,23 @@ public class ProjectService {
 		}
 	}
 
-	public ResponseEntity<Project> updateProject(Project project) {
+	@Transactional
+	public ResponseEntity<Project> updateProject(Long projectId, Project newProject) {
 
 		try {
-			Project projectToUpdate = projectRepository.findById(project.getId())
-					.orElseThrow(() -> new IllegalArgumentException("Project with id " + project.getId() + " not found"));
-			projectToUpdate.setName(project.getName());
-			projectToUpdate.setDescription(project.getDescription());
-			projectToUpdate.setChildNumber(project.getChildNumber());
-			updateProjectChildren(project, projectToUpdate);
+			Project projectToUpdate = projectRepository.findById(projectId)
+					.orElseThrow(() -> new IllegalArgumentException("Project with id " + projectId + " not found"));
+			projectToUpdate.setName(newProject.getName());
+			projectToUpdate.setDescription(newProject.getDescription());
+			projectToUpdate.setChildNumber(newProject.getChildNumber());
+			updateProjectChildren(newProject, projectToUpdate);
 			return ResponseEntity.ok(projectRepository.save(projectToUpdate));
 		} catch (IllegalArgumentException e) {
 			return Error.errorFromException(e);
 		}
 	}
 
+	@Transactional
 	public ResponseEntity<Void> deleteProject(Long projectId) {
 		try {
 			Project project = projectRepository.findById(projectId)

@@ -15,9 +15,10 @@ export default function RootLayout({
   children: React.ReactNode, breadcrumbs: React.ReactNode
 }>) {
   return (
+      
     <html lang="fr">
-      <body className={`h-screen flex flex-col ${inter.className}`}>
-        <div className="p-2 px-10 border-b-2">{breadcrumbs }</div>
+      <body className={`h-screen flex flex-col ${inter.className} bg-gray-100`}>
+        <div className="p-2 px-10 border-b-2 bg">{breadcrumbs }</div>
         <div className="p-2 px-10">{children}</div>
         <Toaster />
       </body>

@@ -21,7 +21,10 @@ import {
 
 import { Estimation, Task } from "@/app/model/projet"
 
+import { useTranslation } from "react-i18next"
+
 export default function BurnUp({ task }: { task: Task }) {
+    const { t } = useTranslation();
 
     const [burnUpData, setBurnUpData] = React.useState([{}]);
     
@@ -70,14 +73,14 @@ export default function BurnUp({ task }: { task: Task }) {
                         <ChartTooltip />
                         <Line
                             dataKey="consommee"
-                            name="Consommée"
+                            name={t("estimation.consommee")}
                             type="stepAfter"
                             stroke="green"
                             dot={false}
                         />
                         <Line
                             dataKey="workScope"
-                            name="Work scope"
+                            name={t("estimation.resteAFaire")}
                             type="stepAfter"
                             stroke="red"
                             dot={false}

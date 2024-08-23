@@ -28,10 +28,13 @@ import { Sprint, SprintData } from "@/app/model/projet"
 import { getProject, postSprint, updateSprint, } from "@/components/utils/api"
 import { createSprintFormSchema } from "@/schemas/forms/sprint"
 import {  getProjectToast, getSprintToast, postSprintToast, updateSprintToast } from "@/components/utils/toasts"
+import { Separator } from "@/components/ui/separator"
+import { useTranslation } from "react-i18next"
 
 
 
 export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{projectId: string, sprintToEdit: Sprint | undefined, setSprintList: any, closeForm: any}) => {
+  const { t } = useTranslation();
   const form = useForm({
     resolver: zodResolver(createSprintFormSchema),
     defaultValues: sprintToEdit ? sprintToEdit : {
@@ -41,11 +44,8 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
     },
   })
 
-    
-    
-
   const onSubmit = async (data: any) => {
-    var sprintData: SprintData = {
+    var sprintData: any = {
       name: data.name,
       description: data.description,
       state: data.state,
@@ -59,9 +59,9 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
       sprintToEdit ? updateSprintToast(false) : postSprintToast(false);
       return;
     }
-    response.json().then(async (newSprint) => { // UpdateSprint return the updated Sprint and postSprint return the sprint
+    response.json().then(async (newSprint) => {
       
-      if (!response.ok || newSprint == null) {
+      if (!response?.ok || newSprint == null) {
         sprintToEdit ? updateSprintToast(false) : postSprintToast(false);
         return;
       }
@@ -77,46 +77,27 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
         setSprintList(updatedProject.sprints);
       });
 
-      // setSprintList((prev: Sprint[]) => [...prev, newSprint]);
       closeForm();
     });
     
     sprintToEdit ? updateSprintToast(true) : postSprintToast(true);
   }
 
-  // function resetform() {
-  //   form.reset({
-  //     name: selectedItem.nom,
-  //     id: selectedItem.id,
-  //     description: selectedItem.description,
-  //     priorite: selectedItem.priorite,
-  //     statut: selectedItem.statut,
-  //     datesEffectives: {
-  //       from: selectedItem.datesEffectives.from,
-  //       to: selectedItem.datesEffectives.to,
-  //     },
-  //     version: selectedItem.version,
-  //     estimation_initiale: selectedItem.estimation || 0,
-  //     commentaires: selectedItem.commentaires,
-  //   })
-  // }
-
   const [displayCalendar, setDisplayCalendar] = React.useState(sprintToEdit?.state != nativeStateEnum.A_FAIRE);
 
   React.useEffect(() => {
-    // resetform(); 
     setDisplayCalendar(sprintToEdit?.state != nativeStateEnum.A_FAIRE);
   }, [sprintToEdit])
 
 
   return (
     <>
-      <h1 className="font-bold mb-2 p-1">{sprintToEdit ? `Modifier ${sprintToEdit.name}` : "Ajouter un sprint" }</h1>
+      <h1 className="font-bold mb-2">{sprintToEdit ? `${t("actions.modifier")} ${sprintToEdit.name}` : t("sprint.ajouterSprint") }</h1>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           aria-label="submitSprintForm"
-          className="w-full overflow-y-auto px-1"
+          className="w-full overflow-y-auto"
         >
           <FormField
             control={form.control}
@@ -135,10 +116,10 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nom {createSprintFormSchema.shape['name'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>{t("global.nom")} {createSprintFormSchema.shape['name'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <FormControl>
-                  <Input placeholder="Nom du sprint" {...field} />
+                  <Input placeholder={t("sprint.nom")} {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -148,11 +129,11 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description {createSprintFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>{t("global.description")} {createSprintFormSchema.shape['description'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <FormControl>
                   <Textarea
-                    placeholder="Description du sprint"
+                    placeholder={t("sprint.description")}
                     className="resize-none"
                     {...field}
                   />
@@ -165,7 +146,7 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>État du sprint {createSprintFormSchema.shape['state'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
+                <FormLabel>{t("sprint.etat")} {createSprintFormSchema.shape['state'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
                 <Select onValueChange={(value) => {
                   setDisplayCalendar(value != nativeStateEnum.A_FAIRE)
@@ -174,7 +155,7 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
                   value={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un état pour le sprint" />
+                      <SelectValue placeholder={t("sprint.selectionnerEtat")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -183,7 +164,7 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
                         <SelectItem
                           key={item}
                           value={item}>
-                          {item}
+                          <div className={item == nativeStateEnum.EN_COURS ? "text-red-600" : (item == nativeStateEnum.TERMINEE ? "text-green-600" : "")}>{item}</div>
                         </SelectItem>
                       )
                     })}
@@ -192,69 +173,17 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
               </FormItem>
             )}
           />
-          {/* {displayCalendar ?
-            <FormField
-              control={form.control}
-              name="datesEffectives"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Date de lancement et de fin estimée</FormLabel>
-                  <FormMessage />
-                  <Popover modal={true}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        id="date"
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !field.value.from && "text-muted-foreground"
-                        )}
-                        aria-label="dateLancementEstimee"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value.from ? (
-                          field.value.to ? (
-                            <div aria-label="dateLancementEstimeeFull">
-                              {format(field.value.from, "LLL dd, y")} -{" "}
-                              {format(field.value.to, "LLL dd, y")}
-                            </div>
-                          ) : (
-                            <div aria-label="dateLancementEstimeeStart">
-                              {format(field.value.from, "LLL dd, y")}
-                            </div>
-                          )
-                        ) : (
-                          <span aria-label="dateLancementEstimeeEmpty">Pick a date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="center">
-                      <Calendar
-                        initialFocus
-                        mode="range"
-                        defaultMonth={field.value.from}
-                        selected={{
-                          from: field.value.from!,
-                          to: field.value.to,
-                        }}
-                        onSelect={field.onChange}
-                        numberOfMonths={2}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </FormItem>
-              )}
-            /> : ""} */}
-         
-         <Button className="mt-2" onClick={closeForm}>Annuler</Button>
+        <Separator className="my-5"/>
+         <div className="flex gap-2 mt-2"> 
+         <Button variant={"outline"} onClick={closeForm}>{t("actions.annuler")}</Button>
           <Button
-            className="mt-2"
             type="submit"
             data-testid="SprintFormSubmitBtn"
             disabled={!form.formState.isValid}
           >
-            {sprintToEdit ? "Modifier" : "Ajouter"}
+            {sprintToEdit ? t("actions.modifier") : t("actions.ajouter")}
           </Button>
+          </div>
         </form>
       </Form>
     </>

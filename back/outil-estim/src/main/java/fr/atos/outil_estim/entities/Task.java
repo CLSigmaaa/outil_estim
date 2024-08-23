@@ -1,12 +1,15 @@
 package fr.atos.outil_estim.entities;
 
+import fr.atos.outil_estim.deserializer.PriorityDeserializer;
+import fr.atos.outil_estim.deserializer.StateDeserializer;
+import fr.atos.outil_estim.serializer.PrioritySerializer;
+import fr.atos.outil_estim.serializer.StateSerializer;
 import fr.atos.outil_estim.enums.ItemType;
 import fr.atos.outil_estim.enums.Priority;
 import fr.atos.outil_estim.enums.State;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,11 +24,9 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Entity
@@ -37,36 +38,36 @@ public class Task {
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "Item_Gen")
 	private Long id;
 	@Column
-	@JsonProperty("name")
 	private String name;
 	@ManyToOne
 	@JoinColumn(name = "project_id")
 	@JsonBackReference(value = "project")
 	private Project project;
-	@Column
-	@JsonProperty("description")
+	@Column(length = 1000)
+
 	private String description;
 	@Column
-	@JsonProperty("state")
+	@JsonDeserialize(using = StateDeserializer.class)
+	@JsonSerialize(using = StateSerializer.class)
 	private State state;
 	@Column
-	@JsonProperty("effectiveDates")
 	protected DateRange effectiveDates;
 	@Column
-	@JsonProperty(value = "type")
 	private ItemType type;
 	@Column
-	@JsonProperty("priority")
+	@JsonDeserialize(using = PriorityDeserializer.class)
+	@JsonSerialize(using = PrioritySerializer.class)
 	private Priority priority;
 	@ManyToOne
 	@JoinColumn(name = "parent_sprint_id")
 	@JsonBackReference(value = "parentItem")
 	private Sprint parentSprint;
 	@OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-//	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JsonManagedReference("relatedTask")
-	@JsonProperty("estimationList")
 	private List<Estimation> estimationList;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private EstimUser estimUser;
 
 	public Task() {
 		this.effectiveDates = new DateRange();

@@ -34,16 +34,12 @@ public class Estimation {
 	@JsonBackReference("relatedTask")
 	private Task task;
 	@Column
-	@JsonProperty("date")
 	private LocalDate date;
 	@Column
-	@JsonProperty("consommee")
 	private double consommee;
 	@Column
-	@JsonProperty("resteAFaire")
 	private double resteAFaire;
 	@Column
-	@JsonProperty("causeEcart")
 	private String causeEcart;
 
 

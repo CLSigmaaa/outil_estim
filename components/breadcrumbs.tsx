@@ -25,16 +25,16 @@ export function Breadcrumbs({routes = []}: {routes: string[]}) {
     if (i === routes.length-1) {
       breadcrumbPage = (
         <BreadcrumbItem>
-          <BreadcrumbPage className="font-bold">{route}</BreadcrumbPage>
+          <BreadcrumbPage className="font-bold text-base">{route}</BreadcrumbPage>
         </BreadcrumbItem>
       )
     } else {
-      if (route.match(/^\D+$/)){
+      if (/^\D+$/.test(route) && route !== "current"){
         breadcrumbItems.push(
           <React.Fragment key={href}>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={href} className="text-black">{route}</BreadcrumbLink>
+              <BreadcrumbLink href={href} className="text-black text-base">{route}</BreadcrumbLink>
             </BreadcrumbItem>
           </React.Fragment>
         )
@@ -46,7 +46,7 @@ export function Breadcrumbs({routes = []}: {routes: string[]}) {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/" className="text-black">Accueil</BreadcrumbLink>
+          <BreadcrumbLink href="/" className="text-black text-base">Accueil</BreadcrumbLink>
         </BreadcrumbItem>
         {breadcrumbItems}
         <BreadcrumbSeparator />

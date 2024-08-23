@@ -1,6 +1,5 @@
 import { Task, Sprint, TaskData, SprintData } from "@/app/model/projet";
 import { toast } from "@/components/ui/use-toast";
-import { error } from "console";
 
 export async function postTask(projectId: string, sprintId: string, task: TaskData){
     return fetch(`http://localhost:8080/projects/${projectId}/sprints/${sprintId}/tasks`, {
@@ -62,7 +61,38 @@ export async function getTask (projectId: string, sprintId: string, taskId: stri
           description: "Erreur lors de l'appel à l'API.",
         });
       });
+  }
 
+  export async function assignTask(taskId: string, userId: string) {
+    return fetch(`http://localhost:8080/users/${userId}/assign`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskId),
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function unassignTask(taskId: string, userId: string) {
+    return fetch(`http://localhost:8080/users/${userId}/assign`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskId),
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
   }
 
   export async function postEstimation(projectId: string, sprintId: string, taskId: string, estimation: any)  {
@@ -181,6 +211,68 @@ export async function getTask (projectId: string, sprintId: string, taskId: stri
   export async function getProject (projectId: string) {
     return fetch(`http://localhost:8080/projects/${projectId}`, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function getProjects () {
+    return fetch(`http://localhost:8080/projects`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function postProject(project: any) {
+    return fetch(`http://localhost:8080/projects`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(project),
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function updateProject(projectId: string, project: any) {
+    return fetch(`http://localhost:8080/projects/${projectId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(project),
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function deleteProject(projectId: string) {
+    return fetch(`http://localhost:8080/projects/${projectId}`, {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },

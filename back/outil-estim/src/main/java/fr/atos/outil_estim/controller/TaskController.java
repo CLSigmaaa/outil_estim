@@ -37,7 +37,7 @@ public class TaskController {
 		return taskService.updateTask(taskId, newTask);
 	}
 	@PutMapping("/tasks/state")
-	public ResponseEntity<Void> editTaskState(Long taskId, String state){
+	public ResponseEntity<Task> editTaskState(Long taskId, String state){
 		return taskService.editTaskState(taskId, State.fromString(state));
 	}
 
@@ -51,4 +51,6 @@ public class TaskController {
 
 		return taskService.getStats(taskId);
 	}
+
+
 }

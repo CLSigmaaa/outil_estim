@@ -101,7 +101,7 @@ public class EstimationServiceTest {
 		Estimation estimation = createEstimation();
 		estimationService.addEstimation(taskId, estimation);
 
-		estimationService.deleteEstimation(estimation.getId());
+		estimationService.deleteEstimation(taskId, estimation.getId());
 		assertThat(estimationRepo.findAll()).isEmpty();
 
 		assertThat(taskService.getTask(taskId).getBody().getEstimationList()).isEmpty();

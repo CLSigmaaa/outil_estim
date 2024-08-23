@@ -3,6 +3,7 @@ import {
     ColumnDef,
     SortingState,
     flexRender,
+    VisibilityState,
     getCoreRowModel,
     getSortedRowModel,
     useReactTable,
@@ -24,22 +25,25 @@ import {
    
   export function DataTable<TData, TValue>({
     columns,
-    data,
+    data
   }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([])
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const table = useReactTable({
       data,
       columns,
       getCoreRowModel: getCoreRowModel(),
       onSortingChange: setSorting,
       getSortedRowModel: getSortedRowModel(),
+      onColumnVisibilityChange: setColumnVisibility,
       state: {
         sorting,
+        columnVisibility,
       },
     })
    
     return (
-      <div className="rounded-md border">
+      <div className="rounded-md border mb-5">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -75,8 +79,8 @@ import {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Aucune donnée disponible
+                <TableCell colSpan={columns.length} className="h-14 text-center">
+                  Aucune donnée
                 </TableCell>
               </TableRow>
             )}
