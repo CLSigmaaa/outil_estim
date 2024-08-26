@@ -7,7 +7,7 @@ const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto px-2 bg-white rounded-md">
+  <div className="relative w-full overflow-auto px-2 bg-white rounded-md table-auto">
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm", className)}
@@ -74,8 +74,9 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-12 px-2  pe-0 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
-      className,  (props.children as any)?.props?.column.id === "causeEcart" ? "w-[360px]" : ""// Impose la width pour la colonne actions
+      "h-12 px-2  pe-0 text-left align-middle font-medium max-w-min text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      className,  (props.children as any)?.props?.column.id === "causeEcart" ? "w-[360px]" : "",// Impose la width pour la colonne actions
+      className?.includes("shrunk-column") ? "w-24" : ""
     )}
     {...props}
   />
@@ -96,7 +97,7 @@ const TableCell = React.forwardRef<
   return (<td
     ref={ref}
     className={cn("p-2 align-middle [&:has([role=checkbox])]:pr-0",
-        className, textClass // Change la couleur du texte si la tâche est terminée
+        className, textClass, className?.includes("shrunk-column") ? "w-24" : "" // Change la couleur du texte si la tâche est terminée
         
       )}
     {...props}

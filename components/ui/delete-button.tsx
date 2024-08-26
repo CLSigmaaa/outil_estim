@@ -25,14 +25,15 @@ export const DeleteItemButton = ({ text, handleClick }: { text: string, handleCl
           <span className="font-medium">{t("actions.supprimer.confirmation")}</span>
           <div className="flex gap-x-2">
             <Button
-              onClick={() => setIsPopOverOpen(false)}
-            >
-              {t("actions.supprimer.nePasSupprimer")}
-            </Button>
-            <Button
+            variant={"destructive"}
               onClick={handleClick}
             >
               {t("global.oui")}
+            </Button>
+            <Button
+              onClick={() => setIsPopOverOpen(false)}
+            >
+              {t("actions.supprimer.nePasSupprimer")}
             </Button>
           </div>
         </PopoverContent>

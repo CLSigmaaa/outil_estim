@@ -19,7 +19,7 @@ import {
     ChartTooltip,
 } from "@/components/ui/chart"
 
-import { Estimation, Task } from "@/app/model/projet"
+import { Task } from "@/app/model/projet"
 
 import { useTranslation } from "react-i18next"
 
@@ -51,7 +51,7 @@ export default function BurnUp({ task }: { task: Task }) {
     return (
         <Card className="w-full">
             <CardHeader className="flex flex-row justify-between">
-                <CardTitle className="text-lg font-normal">{"Burn Up"}</CardTitle>
+                <CardTitle className="text-lg font-normal">{t("global.burnUp")}: {task.name}</CardTitle>
                 
             </CardHeader>
             <CardContent className="font-bold text-2xl">
@@ -73,7 +73,7 @@ export default function BurnUp({ task }: { task: Task }) {
                         <ChartTooltip />
                         <Line
                             dataKey="consommee"
-                            name={t("estimation.consommee")}
+                            name={t("estimation.consomme")}
                             type="stepAfter"
                             stroke="green"
                             dot={false}

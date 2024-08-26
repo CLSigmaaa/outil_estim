@@ -53,7 +53,7 @@ export function EditProjectColumns(editProject: Function, handleDelete: Function
       accessorKey: "actions",
       header: () => <div className=" pe-2 flex justify-center ">{t("global.actions")}</div>,
       cell: ({ row }) => (
-        <div className="flex justify-center items-center gap-4 ">
+        <div className="flex justify-end items-center gap-4 px-8">
           
       <Button onClick={() => goToCurrentSprint(row.original.id, pathname, router)}> {t("sprint.sprintEnCours")} </Button>
       <Link href={`${pathname}/${row.original.id}/sprints`}><Button> {t("sprint.sprints")} </Button></Link>

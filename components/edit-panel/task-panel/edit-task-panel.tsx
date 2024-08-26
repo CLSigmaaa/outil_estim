@@ -136,7 +136,7 @@ export default function EditPanel({projectId, sprintId}: {projectId: string, spr
           </Collapsible>
           <Collapsible className="flex flex-grow flex-col">
           <CollapsibleTrigger className="flex flex-grow justify-center gap-2 border border-black rounded bg-white p-2 mb-2">
-              <p className="font-semibold"> {t("tache.nonAssignees")} </p>
+              <p className="font-semibold"> {t("tache.nonAffectees")} </p>
               <ChevronsUpDown />
             </CollapsibleTrigger>
             <CollapsibleContent>

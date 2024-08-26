@@ -175,7 +175,6 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
           />
         <Separator className="my-5"/>
          <div className="flex gap-2 mt-2"> 
-         <Button variant={"outline"} onClick={closeForm}>{t("actions.annuler")}</Button>
           <Button
             type="submit"
             data-testid="SprintFormSubmitBtn"
@@ -183,6 +182,7 @@ export const SprintForm = ({projectId, sprintToEdit, setSprintList, closeForm}:{
           >
             {sprintToEdit ? t("actions.modifier") : t("actions.ajouter")}
           </Button>
+         <Button variant={"outline"} onClick={closeForm}>{t("actions.annuler")}</Button>
           </div>
         </form>
       </Form>

@@ -137,7 +137,6 @@ export const ProjectForm = ({projectToEdit, setProjectList, closeForm}:{projectT
           />
         <Separator className="my-5"/>
          <div className="flex gap-2 mt-2"> 
-         <Button variant={"outline"} onClick={closeForm as React.MouseEventHandler<HTMLButtonElement>}>Annuler</Button>
           <Button
             type="submit"
             data-testid="ProjectFormSubmitBtn"
@@ -145,6 +144,7 @@ export const ProjectForm = ({projectToEdit, setProjectList, closeForm}:{projectT
           >
             {projectToEdit ? t("actions.modifier") : t("actions.ajouter")}
           </Button>
+         <Button variant={"outline"} onClick={closeForm as React.MouseEventHandler<HTMLButtonElement>}>Annuler</Button>
           </div>
         </form>
       </Form>

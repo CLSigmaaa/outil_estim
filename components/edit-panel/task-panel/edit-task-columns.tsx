@@ -65,14 +65,14 @@ export function EditTableColumns(editTask: Function, handleDeleteTask: Function,
       accessorKey: "actions",
       header: () => <div className="pe-2 flex justify-center">{t("global.actions")}</div>,
       cell: ({ row } : {row : any}) => (
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex justify-end items-center gap-4 px-8">
           {handleUnassignTask !== undefined ? (
             <Button
               className="flex items-center gap-2"
               onClick={() => {
                 handleUnassignTask(row.original.id)}}>
                   <MinusIcon />
-                  {t("tache.desassigner")}
+                  {t("tache.desaffecter")}
             </Button> ) 
             : "" }
           {handleAssignTask !== undefined ? (
@@ -82,7 +82,7 @@ export function EditTableColumns(editTask: Function, handleDeleteTask: Function,
               onClick={() => {
                 handleAssignTask(row.original.id)}}>
                   <PlusIcon />
-                  {t("tache.sAssignerTache")}
+                  {t("tache.sAffecterTache")}
             </Button> ) 
             : "" }
           <Button

@@ -16,8 +16,6 @@ import { ChevronDown, ChevronUp, EyeIcon } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import i18next from "@/app/i18n";
-import { useTranslation } from "react-i18next";
 
 export type EstimInfo = {
   nomTache: string;
@@ -30,13 +28,13 @@ export type EstimInfo = {
   id: string;
 };
 
-const header = ({column, title}:{column: Column<EstimInfo, unknown>, title: string}) => {
+const header = ({column, title, shrunkColumn}:{column: Column<EstimInfo, unknown>, title: string, shrunkColumn: boolean}) => {
   return (
     <Button
       variant="ghost"
-      className="h-fit px-0"
+      className={`h-fit px-0 ${shrunkColumn ? "w-24" : ""}`}
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-      <div className="text-start text-wrap">
+      <div className={`text-start text-wrap `}>
         {title}
       </div>
       {column.getIsSorted() === "asc" ? <ChevronUp height={20} width={20}/> : <ChevronDown height={20} width={20}/>}
@@ -73,7 +71,7 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
   return [
     {
       accessorKey: "nomTache",
-      header: ({column}) => header({column, title: t("global.nom")}),
+      header: ({column}) => header({column, title: t("global.nom"), shrunkColumn: false}),
       cell: ({ row }) => (
         <div className="whitespace-pre-line overflow-auto max-h-16">
           {row.original.nomTache}
@@ -82,34 +80,34 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
     },
     {
       accessorKey: "estimationInitiale",
-      header: ({column}) => header({column, title: t("estimation.estimationInitiale")}),
+      header: ({column}) => header({column, title: `${t("estimation.estimationInitiale")} (j)`, shrunkColumn: true}),
     },
     {
       accessorKey: "consommee",
-      header: ({column}) => header({column, title: t("estimation.consommee")}),
+      header: ({column}) => header({column, title: `${t("estimation.consomme")} (j)`, shrunkColumn: true}),
     },
     {
       accessorKey: "resteAFaire",
-      header: ({column}) => header({column, title: t("estimation.dernierResteAFaire")}),
+      header: ({column}) => header({column, title: `${t("estimation.resteAFaire")} (j)`, shrunkColumn: true}),
     },
     {
       accessorKey: "newConsommee",
-      header: () => t("estimation.nouveauConsommee"),
+      header: () => <div className="w-24 text-wrap">{t("estimation.nouveauConsomme")} (j)</div>,
       cell: ({ row }) => {
         DefineForm(row.original.id);
 
         return (
-          <div className="flex flex-grow min-w-32">
+          <div className="w-24 text-wrap">
           <Form {...formDict[row.original.id]}>
             <FormField
               control={formDict[row.original.id].control}
               name="consommee"
               render={({ field }) => (
-                <FormItem className="flex flex-grow mb-0 w-min ">
+                <FormItem className="w-24 mb-0">
                   <FormMessage />
                   <FormControl>
                     <Input
-                      placeholder={t("estimation.nouveauConsommee")}
+                      placeholder={(row.original.consommee + 1).toString()}
                       className="resize-none"
                       {...field}
                     />
@@ -124,22 +122,22 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
     },
     {
       accessorKey: "newResteAFaire",
-      header: () => t("estimation.nouveauResteAFaire"),
+      header: () => <div className="w-24 text-wrap">{t("estimation.nouveauResteAFaire")} (j)</div>,
       cell: ({ row }) => {
         DefineForm(row.original.id);
 
         return (
-          <div className="flex flex-grow min-w-32">
+          <div >
           <Form {...formDict[row.original.id]}>
             <FormField
               control={formDict[row.original.id].control}
               name="resteAFaire"
               render={({ field }) => (
-                <FormItem className="flex flex-grow mb-0 w-min">
+                <FormItem className="w-24 mb-0">
                   <FormMessage />
                   <FormControl>
                     <Input
-                      placeholder={t("estimation.nouveauResteAFaire")}
+                      placeholder={(row.original.resteAFaire - 1).toString()}
                       className="resize-none"
                       {...field}
                     />
@@ -154,7 +152,7 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
     },
     {
       accessorKey: "causeEcart",
-      header: () => <div>{t("estimation.causeEcart")}</div>,
+      header: () => t("estimation.causeEcart"),
       cell: ({ row }) => {
         DefineForm(row.original.id);
 
@@ -185,7 +183,7 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
       accessorKey: "actions",
       header: () => <div className=" pe-2 flex justify-center ">{t("global.actions")}</div>,
       cell: ({ row }) => (
-        <div className="flex justify-center items-center gap-4 ">
+        <div className="flex justify-end items-center gap-4 px-8">
           <Form {...formDict[row.original.id]}>
           <Button
             type="submit"

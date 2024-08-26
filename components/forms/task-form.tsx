@@ -221,7 +221,7 @@ export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, upda
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>
-                {t("tache.sAssignerTache")}
+                {t("tache.sAffecterTache")}
                 </FormLabel>
               </div>
             </FormItem>
@@ -229,7 +229,6 @@ export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, upda
         /> }
         <Separator className="my-5"/>
         <div className="flex gap-2 mt-2">
-        <Button variant={"outline"} onClick={closeForm as React.MouseEventHandler<HTMLButtonElement>}>Annuler</Button>
           <Button
             type="submit"
             data-testid="TaskFormSubmitBtn"
@@ -237,6 +236,7 @@ export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, upda
           >
             {taskToEdit ? t("actions.modifier") : t("actions.ajouter")}
           </Button>
+        <Button variant={"outline"} onClick={closeForm as React.MouseEventHandler<HTMLButtonElement>}>Annuler</Button>
           </div>
         </form>
       </Form>

@@ -47,8 +47,8 @@ export default function TaskDetails({projectId, sprintId, taskId}: {projectId: s
   }
 
   return (
-    <div className="flex w-full">
-    <div className="flex flex-col w-1/2 p-4 gap-2 border rounded">
+    <div className="flex w-full gap-2">
+    <div className="flex flex-col w-1/2 p-4 gap-2 border rounded bg-white">
       <p className="text-2xl font-semibold self-center">{t("actions.details")}</p>
       <div className="flex gap-1"><p className="font-semibold">{t("global.nom")}:</p> {selectedTask.name}</div>
       <div className="flex gap-1">
@@ -61,6 +61,7 @@ export default function TaskDetails({projectId, sprintId, taskId}: {projectId: s
       {selectedTask.estimationList.length != 0 ? (
         <Tabs
           defaultValue={""}
+          className="border rounded-xl "
         >
           <TabsList className="flex flex-grow mb-2">
             {selectedTask.estimationList.map((estim, index) => (
@@ -68,13 +69,15 @@ export default function TaskDetails({projectId, sprintId, taskId}: {projectId: s
             ))}
           </TabsList>
           {selectedTask.estimationList.map((estim) => (
-            <TabsContent key={estim.id} value={estim.id} className="flex flex-col gap-2 mt-0">
-              <div className="flex gap-1"><p className="font-semibold">{t("estimation.date")}:</p> {format(estim.date, 'dd-MM-yyyy')}</div>
-              <div className="flex gap-1"><p className="font-semibold">{t("estimation.consommee")}:</p> {estim.consommee}</div>
+            <TabsContent key={estim.id} value={estim.id} className="">
+              <div className="flex flex-col gap-2 mt-0 p-2">
+              <div className="flex gap-1"><p className="font-semibold">{t("global.date")}:</p> {format(estim.date, 'dd-MM-yyyy')}</div>
+              <div className="flex gap-1"><p className="font-semibold">{t("estimation.consomme")}:</p> {estim.consommee}</div>
               <div className="flex gap-1"><p className="font-semibold">{t("estimation.resteAFaire")}:</p> {estim.resteAFaire}</div>
-              <div className="flex gap-1"><p className="font-semibold">{t("estimation.causeEcart")}:</p> {estim.causeEcart}</div>
-              <Separator className="my-4"/>
-            <DeleteItemButton text={"Supprimer estimation"} handleClick={() => handleDelete(sprintId, taskId, estim.id)}/>
+              <div className="flex gap-1"><p className="font-semibold">{t("estimation.causeEcart")}:</p> {estim.causeEcart || <p className="text-green-600">Pas d'écart</p>} </div>
+              </div>
+              <Separator className="mt-4"/>
+            <div className="flex justify-center items-center p-3"><DeleteItemButton text={"Supprimer estimation"} handleClick={() => handleDelete(sprintId, taskId, estim.id)}/></div>
             </TabsContent>
             
           ))}
