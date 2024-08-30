@@ -74,7 +74,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-12 px-2  pe-0 text-left align-middle font-medium max-w-min text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      "h-12 px-2 pe-0 text-left align-middle font-medium max-w-min text-muted-foreground [&:has([role=checkbox])]:pr-0",
       className,  (props.children as any)?.props?.column.id === "causeEcart" ? "w-[360px]" : "",// Impose la width pour la colonne actions
       className?.includes("shrunk-column") ? "w-24" : ""
     )}

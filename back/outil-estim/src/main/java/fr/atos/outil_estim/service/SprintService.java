@@ -74,4 +74,30 @@ public class SprintService {
 			return Error.errorFromException(e);
 		}
 	}
+
+	public ResponseEntity<Sprint> getSprintFilterTaskName(Long sprintId, String filterName) {
+		try {
+			Sprint sprint = sprintRepository.findByIdWithTasks(sprintId).orElseThrow(() -> new IllegalArgumentException(SPRINT_NOT_FOUND + sprintId));
+			sprint.setTasks(sprint.getTasks().stream().filter(task -> task.getName().toLowerCase().contains(filterName.toLowerCase())).toList());
+			return ResponseEntity.ok(sprint);
+		} catch (IllegalArgumentException e) {
+			return Error.errorFromException(e);
+		}
+	}
+
+	public ResponseEntity<Sprint> getSprintFilterUser(Long sprintId, String userId) {
+		try {
+			Sprint sprint = sprintRepository.findByIdWithTasks(sprintId).orElseThrow(() -> new IllegalArgumentException(SPRINT_NOT_FOUND + sprintId));
+			sprint.setTasks(sprint.getTasks().stream().filter(
+					task -> {
+						if (task.getEstimUser() == null) {
+							return false;
+						}
+						return task.getEstimUser().getId().equals(Long.parseLong(userId));
+					}).toList());
+			return ResponseEntity.ok(sprint);
+		} catch (IllegalArgumentException e) {
+			return Error.errorFromException(e);
+		}
+	}
 }

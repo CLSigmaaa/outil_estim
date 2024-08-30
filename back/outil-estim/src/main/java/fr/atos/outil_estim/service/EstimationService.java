@@ -6,6 +6,7 @@ import fr.atos.outil_estim.enums.State;
 import fr.atos.outil_estim.repository.EstimationRepo;
 import fr.atos.outil_estim.util.Error;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +44,15 @@ public class EstimationService {
 	public ResponseEntity<Estimation> addEstimation(Long taskId, Estimation estimation) {
 		try {
 			Task task = taskService.getTask(taskId).getBody();
-			if (estimation.getConsommee() == 0){
-				task = taskService.editTaskState(taskId, State.A_FAIRE).getBody();
-			} else if (estimation.getConsommee() > 0) {
-				if (estimation.getResteAFaire() == 0) {
-					task =  taskService.editTaskState(taskId, State.TERMINEE).getBody();
-				} else {
-					task = taskService.editTaskState(taskId, State.EN_COURS).getBody();
-				}
-			}
-
+//			if (estimation.getConsommee() == 0){
+//				task = taskService.editTaskState(taskId, State.A_FAIRE).getBody();
+//			} else if (estimation.getConsommee() > 0) {
+//				if (estimation.getResteAFaire() == 0) {
+//					task =  taskService.editTaskState(taskId, State.TERMINEE).getBody();
+//				} else {
+//					task = taskService.editTaskState(taskId, State.EN_COURS).getBody();
+//				}
+//			}
 
 			estimation.setTask(task);
 			return ResponseEntity.ok(estimationRepository.save(estimation));
@@ -70,20 +70,20 @@ public class EstimationService {
 				throw new IllegalArgumentException("Task not found");
 			}
 
-			if (task.getEstimationList().isEmpty()) {
-				taskService.editTaskState(taskId, State.A_FAIRE);
-			} else {
-				Estimation lastEstimation = task.getEstimationList().get(task.getEstimationList().size() - 1);
-				if (lastEstimation.getConsommee() == 0) {
-					taskService.editTaskState(taskId, State.A_FAIRE);
-				} else if (lastEstimation.getConsommee() > 0) {
-					if (lastEstimation.getResteAFaire() == 0) {
-						taskService.editTaskState(taskId, State.TERMINEE);
-					} else {
-						taskService.editTaskState(taskId, State.EN_COURS);
-					}
-				}
-			}
+//			if (task.getEstimationList().isEmpty()) {
+//				taskService.editTaskState(taskId, State.A_FAIRE);
+//			} else {
+//				Estimation lastEstimation = task.getEstimationList().get(task.getEstimationList().size() - 1);
+//				if (lastEstimation.getConsommee() == 0) {
+//					taskService.editTaskState(taskId, State.A_FAIRE);
+//				} else if (lastEstimation.getConsommee() > 0) {
+//					if (lastEstimation.getResteAFaire() == 0) {
+//						taskService.editTaskState(taskId, State.TERMINEE);
+//					} else {
+//						taskService.editTaskState(taskId, State.EN_COURS);
+//					}
+//				}
+//			}
 			return ResponseEntity.noContent().build();
 		} catch (IllegalArgumentException e) {
 			return Error.errorFromException(e);

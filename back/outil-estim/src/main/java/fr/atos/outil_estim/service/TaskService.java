@@ -9,6 +9,7 @@ import fr.atos.outil_estim.stats.Stats;
 import fr.atos.outil_estim.util.Error;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,17 @@ public class TaskService {
 		try {
 			Task task = taskRepository.findByIdWithEstim(taskId).orElseThrow(() -> new IllegalArgumentException(TASK_NOT_FOUND + taskId));
 			return ResponseEntity.ok(task);
+		} catch (IllegalArgumentException e) {
+			return Error.errorFromException(e);
+		}
+	}
+
+	public ResponseEntity<List<Task>> getTasksByTagId(Long tagId) {
+		try {
+			return ResponseEntity.ok(
+					taskRepository.findAllByTagsId(tagId)
+							.orElseThrow(() -> new IllegalArgumentException("Aucune tâche trouvée avec le tag : " + tagId))
+			);
 		} catch (IllegalArgumentException e) {
 			return Error.errorFromException(e);
 		}
@@ -70,6 +82,7 @@ public class TaskService {
 			taskToEdit.setDescription(newTask.getDescription());
 			taskToEdit.setPriority(newTask.getPriority());
 			taskToEdit.setState(newTask.getState());
+			taskToEdit.setTags(newTask.getTags());
 			return ResponseEntity.ok(taskRepository.save(taskToEdit));
 		} catch (IllegalArgumentException e) {
 			return Error.errorFromException(e);

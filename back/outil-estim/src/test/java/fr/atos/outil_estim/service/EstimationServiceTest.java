@@ -6,9 +6,6 @@ import fr.atos.outil_estim.entities.Sprint;
 import fr.atos.outil_estim.entities.Task;
 import fr.atos.outil_estim.enums.State;
 import fr.atos.outil_estim.repository.EstimationRepo;
-import fr.atos.outil_estim.repository.TaskRepo;
-
-import java.util.Objects;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +68,7 @@ public class EstimationServiceTest {
 
 	private Estimation createEstimation() {
 		Estimation estimation = new Estimation();
-		estimation.setConsommee(1);
+		estimation.setConsomme(1);
 		estimation.setResteAFaire(4);
 		return estimation;
 	}

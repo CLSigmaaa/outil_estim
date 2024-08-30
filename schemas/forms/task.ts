@@ -1,3 +1,4 @@
+import { Tag } from "@/app/model/projet";
 import { nativePriorityEnum, nativeStateEnum } from "@/app/model/projet/itemEnum";
 import { z } from "zod";
 
@@ -11,12 +12,18 @@ const coerceDate = z.preprocess(
   z.coerce.date().optional()
 );
 
+const tagSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+})
+
 
 export const createTaskFormSchema = z.object({
   name: z.string().min(1, { message: "Champ obligatoire." }),
   description: z.string().min(1, { message: "Champ obligatoire." }),
   priority: priorityEnum,
   state: stateEnum,
+  tags: z.array(z.custom<Tag | never>()).optional(),
   assignTask: z.boolean().default(false).optional(),
 });
 

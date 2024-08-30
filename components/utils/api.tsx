@@ -1,4 +1,4 @@
-import { Task, Sprint, TaskData, SprintData } from "@/app/model/projet";
+import { Task, Sprint, TaskData, SprintData, Tag } from "@/app/model/projet";
 import { toast } from "@/components/ui/use-toast";
 
 export async function postTask(projectId: string, sprintId: string, task: TaskData){
@@ -135,6 +135,21 @@ export async function getTask (projectId: string, sprintId: string, taskId: stri
     });
   }
 
+  export async function getCausesEcart(tagId: string) {
+    return fetch(`http://localhost:8080/causesEcarts/${tagId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
   export async function getSprint (projectId: string, sprintId: string) {
      return fetch(`http://localhost:8080/projects/${projectId}/sprints/${sprintId}`, {
         method: "GET",
@@ -153,6 +168,56 @@ export async function getTask (projectId: string, sprintId: string, taskId: stri
         return response;
       })
       .catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function getSprintFilterTaskName(projectId: string, sprintId: string, filter: string) {
+    return fetch(`http://localhost:8080/projects/${projectId}/sprints/${sprintId}/filterName?filterName=${filter}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((response) => {
+        if (!response.ok) {
+          toast({
+            variant: "destructive",
+            title: "Erreur !",
+            description: response.headers.get("error"),
+          });
+          return;
+        }
+        return response;
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function getSprintFilterUser(projectId: string, sprintId: string, userId: string) {
+    return fetch(`http://localhost:8080/projects/${projectId}/sprints/${sprintId}/filterUser?userId=${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((response) => {
+        if (!response.ok) {
+          toast({
+            variant: "destructive",
+            title: "Erreur !",
+            description: response.headers.get("error"),
+          });
+          return;
+        }
+        return response;
+      }).catch((error) => {
         toast({
           variant: "destructive",
           title: "Erreur !",
@@ -276,6 +341,71 @@ export async function getTask (projectId: string, sprintId: string, taskId: stri
         headers: {
           "Content-Type": "application/json",
         },
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function getTagList() {
+    return fetch(`http://localhost:8080/tags`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function postTag(tagName: string) {
+    const data = new URLSearchParams();
+    data.append("tagName", tagName);
+    return fetch(`http://localhost:8080/tags`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: data,
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+  export async function deleteTag(tagId: string) {
+    return fetch(`http://localhost:8080/tags/${tagId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Erreur !",
+          description: "Erreur lors de l'appel à l'API.",
+        });
+      });
+  }
+
+
+  export async function assignTagsToTask(tags: Tag[], taskId: string) {
+    return fetch(`http://localhost:8080/tags/assignTags/${taskId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(tags),
       }).catch((error) => {
         toast({
           variant: "destructive",

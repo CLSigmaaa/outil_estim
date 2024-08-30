@@ -1,5 +1,5 @@
-import { Sprint, Task } from "@/app/model/projet";
-import { assignTask, getSprint } from "@/components/utils/api";
+import { Sprint, Tag, Task } from "@/app/model/projet";
+import { assignTagsToTask, assignTask, getSprint, getSprintFilterUser } from "@/components/utils/api";
 import { getSprintToast, getTaskToast } from "@/components/utils/toasts";
 
 export function sortTaskList(taskList: Task[]) {
@@ -12,7 +12,22 @@ export async function fetchSprint (projectId: string, sprintId: string) {
       return;
     }
     if (!response.ok) {
-      getTaskToast(false);
+      getSprintToast(false);
+      return;
+    }
+    var sprint = await response.json().then((updatedSprint: Sprint) => {
+      return updatedSprint
+    });
+    return sprint;
+  };
+
+  export async function fetchSprintFilterUser (projectId: string, sprintId: string, userId: string) {
+    var response = await getSprintFilterUser(projectId, sprintId, userId);
+    if (response == undefined) {
+      return;
+    }
+    if (!response.ok) {
+      getSprintToast(false);
       return;
     }
     var sprint = await response.json().then((updatedSprint: Sprint) => {
@@ -36,6 +51,17 @@ export async function fetchSprint (projectId: string, sprintId: string) {
       return;
     }
     setSelectedSprint(sprint);
+  }
+
+  export async function addTagsToTask(selectedTags: Tag[], taskId: string) {
+    var response = await assignTagsToTask(selectedTags, taskId);
+    if (response == undefined) {
+      return;
+    }
+    if (!response.ok) {
+      getTaskToast(false);
+      return;
+    }
   }
 
   export function setLists(updatedSprint: Sprint, userId: string, setUserTaskList: Function, setUnassignedTaskList: Function, setOthersTaskList: Function) {

@@ -50,6 +50,7 @@ export const frMessages = {
         description: "Description du sprint",
         etat: "Etat du sprint",
         selectionnerEtat: "Sélectionner un état pour le sprint",
+        filtreNomTache: "Filtrer par nom de tâche (au moins 3 caractères)"
     },
     tache: {
         mesTaches: "Mes tâches",
@@ -67,7 +68,8 @@ export const frMessages = {
         etat: "Etat de la tâche",
         sAffecterTache: "S'affecter la tâche",
         selectionnerEtat: "Sélectionner un état pour la tâche",
-
+        tags: "Tags",
+        aucunTag: "Aucun tag",
     },
   estimation: {
     estimationInitiale: "Estimation initiale",
@@ -78,5 +80,12 @@ export const frMessages = {
     nouveauResteAFaire: "Nouveau reste à faire",
     supprimer: "Supprimer estimation",
     aucune: "Aucune estimation n'a été saisie pour cette tâche",
-  }
+    ecartExceptionnel: "Ecart exceptionnel",
+  },
+  erreurs: {
+    estimationSuperieure: "L'estimation dépasse le reste à faire prévu, veuillez saisir une cause.",
+    estimationInferieure: "L'estimation est inférieure au reste à faire prévu, veuillez saisir une cause.",
+    champRequis: "Requis",
+    nombrePosRequis: "Le nombre doit être positif",
+  },
 }

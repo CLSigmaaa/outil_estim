@@ -4,11 +4,12 @@ import {
   FormMessage,
   FormControl,
   Form,
+  FormLabel,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Column, ColumnDef } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { FormState, useForm, UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { createTaskEstimFormSchema } from "@/schemas/forms/task-estim";
 import React from "react";
@@ -16,15 +17,18 @@ import { ChevronDown, ChevronUp, EyeIcon } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 
 export type EstimInfo = {
   nomTache: string;
   estimationInitiale: number;
-  consommee: number;
+  consomme: number;
   resteAFaire: number;
-  newConsommee: number;
+  newConsomme: number;
   newResteAFaire: number;
   causeEcart: string;
+  isEcartExceptionnel: boolean;
   id: string;
 };
 
@@ -32,7 +36,7 @@ const header = ({column, title, shrunkColumn}:{column: Column<EstimInfo, unknown
   return (
     <Button
       variant="ghost"
-      className={`h-fit px-0 ${shrunkColumn ? "w-24" : ""}`}
+      className={`h-fit px-0 ${shrunkColumn ? "w-min" : ""}`}
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
       <div className={`text-start text-wrap `}>
         {title}
@@ -45,26 +49,52 @@ const header = ({column, title, shrunkColumn}:{column: Column<EstimInfo, unknown
 
 export function EstimAssignedColumns(submitEstimation: Function, t: Function): ColumnDef<EstimInfo>[] {
   const path = usePathname();
+  const [error, setError] = React.useState<{consomme: string, resteAFaire: string, estimation: string}>({consomme: "", resteAFaire: "", estimation: ""});
   var formDict: {
-    [key: string]: UseFormReturn<
-      { consommee: number; resteAFaire: number; causeEcart: string },
-      any,
-      undefined
-    >;
+    [key: string]: UseFormReturn<{
+      newConsomme: string;
+      newResteAFaire: string;
+      causeEcart: string;
+      isEcartExceptionnel: boolean;
+  }, any, undefined>;
   } = {};
 
-  function DefineForm(taskId: string) {
-    var newForm = useForm({
+  function validateAndSubmit(form: UseFormReturn<{newConsomme: string; newResteAFaire: string; causeEcart: string; isEcartExceptionnel: boolean; }, any, undefined>, 
+    rowId: string, consomme: number, resteAFaire: number) {
+    const formValues = form.getValues();
+    var emptyError = {consomme: "", resteAFaire: "", estimation: ""}; 
+    if (formValues.newConsomme == "" || parseFloat(formValues.newConsomme) < 0) {
+      setError({...emptyError, consomme: t("erreurs.nombrePosRequis")});
+      return;
+    } else if (formValues.newResteAFaire == "" || parseFloat(formValues.newResteAFaire) < 0) {
+      setError({...emptyError, resteAFaire: t("erreurs.nombrePosRequis")});
+      return;
+    } else if (consomme + resteAFaire != 0 && formValues.causeEcart == "") {
+      if (parseFloat(formValues.newConsomme) + parseFloat(formValues.newResteAFaire) > consomme + resteAFaire) {
+        setError({...emptyError, estimation: t("erreurs.estimationSuperieure")});
+        return;
+      } else if (parseFloat(formValues.newConsomme) + parseFloat(formValues.newResteAFaire) < consomme + resteAFaire) {
+        setError({...emptyError, estimation: t("erreurs.estimationInferieure")});
+        return;
+      }
+    }
+    setError(emptyError);
+    submitEstimation(form, rowId)
+  }
+
+  function DefineForm(row: EstimInfo) {
+    const formState = useForm({
       // On ne peut appeler de Hook dans un bloc conditionnel
-      resolver: zodResolver(createTaskEstimFormSchema),
+      resolver: zodResolver(createTaskEstimFormSchema(row.estimationInitiale, row.consomme, row.resteAFaire)),
       defaultValues: {
-        consommee: "",
-        resteAFaire: "",
+        newConsomme: "",
+        newResteAFaire: "",
         causeEcart: "",
+        isEcartExceptionnel: true,
       },
     });
-    if (formDict[taskId] == undefined) {
-      formDict[taskId] = newForm as any;
+    if (formDict[row.id] == undefined) {
+      formDict[row.id] = formState;
     }
   }
 
@@ -83,7 +113,7 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
       header: ({column}) => header({column, title: `${t("estimation.estimationInitiale")} (j)`, shrunkColumn: true}),
     },
     {
-      accessorKey: "consommee",
+      accessorKey: "consomme",
       header: ({column}) => header({column, title: `${t("estimation.consomme")} (j)`, shrunkColumn: true}),
     },
     {
@@ -91,23 +121,23 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
       header: ({column}) => header({column, title: `${t("estimation.resteAFaire")} (j)`, shrunkColumn: true}),
     },
     {
-      accessorKey: "newConsommee",
+      accessorKey: "newConsomme",
       header: () => <div className="w-24 text-wrap">{t("estimation.nouveauConsomme")} (j)</div>,
       cell: ({ row }) => {
-        DefineForm(row.original.id);
+        DefineForm(row.original);
 
         return (
           <div className="w-24 text-wrap">
           <Form {...formDict[row.original.id]}>
             <FormField
               control={formDict[row.original.id].control}
-              name="consommee"
+              name="newConsomme"
               render={({ field }) => (
                 <FormItem className="w-24 mb-0">
-                  <FormMessage />
+                  {error.consomme !== "" && <FormMessage>{error.consomme}</FormMessage>}
                   <FormControl>
                     <Input
-                      placeholder={(row.original.consommee + 1).toString()}
+                      placeholder={(row.original.consomme + 1).toString()}
                       className="resize-none"
                       {...field}
                     />
@@ -124,20 +154,20 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
       accessorKey: "newResteAFaire",
       header: () => <div className="w-24 text-wrap">{t("estimation.nouveauResteAFaire")} (j)</div>,
       cell: ({ row }) => {
-        DefineForm(row.original.id);
+        DefineForm(row.original);
 
         return (
           <div >
           <Form {...formDict[row.original.id]}>
             <FormField
               control={formDict[row.original.id].control}
-              name="resteAFaire"
+              name="newResteAFaire"
               render={({ field }) => (
                 <FormItem className="w-24 mb-0">
-                  <FormMessage />
+                  {error.resteAFaire !== "" && <FormMessage>{error.resteAFaire}</FormMessage>}
                   <FormControl>
                     <Input
-                      placeholder={(row.original.resteAFaire - 1).toString()}
+                      placeholder={(row.original.resteAFaire  - 1 <= 0 ? 0 : row.original.resteAFaire - 1).toString()}
                       className="resize-none"
                       {...field}
                     />
@@ -154,17 +184,16 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
       accessorKey: "causeEcart",
       header: () => t("estimation.causeEcart"),
       cell: ({ row }) => {
-        DefineForm(row.original.id);
+        DefineForm(row.original);
 
         return (
-          
           <Form {...formDict[row.original.id]}>
             <FormField
               control={formDict[row.original.id].control}
               name="causeEcart"
               render={({ field }) => (
                 <FormItem className="mb-0">
-                  <FormMessage />
+                  {error.estimation !== "" && <FormMessage>{error.estimation}</FormMessage>}
                   <FormControl>
                     <Textarea
                       placeholder={t("estimation.causeEcart")}
@@ -179,15 +208,40 @@ export function EstimAssignedColumns(submitEstimation: Function, t: Function): C
         );
       },
     },
+    {accessorKey: "isEcartExceptionnel",
+    header:({column}) => header({column, title: t("estimation.ecartExceptionnel"), shrunkColumn: true}),
+    cell: ({ row }) => {
+      return (
+        <Form {...formDict[row.original.id]}>
+        <FormField
+          control={formDict[row.original.id].control}
+          name="isEcartExceptionnel"
+          render={({ field }) => (
+            <FormItem className="flex mb-0">
+              <FormControl>
+                <Switch
+                  checked={field.value.valueOf()}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <FormLabel className="flex items-center pl-1">
+                {field.value.valueOf() ? t("global.oui") : t("global.non")}
+                </FormLabel>
+              </FormItem>
+              )}
+            />
+          </Form>
+          )}
+      },
     {
       accessorKey: "actions",
       header: () => <div className=" pe-2 flex justify-center ">{t("global.actions")}</div>,
       cell: ({ row }) => (
-        <div className="flex justify-end items-center gap-4 px-8">
+        <div className="flex justify-end items-center gap-4 px-2">
           <Form {...formDict[row.original.id]}>
           <Button
             type="submit"
-            onClick={() => formDict[row.original.id].handleSubmit(submitEstimation(formDict[row.original.id], row.original.id))}
+            onClick={() => validateAndSubmit(formDict[row.original.id], row.original.id, row.original.consomme, row.original.resteAFaire)}
             disabled={!formDict[row.original.id] == undefined}
           >
             {t("actions.confirmer")}

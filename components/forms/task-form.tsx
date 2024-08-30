@@ -4,8 +4,6 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 
-import { toast } from "@/components/ui/use-toast"
-
 import {
   Form,
   FormControl,
@@ -25,19 +23,21 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
 import { nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from "@/app/model/projet/itemEnum"
-import { Sprint, Task, TaskData } from "@/app/model/projet"
-import { getSprint, getTask, postTask, updateTask } from "@/components/utils/api"
-import { getSprintToast, getTaskToast, postTaskToast, updateTaskToast } from "@/components/utils/toasts"
+import { Sprint, Tag, Task, TaskData } from "@/app/model/projet"
+import { postTask, updateTask } from "@/components/utils/api"
+import { getSprintToast, postTaskToast, updateTaskToast } from "@/components/utils/toasts"
 import { Checkbox } from "@/components/ui/checkbox"
-import { assignTaskUtil } from "@/components/utils/taskListUtil"
+import { addTagsToTask, assignTaskUtil } from "@/components/utils/taskListUtil"
 import { useProjectStore } from "@/store/useProjectStore"
 import { Separator } from "@/components/ui/separator"
 import { useTranslation } from "react-i18next"
+import { TagComboBoxResponsive } from "@/components/ui/tag-combobox"
 
 
 export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, updateSprintInfos }:{taskToEdit: Task | undefined, closeForm: Function, projectId: string, userId: string, sprint: Sprint | undefined, updateSprintInfos: Function}) => {
   const { t } = useTranslation();
   const { setSelectedSprint } = useProjectStore();
+  const [selectedTags, setSelectedTags] = React.useState<Tag[]>(taskToEdit ? taskToEdit.tags : []);
   
   const form = useForm({
     resolver: zodResolver(createTaskFormSchema),
@@ -47,6 +47,7 @@ export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, upda
       priority: undefined,
       state: undefined,
       assignTask: false,
+      tags:[]
     },
   })
 
@@ -79,7 +80,10 @@ export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, upda
         return;
       }
       if (data.assignTask) {
-        assignTaskUtil(projectId, sprint.id, newTask.id, userId, setSelectedSprint);
+        await assignTaskUtil(projectId, sprint.id, newTask.id, userId, setSelectedSprint);
+      }
+      if (selectedTags.length != 0) {
+        await addTagsToTask(selectedTags, newTask.id);
       }
 
       updateSprintInfos();
@@ -90,15 +94,14 @@ export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, upda
     updateTaskToast(true);
   }
 
-  const [displayCalendar, setDisplayCalendar] = React.useState(taskToEdit?.state != nativeStateEnum.A_FAIRE);
-
   React.useEffect(() => {
-    setDisplayCalendar(taskToEdit?.state != nativeStateEnum.A_FAIRE);
   }, [taskToEdit])
 
 
   return (
     <>
+    <div className="flex">
+      <div className="w-1/2">
       <h1 className="font-bold mb-2 p-1">{taskToEdit ? `${t("actions.modifier")} ${taskToEdit.name}` : t("tache.ajouterTache") }</h1>
       <Form {...form}>
         <form
@@ -183,20 +186,17 @@ export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, upda
               <FormItem>
                 <FormLabel>{t("tache.etat")} {createTaskFormSchema.shape['state'].isOptional() ? "" : <span className="text-red-500">*</span>}</FormLabel>
                 <FormMessage />
-                <Select onValueChange={(value) => {
-                  setDisplayCalendar(value != nativeStateEnum.A_FAIRE)
-                  field.onChange(value)
-                }}
-                  value={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("tache.selectionnerEtat")} />
+                    <SelectTrigger defaultValue={nativeStateEnum.A_FAIRE}>
+                      <SelectValue placeholder={t("tache.selectionnerEtat")}/>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {Object.values(nativeStateEnum).map((item) => {
                       return (
                         <SelectItem
+                        defaultChecked={item == nativeStateEnum.A_FAIRE}
                           key={item}
                           value={item}>
                           <div className={item == nativeStateEnum.EN_COURS ? "text-red-600" : (item == nativeStateEnum.TERMINEE ? "text-green-600" : "")}>{item}</div>
@@ -208,6 +208,10 @@ export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, upda
               </FormItem>
             )}
           />
+            <TagComboBoxResponsive
+              selectedTags={selectedTags}
+              setSelectedTags={setSelectedTags}
+            />
           {taskToEdit ? "" :<FormField
           control={form.control}
           name="assignTask"
@@ -240,6 +244,9 @@ export const TaskForm = ({taskToEdit, closeForm, projectId, userId, sprint, upda
           </div>
         </form>
       </Form>
+      </div>
+      
+      </div>
     </>
   )
 }

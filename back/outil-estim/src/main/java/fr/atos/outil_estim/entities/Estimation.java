@@ -15,10 +15,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Entity
@@ -36,11 +33,11 @@ public class Estimation {
 	@Column
 	private LocalDate date;
 	@Column
-	private double consommee;
+	private double consomme;
 	@Column
 	private double resteAFaire;
 	@Column
 	private String causeEcart;
-
-
+	@Column
+	private Boolean isEcartExceptionnel;
 }

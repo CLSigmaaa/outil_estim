@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,6 +31,16 @@ public class SprintController {
 	@GetMapping("/sprints/current")
 	public ResponseEntity<Sprint> getCurrentSprint(@PathVariable Long projectId) {
 		return sprintService.getCurrentSprint(projectId);
+	}
+
+	@GetMapping("/sprints/{sprintId}/filterName")
+	public ResponseEntity<Sprint> getSprintFilterTaskName(@PathVariable Long sprintId, @RequestParam String filterName) {
+		return sprintService.getSprintFilterTaskName(sprintId, filterName);
+	}
+
+	@GetMapping("/sprints/{sprintId}/filterUser")
+	public ResponseEntity<Sprint> getSprintFilterUser(@PathVariable Long sprintId, @RequestParam String userId) {
+		return sprintService.getSprintFilterUser(sprintId, userId);
 	}
 
 	@PostMapping(value = "/sprints", consumes = MediaType.APPLICATION_JSON_VALUE)

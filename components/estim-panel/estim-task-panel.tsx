@@ -2,26 +2,28 @@ import { Sprint, Task } from "@/app/model/projet";
 import { nativeStateEnum } from "@/app/model/projet/itemEnum";
 import { EstimInfo, EstimAssignedColumns } from "@/components/estim-panel/estim-assigned-columns";
 import { DataTable } from "@/components/ui/data-table";
-import { postEstimation, getSprint } from "@/components/utils/api";
-import { fetchSprint, sortTaskList, assignTaskUtil, setLists } from "@/components/utils/taskListUtil";
-import { postEstimationToast, getTaskToast, getSprintToast } from "@/components/utils/toasts";
+import { getSprintFilterTaskName, postEstimation } from "@/components/utils/api";
+import { fetchSprint, fetchSprintFilterUser, sortTaskList } from "@/components/utils/taskListUtil";
+import { postEstimationToast,  getSprintToast } from "@/components/utils/toasts";
 import { useProjectStore } from "@/store/useProjectStore";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, FilterIcon } from "lucide-react";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 
 export default function EstimPanel({projectId, sprintId}: {projectId: string, sprintId: string}) {
+  const FILTER_DELAY = 750;
   const {t} = useTranslation();
 
   const {selectedSprint, setSelectedSprint} = useProjectStore();
   const [doneTaskList, setDoneTaskList] = React.useState<Task[]>([]);
   const [inProgressTaskList, setInProgressTaskList] = React.useState<Task[]>([]);
-  const [toDoTaskList, setToDoTaskList] = React.useState<Task[]>(
-    []
-  );
+  const [toDoTaskList, setToDoTaskList] = React.useState<Task[]>([]);
+  const [nameFilter, setNameFilter] = React.useState<string>("");
+  
+
   const userId = "1";
 
   React.useEffect(() => {
@@ -29,8 +31,16 @@ export default function EstimPanel({projectId, sprintId}: {projectId: string, sp
     
   }, [selectedSprint]);
 
+  React.useEffect(() => {
+    if (nameFilter.length > 0 && nameFilter.length < 3){
+      return;
+    }
+    const timeOutId = setTimeout(() => updateSprintFilterTaskName(), FILTER_DELAY);
+    return () => clearTimeout(timeOutId);
+  }, [nameFilter]);
+
   async function updateSprintInfos() {
-    var sprint = await fetchSprint(projectId, sprintId);
+    var sprint = await fetchSprintFilterUser(projectId, sprintId, userId);
     if (sprint == undefined) {
       getSprintToast(false);
       return;
@@ -38,6 +48,20 @@ export default function EstimPanel({projectId, sprintId}: {projectId: string, sp
     setSelectedSprint(sprint);
   }
 
+  async function updateSprintFilterTaskName(){
+    var response = await getSprintFilterTaskName(projectId, sprintId, nameFilter);
+    if (response == undefined) {
+      return;
+    }
+    if (!response.ok) {
+      getSprintToast(false);
+      return;
+    }
+    var sprint = await response.json().then((updatedSprint: Sprint) => {
+      return updatedSprint
+    });
+    setSelectedSprint(sprint);
+  }
 
   function refreshLists() {
     if (selectedSprint == undefined) {
@@ -70,7 +94,7 @@ export default function EstimPanel({projectId, sprintId}: {projectId: string, sp
 
   const submitEstimation = async (
     form: UseFormReturn<
-      { consommee: number; resteAFaire: number; causeEcart: string },
+      { newConsomme: number; newResteAFaire: number; causeEcart: string, isEcartExceptionnel: boolean },
       any,
       undefined
     >,
@@ -79,11 +103,11 @@ export default function EstimPanel({projectId, sprintId}: {projectId: string, sp
     var formValues = form.getValues();
     var newEstim = {
       date: new Date().toISOString(),
-      consommee: formValues.consommee,
-      resteAFaire: formValues.resteAFaire,
+      consomme: formValues.newConsomme,
+      resteAFaire: formValues.newResteAFaire,
       causeEcart: formValues.causeEcart,
+      isEcartExceptionnel: formValues.isEcartExceptionnel,
     };
-    console.log(newEstim);
 
     var response = await postEstimation(projectId, sprintId, taskId, newEstim);
     if (response == undefined) {
@@ -112,9 +136,9 @@ export default function EstimPanel({projectId, sprintId}: {projectId: string, sp
       return {
         nomTache: task.name,
         estimationInitiale: task.estimationList[0]?.resteAFaire || 0,
-        consommee: lastEstimation?.consommee || 0,
+        consomme: lastEstimation?.consomme || 0,
         resteAFaire: lastEstimation?.resteAFaire || 0,
-        newConsommee: 0,
+        newConsomme: 0,
         newResteAFaire: 0,
         causeEcart: "",
         id: task.id,
@@ -125,6 +149,10 @@ export default function EstimPanel({projectId, sprintId}: {projectId: string, sp
     <div className="flex flex-col">
      <p className="text-xl font-semibold">{selectedSprint ? selectedSprint.name : t("global.chargement")} </p>
      <div className="py-5">
+      <div className="flex items-center bg-white rounded-2xl p-2 ">
+        <input className="flex flex-grow focus-visible:outline-none" 
+        value={nameFilter} placeholder={t("sprint.filtreNomTache")} onChange={event => setNameFilter(event.target.value)}/> <FilterIcon />
+        </div>
       <p className="text-lg font-medium"> {t("tache.mesTaches")} </p>
       <Collapsible defaultOpen={true} className="flex flex-grow flex-col">
         <CollapsibleTrigger className="flex flex-grow justify-center gap-2 border border-black rounded bg-white p-2 mb-2">

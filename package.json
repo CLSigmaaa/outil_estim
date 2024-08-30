@@ -11,12 +11,11 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@hello-pangea/dnd": "^16.6.0",
     "@hookform/resolvers": "^3.6.0",
     "@mui/icons-material": "^5.15.20",
-    "@mui/x-tree-view": "^7.7.1",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-collapsible": "^1.1.0",
+    "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-menubar": "^1.1.1",
     "@radix-ui/react-popover": "^1.1.1",
@@ -29,6 +28,7 @@
     "@tanstack/react-table": "^8.20.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.3.19",
     "i18next": "^23.14.0",

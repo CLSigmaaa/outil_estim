@@ -5,6 +5,8 @@ import fr.atos.outil_estim.enums.State;
 import fr.atos.outil_estim.service.TaskService;
 import fr.atos.outil_estim.stats.Stats;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
 	@Autowired
 	private TaskService taskService;
-
 
 	@GetMapping("/tasks/{taskId}")
 	public ResponseEntity<Task> getTask(@PathVariable Long taskId) {

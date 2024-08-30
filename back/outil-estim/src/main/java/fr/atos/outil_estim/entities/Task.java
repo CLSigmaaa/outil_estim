@@ -14,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.TableGenerator;
@@ -68,6 +70,11 @@ public class Task {
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private EstimUser estimUser;
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(
+			joinColumns = @JoinColumn(name = "task_id"),
+			inverseJoinColumns = @JoinColumn(name = "tag_id"))
+	private List<Tag> tags;
 
 	public Task() {
 		this.effectiveDates = new DateRange();

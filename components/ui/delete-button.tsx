@@ -5,14 +5,14 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
-export const DeleteItemButton = ({ text, handleClick }: { text: string, handleClick: any }) => {
+export const DeleteItemButton = ({ text, handleClick, className }: { text: string, handleClick: any, className?: string }) => {
     const { t } = useTranslation();
     const [isPopOverOpen, setIsPopOverOpen] = React.useState(false);
   
     return (
       <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
         <PopoverTrigger className={cn(
-          "cursor-pointer flex items-center gap-2 p-2 border rounded w-fit"
+          "cursor-pointer flex items-center gap-2 p-2 border rounded w-fit", className
         )}>
           <Trash2
             size={24}

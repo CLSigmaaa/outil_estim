@@ -1,11 +1,12 @@
-import { string } from "zod";
 import { nativeItemTypeEnum, nativePriorityEnum, nativeStateEnum } from "./itemEnum";
 
-export type Estimation = {id: string, date: Date, consommee: number, resteAFaire: number, causeEcart: string};
+export type Estimation = {id: string, date: Date, consomme: number, resteAFaire: number, causeEcart: string, isEcartExceptionnel: boolean};
 
 export type TaskData = {name: string, description: string, priority: nativePriorityEnum, state: nativeStateEnum, estimationList: Estimation[], effectiveDates: {from: Date, to: Date}, type: nativeItemTypeEnum};
 
 export type EstimUser = {id: string, firstName: string, lastName: string, email: string};
+
+export type Tag = {id: string, name: string};
 
 export class Task {
     name: string;
@@ -15,11 +16,12 @@ export class Task {
     priority: nativePriorityEnum;
     state: nativeStateEnum;
     estimationList: Estimation[];
+    tags: Tag[];
     effectiveDates: { from: Date, to: Date };
     type: nativeItemTypeEnum;
 
     constructor(name: string, description: string, id: string, priority: nativePriorityEnum, estimUser: EstimUser,
-        state: nativeStateEnum, estimationList: Estimation[], effectivesDates: { from: Date, to: Date }, type: nativeItemTypeEnum) {
+        state: nativeStateEnum, estimationList: Estimation[], tags: Tag[], effectivesDates: { from: Date, to: Date }, type: nativeItemTypeEnum) {
         this.name = name;
         this.description = description;
         this.id = id;
@@ -27,6 +29,7 @@ export class Task {
         this.priority = priority;
         this.state = state;
         this.estimationList = estimationList;
+        this.tags = tags;
         this.effectiveDates = effectivesDates;
         this.type = type;
     }

@@ -32,8 +32,8 @@ export default function BurnUp({ task }: { task: Task }) {
         var data = task.estimationList.map((estim) => {
             return {
                 date: `${String(estim.date.getDate()).padStart(2, '0')}/${String(estim.date.getMonth() + 1).padStart(2, '0')}`,
-                workScope: estim.consommee + estim.resteAFaire,
-                consommee: estim.consommee,
+                workScope: estim.consomme + estim.resteAFaire,
+                consomme: estim.consomme,
             }
         });
         setBurnUpData([...data, data[data.length - 1]]);
@@ -72,7 +72,7 @@ export default function BurnUp({ task }: { task: Task }) {
                         <CartesianGrid vertical={false} />
                         <ChartTooltip />
                         <Line
-                            dataKey="consommee"
+                            dataKey="consomme"
                             name={t("estimation.consomme")}
                             type="stepAfter"
                             stroke="green"
