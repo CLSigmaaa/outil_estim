@@ -10,14 +10,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+import { ColumnDef, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
 import { useEffect, useState } from "react"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
-import { Check, Pencil, Trash2, X } from "lucide-react"
+import { Check, Pencil, Plus, X } from "lucide-react"
 import { Input } from "./ui/input"
+import { DataTablePagination } from "./data-table-pagination"
+import { ConfirmDeleteRow } from "./confirm-delete-row"
+import { DataTableToolbar } from "./data-table-toolbar"
 
-type TData = {
+export type TData = {
   id?: string,
   task: string,
   status: 'backlog' | 'in-progress' | 'done',
@@ -30,14 +44,71 @@ type TData = {
   }>
 }
 
-const InputCell = (props: any) => {
+const SelectInputCell = (props: any) => {
+  const updateTempData = props.table.options.meta.updateTempData
+  console.log("props", props.row.id)
+
+  return (
+    <Select defaultValue={props.defaultValues} onValueChange={(status) => updateTempData(props.row.id, 'status', status)}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Select a status" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Status</SelectLabel>
+          <SelectItem
+            value="backlog"
+          >
+            backlog
+          </SelectItem>
+          <SelectItem
+            value="in-progress"
+          >
+            in-progress
+          </SelectItem>
+          <SelectItem
+            value="done"
+          >
+            done
+          </SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  )
+}
+
+const TextInputCell = (props: any) => {
   const isRowSelected = props.row.getIsSelected()
   const updateTempData = props.table.options.meta.updateTempData
+
   const [value, setValue] = useState("")
 
-  //console.log("Row Input Cell", props.row)
-  //console.log("Column Input Cell", props.column)
-  //console.log("Table data", props.table.options.data)
+  useEffect(() => {
+    if (isRowSelected) {
+      setValue(props.defaultValue === "" ? "" : props.defaultValue);
+    }
+  }, [isRowSelected]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateTempData(props.row.id, props.column.id, e.target.value);
+    setValue(e.target.value);
+  };
+
+  return (
+    <Input
+      placeholder={props.placeholder}
+      value={value}
+      onChange={handleChange}
+      disabled={!isRowSelected}
+    />
+  )
+}
+
+const EstimateInputCell = (props: any) => {
+  const isRowSelected = props.row.getIsSelected()
+  const updateTempData = props.table.options.meta.updateTempData
+
+  const [value, setValue] = useState("")
 
   useEffect(() => {
     if (!isRowSelected) {
@@ -48,9 +119,8 @@ const InputCell = (props: any) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateTempData(props.row.id, props.column.id, e.target.value);
     setValue(e.target.value);
-    console.log(props.row.id)
-    console.log(props.row.index)
   };
+
   return (
     <Input
       placeholder={props.placeholder}
@@ -69,9 +139,7 @@ const ActionCell = (props: any) => {
       <Button onClick={row.getToggleSelectedHandler()}>
         <Pencil size={18} />
       </Button>
-      <Button variant="secondary">
-        <Trash2 size={18} />
-      </Button>
+      <ConfirmDeleteRow onConfirm={props.table.options.meta.removeRow} rowId={row.id} />
     </div>
   )
 }
@@ -80,17 +148,29 @@ const EditedActionCell = (props: any) => {
   const row = props.row
 
   const handleSave = () => {
-    row.getToggleSelectedHandler()
-    const updatedConsumedTime = row.getValue('consumedTime') + parseInt(row.getValue('newConsumedTime'))
-    const updatedRemainingTime = parseInt(row.getValue('newConsumedTime'))
+    const tempData = row.original.tempData
 
-    console.log("updatedConsumedTime", updatedConsumedTime)
-    console.log("updatedRemainingTime", updatedRemainingTime)
+    const newConsumedTime = isNaN(parseInt(tempData.newConsumedTime)) ? 0 : parseInt(tempData.newConsumedTime)
+    const newRemainingTime = isNaN(parseInt(tempData.newRemainingTime)) ? 0 : parseInt(tempData.newRemainingTime)
 
-    console.log("row", row)
+    const updatedConsumedTime = isNaN(row.original.consumedTime) ? 0 : row.original.consumedTime + newConsumedTime
+    const updatedRemainingTime = newRemainingTime
 
-    props.table.options.meta.updateData(row.id, 'consumedTime', updatedConsumedTime)
-    props.table.options.meta.updateData(row.id, 'remainingTime', updatedRemainingTime)
+    const updatedStatus = tempData.status || row.original.status
+
+    const updatedTaskName = tempData.task || row.original.task
+
+    props.table.options.meta.updateData(row.id, {
+      consumedTime: updatedConsumedTime,
+      remainingTime: updatedRemainingTime,
+      status: updatedStatus,
+      task: updatedTaskName
+    })
+
+    props.table.options.meta.updateTempData(row.id, 'newConsumedTime', 0)
+    props.table.options.meta.updateTempData(row.id, 'newRemainingTime', 0)
+
+    row.toggleSelected(false)
   }
 
   return (
@@ -129,6 +209,78 @@ const defaultData: TData[] = [
     consumedTime: 10,
     remainingTime: 0,
     tempData: {}
+  },
+  {
+    task: 'Task 4',
+    status: 'backlog',
+    initialEstimate: 10,
+    consumedTime: 0,
+    remainingTime: 10,
+    tempData: {}
+  },
+  {
+    task: 'Task 5',
+    status: 'in-progress',
+    initialEstimate: 10,
+    consumedTime: 5,
+    remainingTime: 5,
+    tempData: {}
+  },
+  {
+    task: 'Task 6',
+    status: 'done',
+    initialEstimate: 10,
+    consumedTime: 10,
+    remainingTime: 0,
+    tempData: {}
+  },
+  {
+    task: 'Task 7',
+    status: 'backlog',
+    initialEstimate: 10,
+    consumedTime: 0,
+    remainingTime: 10,
+    tempData: {}
+  },
+  {
+    task: 'Task 8',
+    status: 'in-progress',
+    initialEstimate: 10,
+    consumedTime: 5,
+    remainingTime: 5,
+    tempData: {}
+  },
+  {
+    task: 'Task 9',
+    status: 'done',
+    initialEstimate: 10,
+    consumedTime: 10,
+    remainingTime: 0,
+    tempData: {}
+  },
+  {
+    task: 'Task 10',
+    status: 'backlog',
+    initialEstimate: 10,
+    consumedTime: 0,
+    remainingTime: 10,
+    tempData: {}
+  },
+  {
+    task: 'Task 11',
+    status: 'in-progress',
+    initialEstimate: 10,
+    consumedTime: 5,
+    remainingTime: 5,
+    tempData: {}
+  },
+  {
+    task: 'Task 12',
+    status: 'done',
+    initialEstimate: 10,
+    consumedTime: 10,
+    remainingTime: 0,
+    tempData: {}
   }
 ]
 
@@ -136,37 +288,53 @@ const columns: ColumnDef<TData>[] = [
   {
     accessorKey: 'task',
     header: 'Task',
-    cell: (props: any) => <p>{props.getValue()}</p>
+    size: 180,
+    enableResizing: false,
+    cell: (props: any) => (
+      props.row.getIsSelected() ? <TextInputCell placeholder="Task" defaultValue={props.getValue()} {...props} /> : <p>{props.getValue()}</p>
+    )
   },
   {
     accessorKey: 'initialEstimate',
     header: 'Initial Estimate',
-    cell: (props: any) => <p>{props.getValue()}</p>
+    cell: (props: any) => (
+      <p>{props.getValue()}</p>
+    )
   },
   {
     accessorKey: 'consumedTime',
     header: 'Consumed Time',
-    cell: (props: any) => <p>{props.getValue()}</p>
+    cell: (props: any) => (
+      <p>{props.getValue()}</p>
+    )
   },
   {
     accessorKey: 'remainingTime',
     header: 'Remaining Time',
-    cell: (props: any) => <p>{props.getValue()}</p>
+    cell: (props: any) => (
+      <p>{props.getValue()}</p>
+    )
   },
   {
     accessorKey: 'newConsumedTime',
     header: 'New Consumed Time',
-    cell: (props: any) => <InputCell placeholder="New Consumed Time" {...props} />
+    cell: (props: any) => <EstimateInputCell placeholder="New Consumed Time" {...props} />
   },
   {
     accessorKey: 'newRemainingTime',
     header: 'New Remaining Time',
-    cell: (props: any) => <InputCell placeholder="New Remaining Time" {...props} />
+    cell: (props: any) => <EstimateInputCell placeholder="New Remaining Time" {...props} />
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: (props: any) => <Badge variant="secondary" className="cursor-pointer select-none">{props.getValue()}</Badge>
+    enableResizing: false,
+    size: 180,
+    minSize: 180,
+    maxSize: 180,
+    cell: (props: any) => (
+      props.row.getIsSelected() ? <SelectInputCell defaultValues={props.getValue()} {...props} /> : <Badge variant="secondary" className="cursor-pointer select-none">{props.getValue()}</Badge>
+    )
   },
   {
     accessorKey: 'actions',
@@ -180,6 +348,10 @@ const columns: ColumnDef<TData>[] = [
 export const DataTable = () => {
   const [data, setData] = useState<TData[]>(defaultData)
   const [rowSelection, setRowSelection] = useState<any>([])
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
 
   const table = useReactTable({
     data,
@@ -188,26 +360,34 @@ export const DataTable = () => {
     enableRowSelection: true,
     enableMultiRowSelection: true,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
+    getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
     state: {
-      rowSelection
+      rowSelection,
+      pagination
     },
     meta: {
-      updateData: (rowId: string, columnId: string, value: any) => {
-        const updatedData = data.map((row) => {
-          if (row.id === rowId) {
-            return {
-              ...row,
-              [columnId]: value
+      updateData: (rowId: string, updatedData: any) => {
+        setData((prev) =>
+          prev.map((row, index) => {
+            if (index.toString() === rowId) {
+              return {
+                ...row,
+                ...updatedData
+              }
             }
-          }
-          return row
-        })
-        setData(updatedData)
+            return row
+          })
+        )
       },
       updateTempData: (rowId: string, columnId: string, value: any) => {
         setData((prev) =>
-          prev.map((row) => {
-            if (row.id === rowId) {
+          prev.map((row, index) => {
+            if (index.toString() === rowId) {
               return {
                 ...row,
                 tempData: {
@@ -219,37 +399,73 @@ export const DataTable = () => {
             return row
           })
         )
+      },
+      removeRow: (rowId: string) => {
+        setData((prev) => prev.filter((_, index) => index.toString() !== rowId))
+      },
+      insertRow: () => {
+        setData((prev) => [
+          ...prev,
+          {
+            task: 'New Task',
+            status: 'backlog',
+            initialEstimate: 0,
+            consumedTime: 0,
+            remainingTime: 0,
+            tempData: {}
+          }
+        ])
       }
     }
   })
-  console.log("table", table.options.data)
+
+  console.log("table", table)
 
   return (
-    <Table>
-      <TableHeader>
-        {table.getHeaderGroups().map((headerGroup: any) => (
-          <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map((column: any) => (
-              <TableHead key={column.id}>{column.column.columnDef.header}</TableHead>
+    <div className="flex flex-col gap-y-4">
+      <div className="flex justify-end gap-4">
+        <Button className="w-32 gap-4">
+          <Plus />
+          Add Task
+        </Button>
+      </div>
+      <div className="flex flex-col justify-start">
+        <DataTableToolbar table={table} />
+      </div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup: any) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((column: any) => (
+                  <TableHead
+                    key={column.id}
+                    style={{ width: `${column.getSize()}px`, minWidth: `${column.getSize()}px`, maxWidth: `${column.getSize()}px` }}
+                  >
+                    {column.column.columnDef.header}
+                  </TableHead>
+                ))}
+              </TableRow>
             ))}
-          </TableRow>
-        ))}
-      </TableHeader>
-      <TableBody>
-        {table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map((row: any) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell: any) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))
-        ) : (
-          <TableCell colSpan={columns.length} className="h-24 text-center">No data</TableCell>
-        )}
-      </TableBody>
-    </Table>
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row: any) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  {row.getVisibleCells().map((cell: any) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableCell colSpan={columns.length} className="h-24 text-center">No data</TableCell>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <DataTablePagination table={table} />
+    </div>
   )
 }
