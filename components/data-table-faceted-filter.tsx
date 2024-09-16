@@ -101,6 +101,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       column?.setFilterValue(
                         filterValues.length ? filterValues : undefined
                       )
+
                     }}
                   >
                     <div

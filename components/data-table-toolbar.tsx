@@ -5,9 +5,9 @@ import { Table } from "@tanstack/react-table"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DataTableViewOptions } from "@/components/data-table-view-options"
 
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { Plus } from "lucide-react"
 
 const statuses = [
   {
@@ -36,14 +36,22 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
+  const handleAddTask = () => {
+    table.options.meta.insertRow()
+    table.setRowSelection((old) => ({
+      ...old,
+      [0]: true,
+    }))
+  }
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
           placeholder="Filter tasks..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("task")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.getColumn("task")?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
@@ -65,7 +73,12 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="flex justify-end gap-4">
+        <Button className="w-32 gap-4" onClick={handleAddTask} disabled={table.getIsSomeRowsSelected()}>
+          <Plus />
+          Add Task
+        </Button>
+      </div>
     </div>
   )
 }

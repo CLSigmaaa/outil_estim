@@ -298,8 +298,9 @@ const columns: ColumnDef<TData>[] = [
     accessorKey: 'initialEstimate',
     header: 'Initial Estimate',
     cell: (props: any) => (
-      <p>{props.getValue()}</p>
+      props.row.getIsSelected() ? <TextInputCell placeholder="0" defaultValue={props.getValue()} {...props} /> : <p>{props.getValue()}</p>
     )
+
   },
   {
     accessorKey: 'consumedTime',
@@ -332,6 +333,7 @@ const columns: ColumnDef<TData>[] = [
     size: 180,
     minSize: 180,
     maxSize: 180,
+    filterFn: 'arrIncludesSome',
     cell: (props: any) => (
       props.row.getIsSelected() ? <SelectInputCell defaultValues={props.getValue()} {...props} /> : <Badge variant="secondary" className="cursor-pointer select-none">{props.getValue()}</Badge>
     )
@@ -405,7 +407,6 @@ export const DataTable = () => {
       },
       insertRow: () => {
         setData((prev) => [
-          ...prev,
           {
             task: 'New Task',
             status: 'backlog',
@@ -413,7 +414,8 @@ export const DataTable = () => {
             consumedTime: 0,
             remainingTime: 0,
             tempData: {}
-          }
+          },
+          ...prev
         ])
       }
     }
@@ -423,12 +425,6 @@ export const DataTable = () => {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="flex justify-end gap-4">
-        <Button className="w-32 gap-4">
-          <Plus />
-          Add Task
-        </Button>
-      </div>
       <div className="flex flex-col justify-start">
         <DataTableToolbar table={table} />
       </div>
