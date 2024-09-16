@@ -4,6 +4,9 @@ import "./globals.css";
 
 import { Toaster } from "@/components/ui/toaster"
 
+import { ThemeProvider } from "@/components/theme-provider";
+import { ModeToggle } from "@/components/dark-mode-toggle";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,8 +22,17 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={inter.className}>
-        <main>{children}</main>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <>
+            {children}
+          </>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

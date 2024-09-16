@@ -160,11 +160,14 @@ const EditedActionCell = (props: any) => {
 
     const updatedTaskName = tempData.task || row.original.task
 
+    const updatedInitialEstimate = tempData.initialEstimate || row.original.initialEstimate
+
     props.table.options.meta.updateData(row.id, {
       consumedTime: updatedConsumedTime,
       remainingTime: updatedRemainingTime,
       status: updatedStatus,
-      task: updatedTaskName
+      task: updatedTaskName,
+      initialEstimate: updatedInitialEstimate
     })
 
     props.table.options.meta.updateTempData(row.id, 'newConsumedTime', 0)
@@ -178,7 +181,7 @@ const EditedActionCell = (props: any) => {
       <Button onClick={handleSave}>
         <Check size={18} />
       </Button>
-      <Button variant="secondary" onClick={row.getToggleSelectedHandler()}>
+      <Button variant="outline" onClick={row.getToggleSelectedHandler()}>
         <X size={18} />
       </Button>
     </div>
@@ -187,101 +190,53 @@ const EditedActionCell = (props: any) => {
 
 const defaultData: TData[] = [
   {
-    task: 'Task 1',
-    status: 'backlog',
-    initialEstimate: 10,
-    consumedTime: 0,
-    remainingTime: 10,
-    tempData: {}
-  },
-  {
-    task: 'Task 2',
-    status: 'in-progress',
-    initialEstimate: 10,
-    consumedTime: 5,
-    remainingTime: 5,
-    tempData: {}
-  },
-  {
-    task: 'Task 3',
+    task: 'Table with dynamic data',
     status: 'done',
-    initialEstimate: 10,
-    consumedTime: 10,
+    initialEstimate: 1,
+    consumedTime: 1.5,
     remainingTime: 0,
     tempData: {}
   },
   {
-    task: 'Task 4',
-    status: 'backlog',
-    initialEstimate: 10,
-    consumedTime: 0,
-    remainingTime: 10,
-    tempData: {}
-  },
-  {
-    task: 'Task 5',
-    status: 'in-progress',
-    initialEstimate: 10,
-    consumedTime: 5,
-    remainingTime: 5,
-    tempData: {}
-  },
-  {
-    task: 'Task 6',
+    task: 'Create a task',
     status: 'done',
-    initialEstimate: 10,
-    consumedTime: 10,
+    initialEstimate: 1.5,
+    consumedTime: 1.5,
     remainingTime: 0,
     tempData: {}
   },
   {
-    task: 'Task 7',
-    status: 'backlog',
-    initialEstimate: 10,
-    consumedTime: 0,
-    remainingTime: 10,
-    tempData: {}
-  },
-  {
-    task: 'Task 8',
-    status: 'in-progress',
-    initialEstimate: 10,
-    consumedTime: 5,
-    remainingTime: 5,
-    tempData: {}
-  },
-  {
-    task: 'Task 9',
+    task: 'Edit a task',
     status: 'done',
-    initialEstimate: 10,
-    consumedTime: 10,
+    initialEstimate: 3,
+    consumedTime: 3,
     remainingTime: 0,
     tempData: {}
   },
   {
-    task: 'Task 10',
-    status: 'backlog',
-    initialEstimate: 10,
-    consumedTime: 0,
-    remainingTime: 10,
-    tempData: {}
-  },
-  {
-    task: 'Task 11',
-    status: 'in-progress',
-    initialEstimate: 10,
-    consumedTime: 5,
-    remainingTime: 5,
-    tempData: {}
-  },
-  {
-    task: 'Task 12',
+    task: 'Add pagination and filtering using statuses',
     status: 'done',
-    initialEstimate: 10,
-    consumedTime: 10,
+    initialEstimate: 1.5,
+    consumedTime: 1.5,
     remainingTime: 0,
     tempData: {}
-  }
+  },
+  {
+    task: 'Add dark mode',
+    status: 'done',
+    initialEstimate: 0.25,
+    consumedTime: 0.25,
+    remainingTime: 0,
+    tempData: {}
+  },
+  {
+    task: 'Deploy to Vercel',
+    status: 'done',
+    initialEstimate: 0.25,
+    consumedTime: 0.25,
+    remainingTime: 0,
+    tempData: {}
+  },
 ]
 
 const columns: ColumnDef<TData>[] = [
@@ -319,12 +274,12 @@ const columns: ColumnDef<TData>[] = [
   {
     accessorKey: 'newConsumedTime',
     header: 'New Consumed Time',
-    cell: (props: any) => <EstimateInputCell placeholder="New Consumed Time" {...props} />
+    cell: (props: any) => <EstimateInputCell placeholder="10" {...props} />
   },
   {
     accessorKey: 'newRemainingTime',
     header: 'New Remaining Time',
-    cell: (props: any) => <EstimateInputCell placeholder="New Remaining Time" {...props} />
+    cell: (props: any) => <EstimateInputCell placeholder="0" {...props} />
   },
   {
     accessorKey: 'status',
@@ -456,7 +411,9 @@ export const DataTable = () => {
                 </TableRow>
               ))
             ) : (
-              <TableCell colSpan={columns.length} className="h-24 text-center">No data</TableCell>
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">No data</TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>
