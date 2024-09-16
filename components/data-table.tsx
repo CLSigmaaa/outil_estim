@@ -259,14 +259,14 @@ const columns: ColumnDef<TData>[] = [
   },
   {
     accessorKey: 'consumedTime',
-    header: 'Consumed Time',
+    header: 'Consumed Time (days)',
     cell: (props: any) => (
       <p>{props.getValue()}</p>
     )
   },
   {
     accessorKey: 'remainingTime',
-    header: 'Remaining Time',
+    header: 'Remaining Time (days)',
     cell: (props: any) => (
       <p>{props.getValue()}</p>
     )
@@ -274,7 +274,7 @@ const columns: ColumnDef<TData>[] = [
   {
     accessorKey: 'newConsumedTime',
     header: 'New Consumed Time',
-    cell: (props: any) => <EstimateInputCell placeholder="10" {...props} />
+    cell: (props: any) => <EstimateInputCell placeholder="1" {...props} />
   },
   {
     accessorKey: 'newRemainingTime',
