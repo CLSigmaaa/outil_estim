@@ -1,5 +1,9 @@
 "use client"
 
+import { useDebounce } from "use-debounce"
+
+import useTasks from "@/hooks/use-tasks"
+
 import {
   Table,
   TableBody,
@@ -12,20 +16,19 @@ import {
 } from "@/components/ui/table"
 
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 import { ColumnDef, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
 import { useEffect, useState } from "react"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
-import { Check, Pencil, Plus, X } from "lucide-react"
+import { ChartLine, ScrollText } from "lucide-react"
 import { Input } from "./ui/input"
 import { DataTablePagination } from "./data-table-pagination"
 import { ConfirmDeleteRow } from "./confirm-delete-row"
@@ -33,100 +36,72 @@ import { DataTableToolbar } from "./data-table-toolbar"
 
 export type TData = {
   id?: string,
-  task: string,
-  status: 'backlog' | 'in-progress' | 'done',
-  initialEstimate: number,
+  taskName: string,
+  status: 'backlog' | 'in-progress' | 'done' | 'created',
+  initialEstimation: number,
   consumedTime: number,
   remainingTime: number,
-  tempData: Partial<Omit<TData, 'id' | 'initialEstimate' | 'consumedTime' | 'remainingTime'> & {
-    newConsumedTime: number,
-    newRemainingTime: number
-  }>
 }
 
-const SelectInputCell = (props: any) => {
-  const updateTempData = props.table.options.meta.updateTempData
-  console.log("props", props.row.id)
-
-  return (
-    <Select defaultValue={props.defaultValues} onValueChange={(status) => updateTempData(props.row.id, 'status', status)}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Select a status" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Status</SelectLabel>
-          <SelectItem
-            value="backlog"
-          >
-            backlog
-          </SelectItem>
-          <SelectItem
-            value="in-progress"
-          >
-            in-progress
-          </SelectItem>
-          <SelectItem
-            value="done"
-          >
-            done
-          </SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  )
+interface EditableCellProps {
+  getValue: () => any;
+  row: {
+    original: {
+      id: string;
+    }
+  };
+  column: {
+    id: string;
+  };
+  table: {
+    options: {
+      meta: {
+        updateRow: (id: string, data: Record<string, any>) => void;
+      };
+    };
+  };
+  placeholder?: string;
+  type?: string;
 }
 
-const TextInputCell = (props: any) => {
-  const isRowSelected = props.row.getIsSelected()
-  const updateTempData = props.table.options.meta.updateTempData
+const EditableCell: React.FC<EditableCellProps> = ({ getValue, row, column, table, placeholder, type }) => {
+  const initialValue = getValue()
 
-  const [value, setValue] = useState("")
+  const options = table.options.meta
+
+  const [value, setValue] = useState(initialValue)
+  const [debouncedValue] = useDebounce(value, 500)
+  const specialFields = ['newConsumedTime', 'newRemainingTime']
 
   useEffect(() => {
-    if (isRowSelected) {
-      setValue(props.defaultValue === "" ? "" : props.defaultValue);
-    }
-  }, [isRowSelected]);
+    if (debouncedValue) {
+      console.log("debouncedValue", debouncedValue)
+      console.log("row.original.id", row.original.id)
+      if (specialFields.includes(column.id)) {
+        if (column.id === 'newConsumedTime') {
+          options.updateRow(row.original.id, { consumedTime: parseInt(debouncedValue) })
+          return;
+        }
+        if (column.id === 'newRemainingTime') {
+          options.updateRow(row.original.id, { remainingTime: parseInt(debouncedValue) })
+          return;
+        }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateTempData(props.row.id, props.column.id, e.target.value);
-    setValue(e.target.value);
-  };
+        options.updateRow(row.original.id, { [column.id]: debouncedValue })
+        return;
+      }
+    }
+  }, [debouncedValue])
 
   return (
     <Input
-      placeholder={props.placeholder}
       value={value}
-      onChange={handleChange}
-      disabled={!isRowSelected}
-    />
-  )
-}
-
-const EstimateInputCell = (props: any) => {
-  const isRowSelected = props.row.getIsSelected()
-  const updateTempData = props.table.options.meta.updateTempData
-
-  const [value, setValue] = useState("")
-
-  useEffect(() => {
-    if (!isRowSelected) {
-      setValue("");
-    }
-  }, [isRowSelected]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateTempData(props.row.id, props.column.id, e.target.value);
-    setValue(e.target.value);
-  };
-
-  return (
-    <Input
-      placeholder={props.placeholder}
-      value={value}
-      onChange={handleChange}
-      disabled={!isRowSelected}
+      onChange={(e) => setValue(e.target.value)}
+      placeholder={placeholder ? placeholder : undefined}
+      type={type ? type : 'text'}
+      onBlur={() => {
+        setValue("")
+      }}
     />
   )
 }
@@ -136,130 +111,73 @@ const ActionCell = (props: any) => {
 
   return (
     <div className="flex items-center gap-2">
-      <Button onClick={row.getToggleSelectedHandler()}>
-        <Pencil size={18} />
-      </Button>
+      <ActionCell.HistoryDialog />
+      <ActionCell.DetailedGraphsDialog />
+
       <ConfirmDeleteRow onConfirm={props.table.options.meta.removeRow} rowId={row.id} />
     </div>
   )
 }
 
-const EditedActionCell = (props: any) => {
-  const row = props.row
-
-  const handleSave = () => {
-    const tempData = row.original.tempData
-
-    const newConsumedTime = isNaN(parseInt(tempData.newConsumedTime)) ? 0 : parseInt(tempData.newConsumedTime)
-    const newRemainingTime = isNaN(parseInt(tempData.newRemainingTime)) ? 0 : parseInt(tempData.newRemainingTime)
-
-    const updatedConsumedTime = isNaN(row.original.consumedTime) ? 0 : row.original.consumedTime + newConsumedTime
-    const updatedRemainingTime = newRemainingTime
-
-    const updatedStatus = tempData.status || row.original.status
-
-    const updatedTaskName = tempData.task || row.original.task
-
-    const updatedInitialEstimate = tempData.initialEstimate || row.original.initialEstimate
-
-    props.table.options.meta.updateData(row.id, {
-      consumedTime: updatedConsumedTime,
-      remainingTime: updatedRemainingTime,
-      status: updatedStatus,
-      task: updatedTaskName,
-      initialEstimate: updatedInitialEstimate
-    })
-
-    props.table.options.meta.updateTempData(row.id, 'newConsumedTime', 0)
-    props.table.options.meta.updateTempData(row.id, 'newRemainingTime', 0)
-
-    row.toggleSelected(false)
-  }
-
+const HistoryDialog = () => {
   return (
-    <div className="flex items-center gap-2">
-      <Button onClick={handleSave}>
-        <Check size={18} />
-      </Button>
-      <Button variant="outline" onClick={row.getToggleSelectedHandler()}>
-        <X size={18} />
-      </Button>
-    </div>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <ScrollText size={18} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>History</DialogTitle>
+        </DialogHeader>
+        <DialogDescription>
+          <p>History of changes</p>
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
   )
 }
+ActionCell.HistoryDialog = HistoryDialog
 
-const defaultData: TData[] = [
-  {
-    task: 'Table with dynamic data',
-    status: 'done',
-    initialEstimate: 1,
-    consumedTime: 1.5,
-    remainingTime: 0,
-    tempData: {}
-  },
-  {
-    task: 'Create a task',
-    status: 'done',
-    initialEstimate: 1.5,
-    consumedTime: 1.5,
-    remainingTime: 0,
-    tempData: {}
-  },
-  {
-    task: 'Edit a task',
-    status: 'done',
-    initialEstimate: 3,
-    consumedTime: 3,
-    remainingTime: 0,
-    tempData: {}
-  },
-  {
-    task: 'Add pagination and filtering using statuses',
-    status: 'done',
-    initialEstimate: 1.5,
-    consumedTime: 1.5,
-    remainingTime: 0,
-    tempData: {}
-  },
-  {
-    task: 'Add dark mode',
-    status: 'done',
-    initialEstimate: 0.25,
-    consumedTime: 0.25,
-    remainingTime: 0,
-    tempData: {}
-  },
-  {
-    task: 'Deploy to Vercel',
-    status: 'done',
-    initialEstimate: 0.25,
-    consumedTime: 0.25,
-    remainingTime: 0,
-    tempData: {}
-  },
-]
+const DetailedGraphsDialog = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <ChartLine size={18} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Detailed Graphs</DialogTitle>
+        </DialogHeader>
+        <DialogDescription>
+          <p>Graphs</p>
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
+  )
+}
+ActionCell.DetailedGraphsDialog = DetailedGraphsDialog
 
 const columns: ColumnDef<TData>[] = [
   {
-    accessorKey: 'task',
+    accessorKey: 'taskName',
     header: 'Task',
     size: 180,
     enableResizing: false,
-    cell: (props: any) => (
-      props.row.getIsSelected() ? <TextInputCell placeholder="Task" defaultValue={props.getValue()} {...props} /> : <p>{props.getValue()}</p>
-    )
+    cell: (props: any) => <EditableCell {...props} />
   },
   {
-    accessorKey: 'initialEstimate',
+    accessorKey: 'initialEstimation',
     header: 'Initial Estimate',
-    cell: (props: any) => (
-      props.row.getIsSelected() ? <TextInputCell placeholder="0" defaultValue={props.getValue()} {...props} /> : <p>{props.getValue()}</p>
-    )
+    cell: (props: any) => <EditableCell {...props} />
 
   },
   {
     accessorKey: 'consumedTime',
-    header: 'Consumed Time (days)',
+    header: 'Total Consumed Time (days)',
     cell: (props: any) => (
       <p>{props.getValue()}</p>
     )
@@ -274,12 +192,12 @@ const columns: ColumnDef<TData>[] = [
   {
     accessorKey: 'newConsumedTime',
     header: 'New Consumed Time',
-    cell: (props: any) => <EstimateInputCell placeholder="1" {...props} />
+    cell: (props: any) => <EditableCell {...props} placeholder="0" type="number" />
   },
   {
     accessorKey: 'newRemainingTime',
     header: 'New Remaining Time',
-    cell: (props: any) => <EstimateInputCell placeholder="0" {...props} />
+    cell: (props: any) => <EditableCell {...props} placeholder="0" type="number" />
   },
   {
     accessorKey: 'status',
@@ -289,34 +207,44 @@ const columns: ColumnDef<TData>[] = [
     minSize: 180,
     maxSize: 180,
     filterFn: 'arrIncludesSome',
-    cell: (props: any) => (
-      props.row.getIsSelected() ? <SelectInputCell defaultValues={props.getValue()} {...props} /> : <Badge variant="secondary" className="cursor-pointer select-none">{props.getValue()}</Badge>
-    )
+    cell: (props: any) => {
+      const badgeColors: Record<string, any> = {
+        'BACKLOG': 'destructive',
+        'IN_PROGRESS': 'warning',
+        'DONE': 'success',
+      }
+      return (
+        <Badge variant={badgeColors[props.getValue()]} className="cursor-pointer select-none">{props.getValue()}</Badge>
+      )
+    }
   },
   {
     accessorKey: 'actions',
     header: 'Actions',
     cell: (props: any) => (
-      props.row.getIsSelected() ? <EditedActionCell {...props} /> : <ActionCell {...props} />
+      <ActionCell {...props} />
     )
   }
 ]
 
-export const DataTable = () => {
-  const [data, setData] = useState<TData[]>(defaultData)
-  const [rowSelection, setRowSelection] = useState<any>([])
+export const TaskTable = () => {
+  const { data: originalData, isValidating, updateRow, addRow, deleteRow } = useTasks()
+  const [data, setData] = useState<TData[]>([])
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 5,
   });
 
+  useEffect(() => {
+    if (isValidating) return;
+    setData([...originalData])
+  }, [isValidating])
+
+
   const table = useReactTable({
-    data,
+    data: data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    enableRowSelection: true,
-    enableMultiRowSelection: true,
-    onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -324,55 +252,33 @@ export const DataTable = () => {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     state: {
-      rowSelection,
       pagination
     },
     meta: {
-      updateData: (rowId: string, updatedData: any) => {
-        setData((prev) =>
-          prev.map((row, index) => {
-            if (index.toString() === rowId) {
-              return {
-                ...row,
-                ...updatedData
-              }
-            }
-            return row
-          })
-        )
+      revertData: (rowIndex: number) => {
+        setData((old) =>
+          old.map((row, index) =>
+            index === rowIndex ? originalData[rowIndex] : row
+          )
+        );
       },
-      updateTempData: (rowId: string, columnId: string, value: any) => {
-        setData((prev) =>
-          prev.map((row, index) => {
-            if (index.toString() === rowId) {
-              return {
-                ...row,
-                tempData: {
-                  ...row.tempData,
-                  [columnId]: value
-                }
-              }
-            }
-            return row
-          })
-        )
+      updateRow: (rowIndex: number, putData: any) => {
+        console.log("rowIndex", rowIndex)
+        updateRow(rowIndex, putData);
       },
-      removeRow: (rowId: string) => {
-        setData((prev) => prev.filter((_, index) => index.toString() !== rowId))
+      addRow: () => {
+        //const newRow: TData = {
+        //};
+        //addRow(newRow);
       },
-      insertRow: () => {
-        setData((prev) => [
-          {
-            task: 'New Task',
-            status: 'backlog',
-            initialEstimate: 0,
-            consumedTime: 0,
-            remainingTime: 0,
-            tempData: {}
-          },
-          ...prev
-        ])
-      }
+      removeRow: (rowIndex: number) => {
+        deleteRow(data[rowIndex].id);
+      },
+      removeSelectedRows: (selectedRows: number[]) => {
+        selectedRows.forEach((rowIndex) => {
+          deleteRow(data[rowIndex].id);
+        });
+      },
     }
   })
 

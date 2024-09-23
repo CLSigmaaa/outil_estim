@@ -24,7 +24,7 @@ export const ConfirmDeleteRow = (
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline">
+        <Button variant="destructive">
           <Trash2 size={18} />
         </Button>
       </PopoverTrigger>
