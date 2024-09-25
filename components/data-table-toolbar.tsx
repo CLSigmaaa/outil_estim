@@ -11,17 +11,17 @@ import { Plus } from "lucide-react"
 
 const statuses = [
   {
-    value: "backlog",
+    value: "BACKLOG",
     label: "Backlog",
     icon: QuestionMarkCircledIcon,
   },
   {
-    value: "in-progress",
+    value: "IN_PROGRESS",
     label: "In Progress",
     icon: StopwatchIcon,
   },
   {
-    value: "done",
+    value: "DONE",
     label: "Done",
     icon: CheckCircledIcon,
   },
@@ -38,10 +38,6 @@ export function DataTableToolbar<TData>({
 
   const handleAddTask = () => {
     table.options.meta.insertRow()
-    table.setRowSelection((old) => ({
-      ...old,
-      [0]: true,
-    }))
   }
 
   return (

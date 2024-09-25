@@ -11,7 +11,7 @@ async function fetcher(url: string) {
 
 
 export default function useTasks() {
-  const { data, isValidating } = useSWR(url, fetcher)
+  const { data, isValidating, isLoading } = useSWR(url, fetcher)
 
   const updateRow = async (id: string, data: any) => {
     await fetch(`${url}/${id}`, {
@@ -24,7 +24,14 @@ export default function useTasks() {
     mutate(url)
   }
 
-  const addRow = async (data: any) => {
+  const addRow = async () => {
+    const data = {
+      taskName: "New Task",
+      initialEstimation: 1,
+      remainingTime: 1,
+      consumedTime: 0,
+      status: "BACKLOG",
+    }
     await fetch(url, {
       method: "POST",
       headers: {
@@ -44,6 +51,7 @@ export default function useTasks() {
 
   return {
     data: data ?? [],
+    isLoading,
     isValidating,
     updateRow,
     addRow,

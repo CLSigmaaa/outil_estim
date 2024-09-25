@@ -11,13 +11,10 @@ import { Table } from "@tanstack/react-table"
 import { TData } from "./data-table"
 
 
-export const ConfirmDeleteRow = (
-  { onConfirm, rowId }: { onConfirm: (rowId: string) => void, rowId: string }
-) => {
+export const ConfirmDeleteRow = ({ onDelete, rowId }) => {
   const [isOpen, setIsOpen] = useState(false)
-
   const handleDelete = () => {
-    onConfirm(rowId)
+    onDelete(rowId)
     setIsOpen(false)
   }
 

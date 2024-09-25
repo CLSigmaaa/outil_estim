@@ -28,7 +28,7 @@ import { ColumnDef, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedU
 import { useEffect, useState } from "react"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
-import { ChartLine, ScrollText } from "lucide-react"
+import { ChartLine, Check, ScrollText } from "lucide-react"
 import { Input } from "./ui/input"
 import { DataTablePagination } from "./data-table-pagination"
 import { ConfirmDeleteRow } from "./confirm-delete-row"
@@ -41,6 +41,10 @@ export type TData = {
   initialEstimation: number,
   consumedTime: number,
   remainingTime: number,
+  tempData: Partial<Omit<TData, 'id' | 'consumedTime' | 'remainingTime'> & {
+    newConsumedTime: number,
+    newRemainingTime: number
+  }>
 }
 
 interface EditableCellProps {
@@ -57,6 +61,7 @@ interface EditableCellProps {
     options: {
       meta: {
         updateRow: (id: string, data: Record<string, any>) => void;
+        updateTempData: (rowId: string, columnId: string, value: any) => void;
       };
     };
   };
@@ -65,56 +70,67 @@ interface EditableCellProps {
 }
 
 const EditableCell: React.FC<EditableCellProps> = ({ getValue, row, column, table, placeholder, type }) => {
-  const initialValue = getValue()
-
-  const options = table.options.meta
-
-  const [value, setValue] = useState(initialValue)
-  const [debouncedValue] = useDebounce(value, 500)
-  const specialFields = ['newConsumedTime', 'newRemainingTime']
+  const options = table.options.meta;
+  const [value, setValue] = useState(getValue());
+  const updateTempData = options.updateTempData;
 
   useEffect(() => {
-    if (debouncedValue) {
-      console.log("debouncedValue", debouncedValue)
-      console.log("row.original.id", row.original.id)
-      if (specialFields.includes(column.id)) {
-        if (column.id === 'newConsumedTime') {
-          options.updateRow(row.original.id, { consumedTime: parseInt(debouncedValue) })
-          return;
-        }
-        if (column.id === 'newRemainingTime') {
-          options.updateRow(row.original.id, { remainingTime: parseInt(debouncedValue) })
-          return;
-        }
+    setValue(getValue());
+  }, [getValue]);
 
-        options.updateRow(row.original.id, { [column.id]: debouncedValue })
-        return;
-      }
-    }
-  }, [debouncedValue])
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setValue(e.target.value);
+    updateTempData(row.original.id, column.id, e.target.value);
+  };
 
   return (
     <Input
       value={value}
-      onChange={(e) => setValue(e.target.value)}
+      onChange={handleOnChange}
       placeholder={placeholder ? placeholder : undefined}
       type={type ? type : 'text'}
-      onBlur={() => {
-        setValue("")
-      }}
     />
-  )
-}
+  );
+};
 
 const ActionCell = (props: any) => {
   const row = props.row
+  const isDisabled = props.table.options.meta.tempData.find((data: any) => data.rowId === row.original.id) ? false : true
+
+  const handleSaveRow = () => {
+    const tempData = props.table.options.meta.tempData.find((data: any) => data.rowId === row.original.id)?.data
+
+    let dataToSend = {}
+
+    if (tempData.newConsumedTime) {
+      dataToSend.consumedTime = parseInt(tempData.newConsumedTime)
+      delete tempData.newConsumedTime
+    }
+    if (tempData.newRemainingTime) {
+      dataToSend.remainingTime = parseInt(tempData.newRemainingTime)
+      delete tempData.newRemainingTime
+    }
+
+    dataToSend = { ...tempData, ...dataToSend }
+
+    props.table.options.meta.setTempData((old: any) => old.filter((data: any) => data.rowId !== row.original.id))
+
+    props.table.options.meta.updateRow(row.original.id, dataToSend)
+  }
 
   return (
     <div className="flex items-center gap-2">
-      <ActionCell.HistoryDialog />
-      <ActionCell.DetailedGraphsDialog />
-
-      <ConfirmDeleteRow onConfirm={props.table.options.meta.removeRow} rowId={row.id} />
+      <Button
+        onClick={handleSaveRow}
+        disabled={isDisabled}
+      >
+        <Check size={18} />
+      </Button>
+      <ConfirmDeleteRow
+        rowId={row.original.id}
+        onDelete={props.table.options.meta.removeRow}
+      />
     </div>
   )
 }
@@ -140,28 +156,15 @@ const HistoryDialog = () => {
 }
 ActionCell.HistoryDialog = HistoryDialog
 
-const DetailedGraphsDialog = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <ChartLine size={18} />
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Detailed Graphs</DialogTitle>
-        </DialogHeader>
-        <DialogDescription>
-          <p>Graphs</p>
-        </DialogDescription>
-      </DialogContent>
-    </Dialog>
-  )
-}
-ActionCell.DetailedGraphsDialog = DetailedGraphsDialog
-
 const columns: ColumnDef<TData>[] = [
+  {
+    accessorKey: 'id',
+    header: 'ID',
+    size: 80,
+    enableHiding: true,
+    enableResizing: false,
+    cell: (props: any) => <p>{props.getValue()}</p>
+  },
   {
     accessorKey: 'taskName',
     header: 'Task',
@@ -228,17 +231,24 @@ const columns: ColumnDef<TData>[] = [
 ]
 
 export const TaskTable = () => {
-  const { data: originalData, isValidating, updateRow, addRow, deleteRow } = useTasks()
+  const { data: originalData, isValidating, isLoading, updateRow, addRow, deleteRow } = useTasks()
   const [data, setData] = useState<TData[]>([])
+  const [tempData, setTempData] = useState<any[]>([])
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 5,
   });
+  const [columnFilters, setColumnFilters] = useState<any[]>([
+    {
+      id: 'status',
+      value: ['BACKLOG', 'IN_PROGRESS']
+    }
+  ])
 
   useEffect(() => {
-    if (isValidating) return;
+    if (isValidating || isLoading) return;
     setData([...originalData])
-  }, [isValidating])
+  }, [isValidating, isLoading, originalData])
 
 
   const table = useReactTable({
@@ -251,10 +261,25 @@ export const TaskTable = () => {
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    state: {
-      pagination
+    initialState: {
+      sorting: [
+        //{
+        //  id: 'id',
+        //  desc: true
+        //}
+      ],
+      columnVisibility: {
+        id: false,
+      }
     },
+    state: {
+      pagination,
+      columnFilters
+    },
+    onColumnFiltersChange: setColumnFilters,
     meta: {
+      tempData,
+      setTempData,
       revertData: (rowIndex: number) => {
         setData((old) =>
           old.map((row, index) =>
@@ -266,19 +291,19 @@ export const TaskTable = () => {
         console.log("rowIndex", rowIndex)
         updateRow(rowIndex, putData);
       },
-      addRow: () => {
-        //const newRow: TData = {
-        //};
-        //addRow(newRow);
-      },
-      removeRow: (rowIndex: number) => {
-        deleteRow(data[rowIndex].id);
-      },
-      removeSelectedRows: (selectedRows: number[]) => {
-        selectedRows.forEach((rowIndex) => {
-          deleteRow(data[rowIndex].id);
+      updateTempData: (rowId: string, columnId: string, value: any) => {
+        setTempData((old) => {
+          const tempData = old.find((data) => data.rowId === rowId) || { rowId, data: {} };
+          tempData.data[columnId] = value;
+          return [...old.filter((data) => data.rowId !== rowId), tempData];
         });
       },
+      insertRow: () => {
+        addRow();
+      },
+      removeRow: (rowId: string) => {
+        deleteRow(rowId);
+      }
     }
   })
 
@@ -289,7 +314,7 @@ export const TaskTable = () => {
       <div className="flex flex-col justify-start">
         <DataTableToolbar table={table} />
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border w-[1352px] overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup: any) => (
