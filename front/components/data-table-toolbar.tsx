@@ -9,6 +9,44 @@ import { Input } from "@/components/ui/input"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { Plus } from "lucide-react"
 
+const taskTypes = [
+  {
+    value: "BUG",
+    label: "Bug",
+    icon: CrossCircledIcon,
+  },
+  {
+    value: "FEATURE",
+    label: "Feature",
+    icon: CheckCircledIcon,
+  },
+  {
+    value: "ENHANCEMENT",
+    label: "Enhancement",
+    icon: CheckCircledIcon,
+  },
+  {
+    value: "REFACTOR",
+    label: "Refactor",
+    icon: CheckCircledIcon,
+  },
+  {
+    value: "RESEARCH",
+    label: "Research",
+    icon: CheckCircledIcon,
+  },
+  {
+    value: "TEST",
+    label: "Test",
+    icon: CheckCircledIcon,
+  },
+  {
+    value: "OTHER",
+    label: "Other",
+    icon: CheckCircledIcon,
+  }
+]
+
 const statuses = [
   {
     value: "BACKLOG",
@@ -44,7 +82,7 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Filter tasks..."
+          placeholder="Filtrer par nom..."
           value={(table.getColumn("taskName")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("taskName")?.setFilterValue(event.target.value)
@@ -54,7 +92,7 @@ export function DataTableToolbar<TData>({
         {table.getColumn("status") && (
           <DataTableFacetedFilter
             column={table.getColumn("status")}
-            title="Status"
+            title="Statut"
             options={statuses}
           />
         )}
@@ -64,15 +102,15 @@ export function DataTableToolbar<TData>({
             onClick={() => table.resetColumnFilters()}
             className="h-8 px-2 lg:px-3"
           >
-            Reset
+            Réinitialiser
             <Cross2Icon className="ml-2 h-4 w-4" />
           </Button>
         )}
       </div>
       <div className="flex justify-end gap-4">
-        <Button className="w-32 gap-4" onClick={handleAddTask} disabled={table.getIsSomeRowsSelected()}>
+        <Button className="w-full gap-4" onClick={handleAddTask} disabled={table.getIsSomeRowsSelected()}>
           <Plus />
-          Add Task
+          Ajouter une tâche
         </Button>
       </div>
     </div>

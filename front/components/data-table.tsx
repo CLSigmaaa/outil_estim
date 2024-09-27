@@ -1,8 +1,14 @@
 "use client"
 
-import { useDebounce } from "use-debounce"
+import { Textarea } from "@/components/ui/textarea"
 
 import useTasks from "@/hooks/use-tasks"
+
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 import {
   Table,
@@ -24,8 +30,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { ColumnDef, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
-import { useEffect, useState } from "react"
+import { forwardRef, useEffect, useState } from "react"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import { ChartLine, Check, ScrollText } from "lucide-react"
@@ -34,10 +48,14 @@ import { DataTablePagination } from "./data-table-pagination"
 import { ConfirmDeleteRow } from "./confirm-delete-row"
 import { DataTableToolbar } from "./data-table-toolbar"
 
+import { CheckCircledIcon, CrossCircledIcon, DotsHorizontalIcon } from "@radix-ui/react-icons"
+import { TaskStatus } from "@/utils/enums"
+
 export type TData = {
   id?: string,
   taskName: string,
-  status: 'backlog' | 'in-progress' | 'done' | 'created',
+  taskType: string,
+  status: TaskStatus,
   initialEstimation: number,
   consumedTime: number,
   remainingTime: number,
@@ -47,7 +65,7 @@ export type TData = {
   }>
 }
 
-interface EditableCellProps {
+interface EditableCellBasicInputProps {
   getValue: () => any;
   row: {
     original: {
@@ -67,32 +85,87 @@ interface EditableCellProps {
   };
   placeholder?: string;
   type?: string;
+  className?: string;
+  useHoverCard?: boolean;
 }
 
-const EditableCell: React.FC<EditableCellProps> = ({ getValue, row, column, table, placeholder, type }) => {
-  const options = table.options.meta;
-  const [value, setValue] = useState(getValue());
-  const updateTempData = options.updateTempData;
+const EditableCellBasicInput = forwardRef<HTMLInputElement, EditableCellBasicInputProps>(
+  ({ className, getValue, row, column, table, placeholder, type, useHoverCard = false }, ref) => {
+    const options = table.options.meta;
+    const [value, setValue] = useState(getValue());
+    const [isHovered, setIsHovered] = useState(false);
+    const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+    const updateTempData = options.updateTempData;
 
-  useEffect(() => {
-    setValue(getValue());
-  }, [getValue]);
+    useEffect(() => {
+      setValue(getValue());
+    }, [getValue]);
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setValue(e.target.value);
-    updateTempData(row.original.id, column.id, e.target.value);
-  };
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      setValue(e.target.value);
+      updateTempData(row.original.id, column.id, e.target.value);
+    };
 
-  return (
-    <Input
-      value={value}
-      onChange={handleOnChange}
-      placeholder={placeholder ? placeholder : undefined}
-      type={type ? type : 'text'}
-    />
-  );
-};
+    const handleMouseEnter = () => {
+      const timeout = setTimeout(() => setIsHovered(true), 300); // Délai de 300ms
+      setHoverTimeout(timeout);
+    };
+
+    const handleMouseLeave = () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        setHoverTimeout(null);
+      }
+      setIsHovered(false);
+    };
+
+    const handleFocus = () => {
+      const timeout = setTimeout(() => setIsHovered(true), 300); // Délai de 300ms
+      setHoverTimeout(timeout);
+    };
+
+    const handleBlur = () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        setHoverTimeout(null);
+      }
+      setIsHovered(false);
+    };
+
+    const inputElement = (
+      <Input
+        ref={ref}
+        className={className}
+        value={value}
+        onChange={handleOnChange}
+        placeholder={placeholder ? placeholder : undefined}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+      />
+    );
+
+    if (useHoverCard) {
+      return (
+        <HoverCard open={isHovered}>
+          <HoverCardTrigger asChild>
+            {inputElement}
+          </HoverCardTrigger>
+          <HoverCardContent>
+            <p>{value}</p>
+          </HoverCardContent>
+        </HoverCard>
+      );
+    }
+
+    return inputElement;
+  }
+);
+
+EditableCellBasicInput.displayName = 'EditableCellBasicInput';;
+
 
 const ActionCell = (props: any) => {
   const row = props.row
@@ -104,12 +177,16 @@ const ActionCell = (props: any) => {
     let dataToSend = {}
 
     if (tempData.newConsumedTime) {
-      dataToSend.consumedTime = parseInt(tempData.newConsumedTime)
+      dataToSend.consumedTime = parseFloat(tempData.newConsumedTime).toFixed(2)
       delete tempData.newConsumedTime
     }
     if (tempData.newRemainingTime) {
-      dataToSend.remainingTime = parseInt(tempData.newRemainingTime)
+      dataToSend.remainingTime = parseFloat(tempData.newRemainingTime).toFixed(2)
       delete tempData.newRemainingTime
+    }
+    if (tempData.initialEstimation) {
+      dataToSend.initialEstimation = parseFloat(tempData.initialEstimation).toFixed(2)
+      delete tempData.initialEstimation
     }
 
     dataToSend = { ...tempData, ...dataToSend }
@@ -118,6 +195,8 @@ const ActionCell = (props: any) => {
 
     props.table.options.meta.updateRow(row.original.id, dataToSend)
   }
+
+
 
   return (
     <div className="flex items-center gap-2">
@@ -167,48 +246,57 @@ const columns: ColumnDef<TData>[] = [
   },
   {
     accessorKey: 'taskName',
-    header: 'Task',
+    header: 'Tâche',
     size: 180,
     enableResizing: false,
-    cell: (props: any) => <EditableCell {...props} />
+    cell: (props: any) => (
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <EditableCellBasicInput useHoverCard={true} {...props} />
+        </HoverCardTrigger>
+        <HoverCardContent>
+          <p>{props.getValue()}</p>
+        </HoverCardContent>
+      </HoverCard>
+    )
   },
   {
     accessorKey: 'initialEstimation',
-    header: 'Initial Estimate',
-    cell: (props: any) => <EditableCell {...props} />
+    header: 'Estimation initiale',
+    cell: (props: any) => <EditableCellBasicInput {...props} placeholder="0" type="number" />
 
   },
   {
     accessorKey: 'consumedTime',
-    header: 'Total Consumed Time (days)',
+    header: 'Temps consommé total (jours)',
     cell: (props: any) => (
       <p>{props.getValue()}</p>
     )
   },
   {
     accessorKey: 'remainingTime',
-    header: 'Remaining Time (days)',
+    header: 'Reste à faire (jours)',
     cell: (props: any) => (
       <p>{props.getValue()}</p>
     )
   },
   {
     accessorKey: 'newConsumedTime',
-    header: 'New Consumed Time',
-    cell: (props: any) => <EditableCell {...props} placeholder="0" type="number" />
+    header: 'Nouveau temps consommé',
+    cell: (props: any) => <EditableCellBasicInput {...props} placeholder="0" type="number" />
   },
   {
     accessorKey: 'newRemainingTime',
-    header: 'New Remaining Time',
-    cell: (props: any) => <EditableCell {...props} placeholder="0" type="number" />
+    header: 'Nouveau reste à faire',
+    cell: (props: any) => <EditableCellBasicInput {...props} placeholder="0" type="number" />
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: 'Statut',
     enableResizing: false,
-    size: 180,
-    minSize: 180,
-    maxSize: 180,
+    size: 140,
+    minSize: 140,
+    maxSize: 140,
     filterFn: 'arrIncludesSome',
     cell: (props: any) => {
       const badgeColors: Record<string, any> = {
@@ -343,7 +431,9 @@ export const TaskTable = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">No data</TableCell>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Aucune donnée
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
