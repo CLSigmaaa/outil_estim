@@ -105,6 +105,12 @@ const EditableCellBasicInput = forwardRef<HTMLInputElement, EditableCellBasicInp
       e.preventDefault();
       setValue(e.target.value);
       updateTempData(row.original.id, column.id, e.target.value);
+
+      const currentTempData = options.getTempData(row.original.id);
+
+      if (e.target.value === "" && Object.values(currentTempData).every((value) => value === "")) {
+        options.resetTempData(row.original.id);
+      }
     };
 
     const handleMouseEnter = () => {
@@ -263,7 +269,7 @@ const columns: ColumnDef<TData>[] = [
   {
     accessorKey: 'initialEstimation',
     header: 'Estimation initiale',
-    cell: (props: any) => <EditableCellBasicInput {...props} placeholder="0" type="number" />
+    cell: (props: any) => <EditableCellBasicInput placeholder="0" type="number" {...props} />
 
   },
   {
@@ -283,12 +289,12 @@ const columns: ColumnDef<TData>[] = [
   {
     accessorKey: 'newConsumedTime',
     header: 'Nouveau temps consommé',
-    cell: (props: any) => <EditableCellBasicInput {...props} placeholder="0" type="number" />
+    cell: (props: any) => <EditableCellBasicInput placeholder="0" type="number" {...props} />
   },
   {
     accessorKey: 'newRemainingTime',
     header: 'Nouveau reste à faire',
-    cell: (props: any) => <EditableCellBasicInput {...props} placeholder="0" type="number" />
+    cell: (props: any) => <EditableCellBasicInput placeholder="0" type="number" {...props} />
   },
   {
     accessorKey: 'status',
@@ -305,7 +311,12 @@ const columns: ColumnDef<TData>[] = [
         'DONE': 'success',
       }
       return (
-        <Badge variant={badgeColors[props.getValue()]} className="cursor-pointer select-none">{props.getValue()}</Badge>
+        <Badge
+          variant={badgeColors[props.getValue()]}
+          className="cursor-pointer select-none"
+        >
+          {props.getValue()}
+        </Badge>
       )
     }
   },
@@ -385,6 +396,12 @@ export const TaskTable = () => {
           tempData.data[columnId] = value;
           return [...old.filter((data) => data.rowId !== rowId), tempData];
         });
+      },
+      getTempData: (rowId: string) => {
+        return tempData.find((data) => data.rowId === rowId)?.data;
+      },
+      resetTempData: (rowId: string) => {
+        setTempData((old) => old.filter((data) => data.rowId !== rowId));
       },
       insertRow: () => {
         addRow();
