@@ -1,6 +1,9 @@
 "use client"
 
 import { Textarea } from "@/components/ui/textarea"
+import { createPortal } from "react-dom"
+
+import { useRef } from "react"
 
 import useTasks from "@/hooks/use-tasks"
 
@@ -49,7 +52,11 @@ import { ConfirmDeleteRow } from "./confirm-delete-row"
 import { DataTableToolbar } from "./data-table-toolbar"
 
 import { CheckCircledIcon, CrossCircledIcon, DotsHorizontalIcon } from "@radix-ui/react-icons"
+import { CircleAlert } from 'lucide-react';
+
 import { TaskStatus } from "@/utils/enums"
+import { nullableNumericSchema, nonNullabeNumericSchema } from "@/utils/schemas"
+import { cn } from "@/lib/utils"
 
 export type TData = {
   id?: string,
@@ -66,109 +73,176 @@ export type TData = {
 }
 
 interface EditableCellBasicInputProps {
-  getValue: () => any;
-  row: {
-    original: {
-      id: string;
-    }
-  };
-  column: {
-    id: string;
-  };
-  table: {
-    options: {
-      meta: {
-        updateRow: (id: string, data: Record<string, any>) => void;
-        updateTempData: (rowId: string, columnId: string, value: any) => void;
-      };
-    };
-  };
-  placeholder?: string;
-  type?: string;
   className?: string;
+  getValue: () => string | number;
+  row: any;
+  column: any;
+  table: any;
+  placeholder?: string;
+  type: 'text' | 'number';
   useHoverCard?: boolean;
 }
 
-const EditableCellBasicInput = forwardRef<HTMLInputElement, EditableCellBasicInputProps>(
-  ({ className, getValue, row, column, table, placeholder, type, useHoverCard = false }, ref) => {
-    const options = table.options.meta;
-    const [value, setValue] = useState(getValue());
-    const [isHovered, setIsHovered] = useState(false);
-    const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
-    const updateTempData = options.updateTempData;
+const EditableCellBasicInput: React.FC<EditableCellBasicInputProps> = ({
+  className,
+  getValue,
+  row,
+  column,
+  table,
+  placeholder,
+  type,
+  useHoverCard = false,
+}) => {
+  const options = table.options.meta;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState<string | number>(getValue());
+  const [isHovered, setIsHovered] = useState(false);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isValid, setIsValid] = useState(true);
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
+  const updateTempData = options.updateTempData;
 
-    useEffect(() => {
-      setValue(getValue());
-    }, [getValue]);
+  useEffect(() => {
+    setValue(getValue());
+  }, [getValue]);
 
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      setValue(e.target.value);
-      updateTempData(row.original.id, column.id, e.target.value);
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
 
-      const currentTempData = options.getTempData(row.original.id);
+    const inputType = type === "number" ? "number" : "text";
 
-      if (e.target.value === "" && Object.values(currentTempData).every((value) => value === "")) {
-        options.resetTempData(row.original.id);
-      }
-    };
+    let inputValue = inputType === "number" ? parseFloat(e.target.value) : e.target.value;
 
-    const handleMouseEnter = () => {
-      const timeout = setTimeout(() => setIsHovered(true), 300); // Délai de 300ms
-      setHoverTimeout(timeout);
-    };
+    const textFields = ["taskName"];
+    const nonNullabeNumericFields = ["initialEstimation"];
+    const nullableNumericFields = ["newConsumedTime", "newRemainingTime"];
 
-    const handleMouseLeave = () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-        setHoverTimeout(null);
-      }
-      setIsHovered(false);
-    };
+    let typeValidator: any;
 
-    const handleFocus = () => {
-      const timeout = setTimeout(() => setIsHovered(true), 300); // Délai de 300ms
-      setHoverTimeout(timeout);
-    };
-
-    const handleBlur = () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-        setHoverTimeout(null);
-      }
-      setIsHovered(false);
-    };
-
-    const inputElement = (
-      <Input
-        ref={ref}
-        className={className}
-        value={value}
-        onChange={handleOnChange}
-        placeholder={placeholder ? placeholder : undefined}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-      />
-    );
-
-    if (useHoverCard) {
-      return (
-        <HoverCard open={isHovered}>
-          <HoverCardTrigger asChild>
-            {inputElement}
-          </HoverCardTrigger>
-          <HoverCardContent>
-            <p>{value}</p>
-          </HoverCardContent>
-        </HoverCard>
-      );
+    if (textFields.includes(column.id)) {
+      typeValidator = undefined;
+    } else if (nonNullabeNumericFields.includes(column.id)) {
+      typeValidator = nonNullabeNumericSchema;
+    } else if (nullableNumericFields.includes(column.id)) {
+      typeValidator = nullableNumericSchema;
     }
 
-    return inputElement;
+    const isValid = e.target.value ? typeValidator?.safeParse(inputValue) : { success: true };
+
+    if (!isValid?.success) {
+      setIsValid(false);
+      setErrorMessages(isValid.error?.errors.map((error: any) => error.message) || []);
+    } else {
+      setIsValid(true);
+      setErrorMessages([]);
+    }
+
+    setValue(e.target.value);
+    updateTempData(row.original.id, column.id, e.target.value);
+
+    const currentTempData = options.getTempData(row.original.id);
+
+    if (e.target.value === "" && Object.values(currentTempData).every((value) => value === "")) {
+      options.resetTempData(row.original.id);
+    }
+  };
+
+  const handleMouseEnter = () => {
+    const timeout = setTimeout(() => setIsHovered(true), 300); // Délai de 300ms
+    setHoverTimeout(timeout);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    setIsHovered(false);
+  };
+
+  const handleFocus = () => {
+    const timeout = setTimeout(() => setIsHovered(true), 300); // Délai de 300ms
+    setHoverTimeout(timeout);
+  };
+
+  const handleBlur = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    setIsHovered(false);
+    if (isValid) {
+      return;
+    } else {
+      setValue(getValue());
+      setIsValid(true);
+    }
+  };
+
+  const inputElement = (
+    <Input
+      ref={inputRef}
+      type={type}
+      step={type === "number" ? "0.25" : undefined}
+      className={className}
+      max={type === "number" ? "2" : undefined}
+      min={type === "number" ? "0" : undefined}
+      value={value ?? ""}
+      onChange={handleOnChange}
+      placeholder={placeholder ? placeholder : undefined}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    />
+  );
+
+  if (useHoverCard) {
+    return (
+      <HoverCard open={isHovered}>
+        <HoverCardTrigger asChild>
+          {inputElement}
+        </HoverCardTrigger>
+        <HoverCardContent>
+          <p>{value}</p>
+        </HoverCardContent>
+      </HoverCard>
+    );
   }
-);
+
+  return (
+    <div className="relative">
+      {inputElement}
+      {!isValid && createPortal(
+        <div
+          className={cn(
+            "text-red-500 text-xs font-bold",
+            "absolute mt-[0.3rem]",
+            "bg-red-100 p-3 w-full rounded-md z-50 shadow-md border border-gray-200",
+          )}
+          style={{
+            top: inputRef.current
+              ? `${inputRef.current.getBoundingClientRect().bottom + window.scrollY}px`
+              : '0',
+            left: inputRef.current
+              ? `${inputRef.current.getBoundingClientRect().left + window.scrollX}px`
+              : '0',
+            width: inputRef.current ? `${inputRef.current.offsetWidth}px` : '0',
+          }}
+        >
+          <CircleAlert size={16} />
+          <span>
+            {
+              errorMessages.map((message, index) => (
+                <p key={index}>{message}</p>
+              ))
+            }
+          </span>
+        </div>,
+        document.body)}
+    </div>
+  );
+};
 
 EditableCellBasicInput.displayName = 'EditableCellBasicInput';;
 
@@ -256,19 +330,12 @@ const columns: ColumnDef<TData>[] = [
     size: 180,
     enableResizing: false,
     cell: (props: any) => (
-      <HoverCard>
-        <HoverCardTrigger asChild>
-          <EditableCellBasicInput useHoverCard={true} {...props} />
-        </HoverCardTrigger>
-        <HoverCardContent>
-          <p>{props.getValue()}</p>
-        </HoverCardContent>
-      </HoverCard>
+      <EditableCellBasicInput useHoverCard={true} {...props} />
     )
   },
   {
     accessorKey: 'initialEstimation',
-    header: 'Estimation initiale',
+    header: 'Estimation initiale (jours)',
     cell: (props: any) => <EditableCellBasicInput placeholder="0" type="number" {...props} />
 
   },
@@ -300,9 +367,9 @@ const columns: ColumnDef<TData>[] = [
     accessorKey: 'status',
     header: 'Statut',
     enableResizing: false,
-    size: 140,
-    minSize: 140,
-    maxSize: 140,
+    size: 145,
+    minSize: 145,
+    maxSize: 145,
     filterFn: 'arrIncludesSome',
     cell: (props: any) => {
       const badgeColors: Record<string, any> = {
@@ -402,6 +469,13 @@ export const TaskTable = () => {
       },
       resetTempData: (rowId: string) => {
         setTempData((old) => old.filter((data) => data.rowId !== rowId));
+      },
+      deleteKeyFromTempData: (rowId: string, key: string) => {
+        setTempData((old) => {
+          const tempData = old.find((data) => data.rowId === rowId) || { rowId, data: {} };
+          delete tempData.data[key];
+          return [...old.filter((data) => data.rowId !== rowId), tempData];
+        });
       },
       insertRow: () => {
         addRow();

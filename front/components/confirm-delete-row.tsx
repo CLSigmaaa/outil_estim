@@ -25,11 +25,17 @@ export const ConfirmDeleteRow = ({ onDelete, rowId }) => {
           <Trash2 size={18} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent>
-        <div className="p-2 text-sm">Are you sure you want to delete this row?</div>
+      <PopoverContent className="p-2">
+        <div className="p-2 text-sm">
+          Êtes-vous sûr de vouloir supprimer cette tâche ?
+        </div>
         <div className="flex justify-start gap-2 p-2">
-          <Button variant="secondary" onClick={handleDelete}>Yes</Button>
-          <Button onClick={() => setIsOpen(false)}>No</Button>
+          <Button variant="secondary" onClick={handleDelete}>
+            Oui
+          </Button>
+          <Button onClick={() => setIsOpen(false)}>
+            Non
+          </Button>
         </div>
       </PopoverContent>
     </Popover>
